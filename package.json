@@ -1,9 +1,11 @@
 {
   "name": "mon-jeu",
   "version": "1.0.0",
+  "type": "module",
   "scripts": {
-    "build": "tsc",
-    "watch": "tsc --watch"
+    "build:front": "tsc",
+    "watch": "tsc --watch",
+    "dev": "ts-node --esm back/server.ts"
   },
   "devDependencies": {
     "@types/node": "^24.10.1",
@@ -11,6 +13,24 @@
   },
   "dependencies": {
     "better-sqlite3": "^12.4.1",
-    "sqlite3": "^5.1.7"
-  }
+    "sqlite3": "^5.1.7",
+    "esbuild": "^0.27.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3",
+    "@fastify/static": "^8.3.0",
+    "fastify": "^5.6.2"
+  },
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Elisa-Delannoy/42-Transcendence.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Elisa-Delannoy/42-Transcendence/issues"
+  },
+  "homepage": "https://github.com/Elisa-Delannoy/42-Transcendence#readme",
+  "description": ""
 }
