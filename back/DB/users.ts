@@ -16,7 +16,7 @@ export class Users
 		await db.execute(`
 			CREATE TABLE IF NOT EXISTS Users (
 				user_id INTEGER PRIMARY KEY AUTOINCREMENT,
-                pseudo UNIQUE TEXT NOT NULL,
+                pseudo  TEXT NOT NULL UNIQUE,
                 email TEXT NOT NULL,
                 password TEXT NOT NULL,
 				avatar TEXT NOT NULL,
@@ -54,6 +54,15 @@ export class Users
 	{
 		const query = `DROP TABLE IF EXISTS Users`
 		await db.execute(query, []);
+	}
+
+	async checkInfoExist(element: string, query: string)
+	{
+		const infos: any[] = await this._db.query(query, [element]);
+		if (infos.length  === 0)
+			return [];
+		else
+			return infos[0];
 	}
 
 	async getInfoUser(pseudo: string)
