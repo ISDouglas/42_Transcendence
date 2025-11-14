@@ -4,6 +4,7 @@ import { join } from "path";
 import { request } from "http";
 import  { ManageDB } from "./DB/manageDB";
 import { Users } from './DB/users';
+import { manageRegister } from "./routes/register/resgister";
 
 export const db = new ManageDB("./back/DB/database.db");
 
@@ -22,11 +23,7 @@ fastify.get("/", async (request, reply) => {
 
 fastify.post("/api/register", async (request, reply) => {
   const { username, email, password } = request.body as any;
-
-  const user = new Users(db, username, email, password);
-  await user.addUser();
-
-  return { message: `Utilisateur ${username} enregistré avec succès !` };
+  return { message: manageRegister(username, email, password) };
 });
 
 const start = async () => {

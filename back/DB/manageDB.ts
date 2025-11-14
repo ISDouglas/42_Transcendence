@@ -27,6 +27,7 @@ export class ManageDB
 		});
 	}
 
+
 	close(): Promise<void>
 	{
 		return new Promise((resolve, reject) =>
