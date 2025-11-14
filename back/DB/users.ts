@@ -16,7 +16,7 @@ export class Users
 		await db.execute(`
 			CREATE TABLE IF NOT EXISTS Users (
 				user_id INTEGER PRIMARY KEY AUTOINCREMENT,
-                pseudo TEXT NOT NULL,
+                pseudo UNIQUE TEXT NOT NULL,
                 email TEXT NOT NULL,
                 password TEXT NOT NULL,
 				avatar TEXT NOT NULL,
