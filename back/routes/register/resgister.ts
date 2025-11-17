@@ -1,6 +1,5 @@
 import { db } from "../../server";
-import { user } from '../../server';
-import { error } from "console";
+import { users } from '../../server';
 
 export async function manageRegister(pseudo: string, email: string, password: string): Promise<string> {
 	try
@@ -13,13 +12,13 @@ export async function manageRegister(pseudo: string, email: string, password: st
 	{
 		return (err as Error).message;
 	}
-	user.addUser(pseudo, email, password);
+	users.addUser(pseudo, email, password);
 	return "User have been register successfully";
 }
 
 async function checkPseudo(pseudo: string)
 {
-	const info = await user.checkInfoExist(pseudo, "SELECT * FROM Users WHERE pseudo = ?");
+	const info = await users.getPseudoUser(pseudo);
 	if (pseudo.length > 16)
 		throw new Error("Pseudo too long! 16 character maximum.");
 	if (info?.pseudo === pseudo)
@@ -30,7 +29,7 @@ async function checkEmail(email: string)
 {
 	if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
 		throw new Error("Invalid email format.");
-	const info = await user.checkInfoExist(email, "SELECT * FROM Users WHERE email = ?");
+	const info = await users.getEmailUser(email);
 	if (info?.email === email)
 		throw new Error("Email already in use.");
 }

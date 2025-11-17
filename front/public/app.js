@@ -51,7 +51,7 @@ var init_auth = __esm({
 function LoginView() {
   return document.getElementById("loginhtml").innerHTML;
 }
-function toLogin() {
+function initLogin() {
   const form = document.getElementById("login-form");
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -75,13 +75,6 @@ var init_login = __esm({
 
 // front/src/views/dashboard.ts
 function DashboardView() {
-  setTimeout(() => {
-    const btn = document.getElementById("logout-btn");
-    btn.addEventListener("click", () => {
-      logout();
-      navigateTo("/login");
-    });
-  }, 0);
   return document.getElementById("dashboardhtml").innerHTML;
 }
 var init_dashboard = __esm({
@@ -168,6 +161,19 @@ var init_p_tournament = __esm({
 });
 
 // front/src/router.ts
+<<<<<<< HEAD
+=======
+var routes = [
+  { path: "/", view: HomeView },
+  { path: "/login", view: LoginView, init: initLogin },
+  { path: "/dashboard", view: DashboardView },
+  { path: "/register", view: RegisterView, init: initRegister },
+  { path: "/homelogin", view: HomeLoginView },
+  { path: "/profil", view: ProfilView },
+  { path: "/game", view: GameView },
+  { path: "/tournament", view: TournamentView }
+];
+>>>>>>> main
 function navigateTo(url) {
   history.pushState(null, "", url);
   router();
@@ -195,9 +201,6 @@ function router() {
     document.querySelector("#app").innerHTML = "<h1>404 Not Found</h1>";
     return;
   }
-  if (match.path === "/dashboard" && !isLoggedIn()) {
-    return navigateTo("/login");
-  }
   document.querySelector("#app").innerHTML = match.view();
   match.init?.();
   updateNav();
@@ -220,6 +223,7 @@ function initRouter() {
   localStorage.removeItem("token");
   router();
 }
+<<<<<<< HEAD
 var routes;
 var init_router = __esm({
   "front/src/router.ts"() {
@@ -244,6 +248,12 @@ var init_router = __esm({
       { path: "/tournament", view: TournamentView }
     ];
   }
+=======
+
+// front/src/main.ts
+document.addEventListener("DOMContentLoaded", () => {
+  initRouter();
+>>>>>>> main
 });
 
 // front/src/main.ts

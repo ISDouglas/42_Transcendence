@@ -10,4 +10,4 @@ RUN npm init
 
 COPY . .
 
-CMD ["npm", "start"]
+CMD ["npm", "run front"]

@@ -54,18 +54,19 @@ export class Users
 		await this._db.execute(query, []);
 	}
 
-	async checkInfoExist(element: string, query: string)
+	async getEmailUser(email: string)
 	{
-		const infos: any[] = await this._db.query(query, [element]);
+		const infos: any[] = await this._db.query(`SELECT * FROM Users WHERE email = ?`, [email])
 		if (infos.length  === 0)
 			return [];
 		else
 			return infos[0];
 	}
 
-	async getInfoUser(pseudo: string)
+	async getPseudoUser(pseudo: string)
 	{
 		const infos: any[] = await this._db.query(`SELECT * FROM Users WHERE pseudo = ?`, [pseudo])
+		console.log(infos);
 		if (infos.length  === 0)
 			return [];
 		else

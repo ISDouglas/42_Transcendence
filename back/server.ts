@@ -45,8 +45,9 @@ fastify.post("/api/login", async (request, reply) => {
 });
 
 fastify.get("/api/profil", async (request, reply) => {
-  try {
-    const profil = await users.getInfoUser(login)
+	request.body 
+	try {
+    const profil = await users.getPseudoUser(login)
     if (!profil || profil === 0)
     {
       return reply.code(404).send({message: "User not found"})
