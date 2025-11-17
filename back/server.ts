@@ -4,9 +4,9 @@ import { join } from "path";
 import { request } from "http";
 import  { ManageDB } from "./DB/manageDB";
 import { Users } from './DB/users';
-import { GameInfo } from "./DB/gameinfo";
 import { manageLogin } from './routes/login/login';
 import { manageRegister } from "./routes/register/resgister";
+import { GameInfo } from "./DB/gameinfo";
 
 export const db = new ManageDB("./back/DB/database.db");
 export const user = new Users(db);
@@ -14,21 +14,21 @@ export const user = new Users(db);
 let login = ""
 
 const fastify = Fastify({
-	logger: true,
+  logger: true,
 });
 
 fastify.register(fastifyStatic, {
-	root: join(process.cwd(), "front"),
-	prefix: "/",
+  root: join(process.cwd(), "front"),
+  prefix: "/",
 });
 
 fastify.get("/", async (request, reply) => {
-	return reply.sendFile("index.html");
+  return reply.sendFile("index.html");
 });
 
 fastify.post("/api/register", async (request, reply) => {
-	const { username, email, password } = request.body as any;
-	return { message: manageRegister(username, email, password) };
+  const { username, email, password } = request.body as any;
+  return { message: await manageRegister(username, email, password) };
 });
 
 fastify.post("/api/gameinfo/add", async (request, reply) => {
@@ -62,7 +62,7 @@ const start = async () => {
   try {
 	  await fastify.listen({ port: 3000 });
 	  await db.connect();
-    await Users.deleteUserTable(db);
+    // await Users.deleteUserTable(db);
     await Users.createUserTable(db);
 	await GameInfo.createGameInfoTable(db);
     console.log("🚀 Serveur lancé sur http://localhost:3000");

@@ -54,10 +54,18 @@ export function router() {
   // Protection : dashboard → login si non connecté
   if (match.path === "/dashboard" && !isLoggedIn()) {
 	return navigateTo("/login");
-  } 
+  }
   document.querySelector("#app")!.innerHTML = match.view();
   match.init?.();
   updateNav();
+  if (match.path == "/game")
+  {
+    console.log("ok");
+    const script = document.createElement("script");
+    script.src = "/game/game.js";
+    script.defer = true;
+    document.body.appendChild(script);
+  }
 }
 
 export function initRouter() {
