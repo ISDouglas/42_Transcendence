@@ -1,5 +1,5 @@
 import { HomeView } from "./views/home";
-import { LoginView, toLogin} from "./views/login";
+import { LoginView, initLogin} from "./views/login";
 import { DashboardView } from "./views/dashboard";
 import { isLoggedIn, logout } from "./auth";
 import { RegisterView, initRegister } from "./views/register";
@@ -10,7 +10,7 @@ import { TournamentView} from "./views/p_tournament";
 
 const routes = [
   { path: "/", view: HomeView },
-  { path: "/login", view: LoginView, init:toLogin},
+  { path: "/login", view: LoginView, init:initLogin},
   { path: "/dashboard", view: DashboardView },
   { path: "/register", view: RegisterView, init: initRegister},
   { path: "/homelogin", view: HomeLoginView},
@@ -50,11 +50,6 @@ export function router() {
 	document.querySelector("#app")!.innerHTML = "<h1>404 Not Found</h1>";
 	return;
   }
-
-  // Protection : dashboard → login si non connecté
-  if (match.path === "/dashboard" && !isLoggedIn()) {
-	return navigateTo("/login");
-  } 
   document.querySelector("#app")!.innerHTML = match.view();
   match.init?.();
   updateNav();

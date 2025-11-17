@@ -1,9 +1,9 @@
-// src/views/home.ts
+// front/src/views/home.ts
 function HomeView() {
   return document.getElementById("homehtml").innerHTML;
 }
 
-// src/auth.ts
+// front/src/auth.ts
 async function login(username, password) {
   try {
     const res = await fetch("/api/login", {
@@ -29,11 +29,11 @@ function logout() {
   localStorage.removeItem("token");
 }
 
-// src/views/login.ts
+// front/src/views/login.ts
 function LoginView() {
   return document.getElementById("loginhtml").innerHTML;
 }
-function toLogin() {
+function initLogin() {
   const form = document.getElementById("login-form");
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -48,19 +48,12 @@ function toLogin() {
   });
 }
 
-// src/views/dashboard.ts
+// front/src/views/dashboard.ts
 function DashboardView() {
-  setTimeout(() => {
-    const btn = document.getElementById("logout-btn");
-    btn.addEventListener("click", () => {
-      logout();
-      navigateTo("/login");
-    });
-  }, 0);
   return document.getElementById("dashboardhtml").innerHTML;
 }
 
-// src/views/register.ts
+// front/src/views/register.ts
 function RegisterView() {
   return document.getElementById("registerhtml").innerHTML;
 }
@@ -90,30 +83,30 @@ function initRegister() {
   });
 }
 
-// src/views/p_homelogin.ts
+// front/src/views/p_homelogin.ts
 function HomeLoginView() {
   return document.getElementById("homeloginhtml").innerHTML;
 }
 
-// src/views/p_profil.ts
+// front/src/views/p_profil.ts
 function ProfilView() {
   return document.getElementById("profilhtml").innerHTML;
 }
 
-// src/views/p_game.ts
+// front/src/views/p_game.ts
 function GameView() {
   return document.getElementById("gamehtml").innerHTML;
 }
 
-// src/views/p_tournament.ts
+// front/src/views/p_tournament.ts
 function TournamentView() {
   return document.getElementById("tournamenthtml").innerHTML;
 }
 
-// src/router.ts
+// front/src/router.ts
 var routes = [
   { path: "/", view: HomeView },
-  { path: "/login", view: LoginView, init: toLogin },
+  { path: "/login", view: LoginView, init: initLogin },
   { path: "/dashboard", view: DashboardView },
   { path: "/register", view: RegisterView, init: initRegister },
   { path: "/homelogin", view: HomeLoginView },
@@ -148,9 +141,6 @@ function router() {
     document.querySelector("#app").innerHTML = "<h1>404 Not Found</h1>";
     return;
   }
-  if (match.path === "/dashboard" && !isLoggedIn()) {
-    return navigateTo("/login");
-  }
   document.querySelector("#app").innerHTML = match.view();
   match.init?.();
   updateNav();
@@ -168,7 +158,7 @@ function initRouter() {
   router();
 }
 
-// src/main.ts
+// front/src/main.ts
 document.addEventListener("DOMContentLoaded", () => {
   initRouter();
 });

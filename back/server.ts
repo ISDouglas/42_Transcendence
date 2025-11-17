@@ -8,7 +8,7 @@ import { manageLogin } from './routes/login/login';
 import { manageRegister } from "./routes/register/resgister";
 
 export const db = new ManageDB("./back/DB/database.db");
-export const user = new Users(db);
+export const users = new Users(db);
 
 let login = ""
 
@@ -36,8 +36,9 @@ fastify.post("/api/login", async (request, reply) => {
 });
 
 fastify.get("/api/profil", async (request, reply) => {
-  try {
-    const profil = await user.getInfoUser(login)
+	request.body 
+	try {
+    const profil = await users.getPseudoUser(login)
     if (!profil || profil === 0)
     {
       return reply.code(404).send({message: "User not found"})
@@ -53,8 +54,8 @@ const start = async () => {
   try {
 	  await fastify.listen({ port: 3000 });
 	  await db.connect();
-    await Users.deleteUserTable(db);
-    await Users.createUserTable(db);
+    // await Users.deleteUserTable(db);
+    await users.createUserTable();
     console.log("🚀 Serveur lancé sur http://localhost:3000");
   } catch (err) {
     fastify.log.error(err);

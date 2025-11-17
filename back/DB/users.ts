@@ -1,5 +1,3 @@
-import { info } from "console";
-import { db } from "../../src/main";
 import { ManageDB } from "./manageDB";
 
 export class Users
@@ -11,9 +9,9 @@ export class Users
 		this._db = db;
 	}
 
-	static async createUserTable(db: ManageDB)
+	async createUserTable()
 	{
-		await db.execute(`
+		await this._db.execute(`
 			CREATE TABLE IF NOT EXISTS Users (
 				user_id INTEGER PRIMARY KEY AUTOINCREMENT,
                 pseudo TEXT UNIQUE NOT NULL,
@@ -50,24 +48,25 @@ export class Users
 		await this._db.execute(query, parameters);
 	}
 
-	static async deleteUserTable(db: ManageDB)
+	async deleteUserTable()
 	{
 		const query = `DROP TABLE IF EXISTS Users`
-		await db.execute(query, []);
+		await this._db.execute(query, []);
 	}
 
-	async checkInfoExist(element: string, query: string)
+	async getEmailUser(email: string)
 	{
-		const infos: any[] = await this._db.query(query, [element]);
+		const infos: any[] = await this._db.query(`SELECT * FROM Users WHERE email = ?`, [email])
 		if (infos.length  === 0)
 			return [];
 		else
 			return infos[0];
 	}
 
-	async getInfoUser(pseudo: string)
+	async getPseudoUser(pseudo: string)
 	{
 		const infos: any[] = await this._db.query(`SELECT * FROM Users WHERE pseudo = ?`, [pseudo])
+		console.log(infos);
 		if (infos.length  === 0)
 			return [];
 		else

@@ -1,3 +1,4 @@
 .vscode
 /node_modules
 back/node_modules
+back/DB/database.db

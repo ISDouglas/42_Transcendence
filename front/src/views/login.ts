@@ -5,7 +5,7 @@ export function LoginView(): string {
   return (document.getElementById("loginhtml") as HTMLFormElement).innerHTML;
 }
 
-export function toLogin()
+export function initLogin()
 {
 	const form = document.getElementById("login-form") as HTMLFormElement;
 	form.addEventListener("submit", async (e) => {
