@@ -62,6 +62,19 @@ export class GameInfo
 
 		await this._db.execute(query, parameters);
 	}
+
+	async updateScore(winner_score: number, loser_score: number) {
+		const query = `
+			UPDATE game_info
+			SET winner_score = ?, loser_score = ?
+			WHERE id = 4
+		`;
+
+		await this._db.execute(query, [
+			winner_score,
+			loser_score
+		]);
+	}
 }
 
 enum GameInfoStatus

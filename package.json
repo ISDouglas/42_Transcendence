@@ -6,7 +6,7 @@
     "build:front": "tsc",
     "watch": "tsc",
     "dev": "tsx back/server.ts",
-    "build:game": "esbuild game/game.ts --bundle --outfile=game/game.js"
+    "build:game": "esbuild front/game/game.ts --bundle --outfile=front/game/game.js"
   },
   "devDependencies": {
     "@types/node": "^24.10.1",

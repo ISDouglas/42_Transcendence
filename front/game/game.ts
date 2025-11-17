@@ -1,5 +1,3 @@
-alert("script loaded");
-
 let isPlaying: boolean;
 
 /**========================================================================
@@ -88,8 +86,10 @@ const game: Game = {
 };
 
 //others
-let scoreMax: number = 11;
+let scoreMax: number = 4;
 let winner: string;
+let winnerId: number;
+let loserId: number;
 let anim: number;
 let randomValue: number;
 let increaseSpeed: number = -1.1;
@@ -256,7 +256,20 @@ function displayWinner() {
 	ctx.font = "40px Arial";
 	ctx.textAlign = "center";
 
-	winner = game.player1.score > game.player2.score ? "Player 1 Wins!" : "Player 2 Wins!";
+	if (game.player1.score > game.player2.score)
+	{
+		winner = "Player 1 Wins!";
+		winnerId = 1;
+		loserId = 2;
+		sendGameResult(winnerId, loserId, game.player1.score, game.player2.score);
+	}
+	else
+	{
+		winner = "Player 2 Wins!";
+		winnerId = 2;
+		loserId = 1;
+		sendGameResult(winnerId, loserId, game.player2.score, game.player1.score);
+	}
 	ctx.fillText(winner, canvasWidth / 2, canvasHeight / 2);
 }
 
@@ -304,3 +317,23 @@ document.querySelector('#stop-game')?.addEventListener('click', () => {
 	isPlaying = false;
 	stop();
 });
+
+async function sendGameResult(winnerId: number, loserId: number, winnerScore: number, loserScore: number) {
+	const res = await fetch("/api/game/end", {
+		method: "POST",
+		headers: {"Content-Type": "application/json"},
+		body: JSON.stringify({
+			winner_id: winnerId,
+			loser_id: loserId,
+			winner_score: winnerScore,
+			loser_score: loserScore
+		})
+	});
+
+	try {
+		const data = await res.json();
+		console.log("Saved data : ", data);
+	} catch (err) {
+		console.error("Error parsing JSON : ", err);
+	}
+}

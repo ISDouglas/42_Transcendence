@@ -202,7 +202,6 @@ function router() {
   match.init?.();
   updateNav();
   if (match.path == "/game") {
-    console.log("ok");
     const script = document.createElement("script");
     script.src = "/game/game.js";
     script.defer = true;

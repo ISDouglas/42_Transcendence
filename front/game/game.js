@@ -5,10 +5,9 @@
     return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
   };
 
-  // game/game.ts
+  // front/game/game.ts
   var require_game = __commonJS({
-    "game/game.ts"() {
-      alert("script loaded");
+    "front/game/game.ts"() {
       var isPlaying;
       var canvas = document.querySelector("canvas");
       var ctx = canvas.getContext("2d");
@@ -48,8 +47,10 @@
           }
         }
       };
-      var scoreMax = 11;
+      var scoreMax = 4;
       var winner;
+      var winnerId;
+      var loserId;
       var anim;
       var randomValue;
       var increaseSpeed = -1.1;
@@ -165,7 +166,17 @@
         ctx.fillStyle = "white";
         ctx.font = "40px Arial";
         ctx.textAlign = "center";
-        winner = game.player1.score > game.player2.score ? "Player 1 Wins!" : "Player 2 Wins!";
+        if (game.player1.score > game.player2.score) {
+          winner = "Player 1 Wins!";
+          winnerId = 1;
+          loserId = 2;
+          sendGameResult(winnerId, loserId, game.player1.score, game.player2.score);
+        } else {
+          winner = "Player 2 Wins!";
+          winnerId = 2;
+          loserId = 1;
+          sendGameResult(winnerId, loserId, game.player2.score, game.player1.score);
+        }
         ctx.fillText(winner, canvasWidth / 2, canvasHeight / 2);
       }
       function play() {
@@ -202,6 +213,24 @@
         isPlaying = false;
         stop();
       });
+      async function sendGameResult(winnerId2, loserId2, winnerScore, loserScore) {
+        const res = await fetch("/api/game/end", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            winner_id: winnerId2,
+            loser_id: loserId2,
+            winner_score: winnerScore,
+            loser_score: loserScore
+          })
+        });
+        try {
+          const data = await res.json();
+          console.log("Saved data : ", data);
+        } catch (err) {
+          console.error("Error parsing JSON : ", err);
+        }
+      }
     }
   });
   require_game();

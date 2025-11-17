@@ -58,6 +58,14 @@ fastify.get("/api/profil", async (request, reply) => {
   }
 });
 
+fastify.post("/api/game/end", async (request, reply) => {
+  const { winner_id, loser_id, winner_score, loser_score } = request.body as any;
+
+  const game = new GameInfo(db, winner_id, loser_id, "Bot");
+  await game.updateScore(winner_score, loser_score);
+  return { message: "Game saved!" };
+})
+
 const start = async () => {
   try {
 	  await fastify.listen({ port: 3000 });
