@@ -148,6 +148,15 @@ function setupGame() {
   let randomValue;
   let increaseSpeed = -1.1;
   const maxAngle = Math.PI / 4;
+  let startTime;
+  let elapsedTime;
+  function startTimer() {
+    startTime = Date.now();
+  }
+  function stopTimer() {
+    elapsedTime = Math.floor((Date.now() - startTime) / 1e3);
+    console.log("Duration of the game : ", elapsedTime, "s.");
+  }
   function playSound(frequency, duration) {
     const oscillator = audioCtx.createOscillator();
     const gainNode = audioCtx.createGain();
@@ -263,17 +272,18 @@ function setupGame() {
       winner = "Player 1 Wins!";
       winnerId = 1;
       loserId = 2;
-      sendGameResult(winnerId, loserId, game.player1.score, game.player2.score);
+      sendGameResult(winnerId, loserId, game.player1.score, game.player2.score, elapsedTime);
     } else {
       winner = "Player 2 Wins!";
       winnerId = 2;
       loserId = 1;
-      sendGameResult(winnerId, loserId, game.player2.score, game.player1.score);
+      sendGameResult(winnerId, loserId, game.player2.score, game.player1.score, elapsedTime);
     }
     ctx.fillText(winner, canvasWidth / 2, canvasHeight / 2);
   }
   function play() {
     if (!isPlaying) {
+      stopTimer();
       displayWinner();
       return;
     }
@@ -300,13 +310,14 @@ function setupGame() {
     game.ball.speed.x = randomValue;
     resetGame();
     isPlaying = true;
+    startTimer();
     play();
   });
   document.querySelector("#stop-game")?.addEventListener("click", () => {
     isPlaying = false;
     stop();
   });
-  async function sendGameResult(winnerId2, loserId2, winnerScore, loserScore) {
+  async function sendGameResult(winnerId2, loserId2, winnerScore, loserScore, duration) {
     const res = await fetch("/api/game/end", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -314,7 +325,8 @@ function setupGame() {
         winner_id: winnerId2,
         loser_id: loserId2,
         winner_score: winnerScore,
-        loser_score: loserScore
+        loser_score: loserScore,
+        duration_game: duration
       })
     });
     try {

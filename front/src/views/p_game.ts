@@ -104,11 +104,22 @@ function setupGame() {
 	let randomValue: number;
 	let increaseSpeed: number = -1.1;
 	const maxAngle: number = Math.PI / 4;
+	let startTime: number;
+	let elapsedTime: number;
 	
 	/**========================================================================
 	 *!                                  FUNCTIONS
 	 *========================================================================**/
-	
+
+	function startTimer() {
+		startTime = Date.now();
+	}
+
+	function stopTimer() {
+		elapsedTime = Math.floor((Date.now() - startTime) / 1000);
+		console.log("Duration of the game : ", elapsedTime, "s.");
+	}
+
 	function playSound(frequency: number, duration: number) {
 		const oscillator = audioCtx.createOscillator();
 		const gainNode = audioCtx.createGain();
@@ -271,14 +282,14 @@ function setupGame() {
 			winner = "Player 1 Wins!";
 			winnerId = 1;
 			loserId = 2;
-			sendGameResult(winnerId, loserId, game.player1.score, game.player2.score);
+			sendGameResult(winnerId, loserId, game.player1.score, game.player2.score, elapsedTime);
 		}
 		else
 		{
 			winner = "Player 2 Wins!";
 			winnerId = 2;
 			loserId = 1;
-			sendGameResult(winnerId, loserId, game.player2.score, game.player1.score);
+			sendGameResult(winnerId, loserId, game.player2.score, game.player1.score, elapsedTime);
 		}
 		ctx.fillText(winner, canvasWidth / 2, canvasHeight / 2);
 	}
@@ -286,6 +297,7 @@ function setupGame() {
 	function play() {
 		if (!isPlaying)
 		{
+			stopTimer();
 			displayWinner();
 			return;
 		}
@@ -320,6 +332,7 @@ function setupGame() {
 		game.ball.speed.x = randomValue;
 		resetGame();
 		isPlaying = true;
+		startTimer();
 		play();
 	});
 	
@@ -328,7 +341,7 @@ function setupGame() {
 		stop();
 	});
 	
-	async function sendGameResult(winnerId: number, loserId: number, winnerScore: number, loserScore: number) {
+	async function sendGameResult(winnerId: number, loserId: number, winnerScore: number, loserScore: number, duration: number) {
 		const res = await fetch("/api/game/end", {
 			method: "POST",
 			headers: {"Content-Type": "application/json"},
@@ -336,7 +349,8 @@ function setupGame() {
 				winner_id: winnerId,
 				loser_id: loserId,
 				winner_score: winnerScore,
-				loser_score: loserScore
+				loser_score: loserScore,
+				duration_game: duration
 			})
 		});
 	
