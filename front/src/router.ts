@@ -5,7 +5,7 @@ import { isLoggedIn, logout } from "./auth";
 import { RegisterView, initRegister } from "./views/register";
 import { HomeLoginView} from "./views/p_homelogin";
 import { ProfilView} from "./views/p_profil";
-import { GameView} from "./views/p_game";
+import { GameView, initGame} from "./views/p_game";
 import { TournamentView} from "./views/p_tournament";
 
 const routes = [
@@ -15,7 +15,7 @@ const routes = [
   { path: "/register", view: RegisterView, init: initRegister},
   { path: "/homelogin", view: HomeLoginView},
   { path: "/profil", view: ProfilView},
-  { path: "/game", view: GameView },
+  { path: "/game", view: GameView, init: initGame},
   { path: "/tournament", view: TournamentView}
 ];
 
@@ -53,13 +53,6 @@ export function router() {
   document.querySelector("#app")!.innerHTML = match.view();
   match.init?.();
   updateNav();
-  if (match.path == "/game")
-  {
-    const script = document.createElement("script");
-    script.src = "/src/game/game.js";
-    script.defer = true;
-    document.body.appendChild(script);
-  }
 }
 
 export function initRouter() {
