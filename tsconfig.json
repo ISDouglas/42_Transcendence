@@ -15,7 +15,8 @@
   },
   "include": [
     "back/**/*.ts",
-    "front/src/**/*.ts"
+    "front/src/**/*.ts",
+    "types.ts"
   ],
   "exclude": [
     "node_modules",

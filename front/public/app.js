@@ -15,42 +15,39 @@ function initLogin() {
     const password = document.getElementById("password").value;
     const success = await login(username, password);
     if (success) {
-      updateNav();
       navigateTo("/homelogin");
+      updateNav();
     } else
-      alert("Identifiants incorrects");
+      alert("Invalid username or password");
   });
 }
 async function login(username, password) {
   try {
-    const res = await fetch("/api/login", {
+    const res = await genericFetch("/api/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password })
+      body: JSON.stringify({ username, password }),
+      credentials: "include"
     });
     const result = await res.json();
-    if (res.ok) {
-      localStorage.setItem("token", "OK");
+    if (res.ok)
       return true;
-    } else
+    else
       return false;
   } catch (err) {
-    console.error("Erreur serveur:", err);
+    console.error(err);
     return false;
   }
+}
+async function isLoggedIn() {
+  const res = await fetch("/api/isLoggedIn", { credentials: "include" });
+  const result = await res.json();
+  return result.logged;
 }
 
 // front/src/views/dashboard.ts
 function DashboardView() {
   return document.getElementById("dashboardhtml").innerHTML;
-}
-
-// front/src/auth.ts
-function isLoggedIn() {
-  return localStorage.getItem("token") !== null;
-}
-function logout() {
-  localStorage.removeItem("token");
 }
 
 // front/src/views/register.ts
@@ -86,6 +83,18 @@ function initRegister() {
 // front/src/views/p_homelogin.ts
 function HomeLoginView() {
   return document.getElementById("homeloginhtml").innerHTML;
+}
+async function initHomePage() {
+  try {
+    const res = await genericFetch("/api/private/homelogin", {
+      method: "POST",
+      credentials: "include"
+    });
+    const result = await res.json();
+    document.querySelector("#pseudo").textContent = result.pseudo;
+  } catch (err) {
+    console.error(err);
+  }
 }
 
 // front/src/views/p_profil.ts
@@ -349,7 +358,7 @@ var routes = [
   { path: "/login", view: LoginView, init: initLogin },
   { path: "/dashboard", view: DashboardView },
   { path: "/register", view: RegisterView, init: initRegister },
-  { path: "/homelogin", view: HomeLoginView },
+  { path: "/homelogin", view: HomeLoginView, init: initHomePage },
   { path: "/profil", view: ProfilView },
   { path: "/game", view: GameView, init: initGame },
   { path: "/tournament", view: TournamentView }
@@ -358,22 +367,33 @@ function navigateTo(url) {
   history.pushState(null, "", url);
   router();
 }
+async function genericFetch(url, options = {}) {
+  const res = await fetch(url, {
+    ...options,
+    credentials: "include"
+  });
+  if (res.status === 401) {
+    navigateTo("/login");
+    updateNav();
+    throw new Error("Unauthorized");
+  }
+  if (!res.ok) {
+    throw new Error(`Error: ${res.status}`);
+  }
+  return res;
+}
 function updateNav() {
   const publicNav = document.getElementById("public-nav");
   const privateNav = document.getElementById("private-nav");
-  if (isLoggedIn()) {
-    publicNav.style.display = "none";
-    privateNav.style.display = "block";
-    const button = document.getElementById("butlogout");
-    button.addEventListener("click", () => {
-      logout();
-      navigateTo("/");
-      updateNav();
-    });
-  } else {
-    publicNav.style.display = "block";
-    privateNav.style.display = "none";
-  }
+  isLoggedIn().then((logged) => {
+    if (logged) {
+      publicNav.style.display = "none";
+      privateNav.style.display = "block";
+    } else {
+      publicNav.style.display = "block";
+      privateNav.style.display = "none";
+    }
+  });
 }
 function router() {
   const match = routes.find((r) => r.path === location.pathname);
@@ -394,11 +414,22 @@ function initRouter() {
     }
   });
   window.addEventListener("popstate", router);
-  localStorage.removeItem("token");
   router();
 }
+var logout = async () => {
+  await fetch("/api/logout", {
+    method: "GET",
+    credentials: "include"
+  });
+  navigateTo("/login");
+  updateNav();
+};
 
 // front/src/main.ts
 document.addEventListener("DOMContentLoaded", () => {
   initRouter();
+  const button = document.getElementById("butlogout");
+  button.addEventListener("click", async () => {
+    await logout();
+  });
 });

@@ -1,9 +1,8 @@
 import { HomeView } from "./views/home";
-import { LoginView, initLogin} from "./views/login";
+import { LoginView, initLogin, isLoggedIn} from "./views/login";
 import { DashboardView } from "./views/dashboard";
-import { isLoggedIn, logout } from "./auth";
 import { RegisterView, initRegister } from "./views/register";
-import { HomeLoginView} from "./views/p_homelogin";
+import { HomeLoginView, initHomePage} from "./views/p_homelogin";
 import { ProfilView} from "./views/p_profil";
 import { GameView, initGame} from "./views/p_game";
 import { TournamentView} from "./views/p_tournament";
@@ -13,7 +12,7 @@ const routes = [
   { path: "/login", view: LoginView, init:initLogin},
   { path: "/dashboard", view: DashboardView },
   { path: "/register", view: RegisterView, init: initRegister},
-  { path: "/homelogin", view: HomeLoginView},
+  { path: "/homelogin", view: HomeLoginView, init: initHomePage},
   { path: "/profil", view: ProfilView},
   { path: "/game", view: GameView, init: initGame},
   { path: "/tournament", view: TournamentView}
@@ -24,23 +23,35 @@ export function navigateTo(url: string) {
   router();
 }
 
+export async function genericFetch(url: string, options: RequestInit = {}) {
+	const res = await fetch(url, {
+		...options,
+		credentials: "include"
+	});
+	if (res.status === 401) {
+		navigateTo("/login");
+		updateNav();
+		throw new Error("Unauthorized");
+	}
+	if (!res.ok){
+		throw new Error(`Error: ${res.status}`);
+	}
+	return res;
+}
+
+
 export function updateNav() {
 	const publicNav = document.getElementById("public-nav")!;
 	const privateNav = document.getElementById("private-nav")!;
-
-	if (isLoggedIn()) {
-	  publicNav.style.display = "none";
-	  privateNav.style.display = "block";
-	const button = document.getElementById("butlogout")!;
-	  button.addEventListener("click", () => {
-	  logout();
-	  navigateTo("/");
-    updateNav();
-	  });
-	}	else {
-  	publicNav.style.display = "block";
-	  privateNav.style.display = "none";
-	}
+	isLoggedIn().then(logged => {
+		if (logged) {
+			publicNav.style.display = "none";
+			privateNav.style.display = "block";
+		}	else {
+  			publicNav.style.display = "block";
+			privateNav.style.display = "none";
+		}
+	});
 }
 
 export function router() {
@@ -64,7 +75,14 @@ export function initRouter() {
 	}
   });
   window.addEventListener("popstate", router);
-  localStorage.removeItem("token") /*a enlever quand logout ok*/
   router();
 }
 
+export const logout = async() => {
+	await fetch("/api/logout", {
+		method: "GET",
+		credentials: "include"
+		});
+	navigateTo("/login");
+	updateNav();
+}

@@ -1,7 +1,7 @@
-import { navigateTo, updateNav} from "../router";
+import { navigateTo, updateNav, genericFetch} from "../router";
 
 export function LoginView(): string {
-  return (document.getElementById("loginhtml") as HTMLFormElement).innerHTML;
+	return (document.getElementById("loginhtml") as HTMLFormElement).innerHTML;
 }
 
 export function initLogin()
@@ -15,35 +15,37 @@ export function initLogin()
 	const success = await login(username, password)
    	if (success)
 	{
-		updateNav()
 		navigateTo("/homelogin");
+		updateNav();
 	}
 	else
-		alert("Identifiants incorrects");
+		alert("Invalid username or password");
 	});
 }
 
 export async function login(username: string, password: string): Promise<boolean> {
-
 try {
-	  const res = await fetch("/api/login", {
+		const res = await genericFetch("/api/login", {
 		method: "POST",
 		headers: { "Content-Type": "application/json" },
 		body: JSON.stringify({username, password}),
 		credentials: "include"
-	  });
-	  const result = await res.json();
-	  if (res.ok)
-	  {
-		localStorage.setItem("token", "OK");
-		return true;
-	  }
-	  else
-		return false;
+		});
+		const result = await res.json();
+		if (res.ok)
+			return true;
+		else
+			return false;
 	} catch (err) {
-	  console.error("Erreur serveur:", err);
-	  return false;     
+		console.error(err);
+		return false;     
   }
+}
+
+export async function isLoggedIn(): Promise<boolean> {
+	const res = await fetch("/api/isLoggedIn", { credentials: "include" });
+	const result = await res.json()
+	return result.logged;
 }
 
 
