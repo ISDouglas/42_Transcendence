@@ -421,32 +421,15 @@ function matchRoute(pathname) {
   return null;
 }
 function router() {
-<<<<<<< HEAD
-  const match = routes.find((r) => r.path === location.pathname);
-  console.log(match);
-=======
   const match = matchRoute(location.pathname);
->>>>>>> phil
   if (!match) {
     document.querySelector("#app").innerHTML = "<h1>404 Not Found</h1>";
     return;
   }
-<<<<<<< HEAD
-  if (match.view)
-    document.querySelector("#app").innerHTML = match.view();
-  match.init?.();
-  if (match.path == "/game") {
-    const script = document.createElement("script");
-    script.src = "/src/game/game.js";
-    script.defer = true;
-    document.body.appendChild(script);
-  }
-=======
   const { route, params } = match;
-  document.querySelector("#app").innerHTML = route.view(params);
+  if (route.view)
+    document.querySelector("#app").innerHTML = route.view(params);
   route.init?.(params);
-  updateNav();
->>>>>>> phil
 }
 function initRouter() {
   document.body.addEventListener("click", (e) => {

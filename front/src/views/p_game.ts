@@ -7,7 +7,7 @@ export function GameView(): string {
 export function initGame() {
 	const button = document.getElementById("start-quickgame");
 	button?.addEventListener("click", async () => {
-		const res = await fetch("/api/game/create", {
+		const res = await fetch("/api/private/game/create", {
 			method: "POST"
 		});
 		const { gameId } = await res.json();

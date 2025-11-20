@@ -345,7 +345,7 @@ function setupGame(gameID: string) {
 	});
 
 	async function sendGameResult(winnerId: number, loserId: number, winnerScore: number, loserScore: number, duration: number, id: string) {
-		const res = await fetch("/api/game/end", {
+		const res = await fetch("/api/private/game/end", {
 			method: "POST",
 			headers: {"Content-Type": "application/json"},
 			body: JSON.stringify({
