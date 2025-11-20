@@ -8,9 +8,7 @@ export function initGame() {
 	const button = document.getElementById("start-quickgame");
 	button?.addEventListener("click", async () => {
 		const res = await fetch("/api/game/create", {
-			method: "POST",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({ adversary_name: "QuickMatch" })
+			method: "POST"
 		});
 		const { gameId } = await res.json();
 

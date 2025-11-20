@@ -8,6 +8,8 @@ import { manageLogin } from './routes/login/login';
 import { manageRegister } from "./routes/register/resgister";
 import { GameInfo } from "./DB/gameinfo";
 import * as GameModule from "./DB/game";
+console.log(GameModule.games);
+console.log("games imported", GameModule.games);
 
 export const db = new ManageDB("./back/DB/database.db");
 export const users = new Users(db);
@@ -55,9 +57,8 @@ fastify.get("/api/profil", async (request, reply) => {
 });
 
 fastify.post("/api/game/create", async (request, reply) => {
-	const { adversary_name } = request.body as { adversary_name: string };
-
-	const gameId = await gameInfo.createGame(adversary_name);
+	const gameId = GameModule.games.size + 1;
+	console.log("gameId : ", gameId, " type = ", typeof gameId);
 
 	const game = new GameModule.Game(gameId);
 	GameModule.games.set(gameId, game);
@@ -78,9 +79,11 @@ fastify.post("/api/game/update", async (request, reply) => {
 });
 
 fastify.post("/api/game/end", async (request, reply) => {
-	const { game_id, winner_id, loser_id, winner_score, loser_score, duration_game } = request.body as any;
+	const { winner_id, loser_id, winner_score, loser_score, duration_game, id } = request.body as any;
 
-	await gameInfo.finishGame(game_id, winner_id, loser_id, winner_score, loser_score, duration_game);
+	const gameid = Number(id);
+	const gameDate: any = GameModule.getDate(gameid);
+	await gameInfo.finishGame(winner_id, loser_id, winner_score, loser_score, duration_game, gameDate);
 	return { message: "Game saved!" };
 });
 

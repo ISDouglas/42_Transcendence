@@ -101,9 +101,7 @@ function initGame() {
   const button = document.getElementById("start-quickgame");
   button?.addEventListener("click", async () => {
     const res = await fetch("/api/game/create", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ adversary_name: "QuickMatch" })
+      method: "POST"
     });
     const { gameId } = await res.json();
     navigateTo(`/quickgame/${gameId}`);
@@ -116,9 +114,11 @@ function QuickGameView(params) {
 }
 function initQuickGame(params) {
   console.log("Game ID =", params?.id);
-  setupGame();
+  const gameID = params?.id;
+  console.log("gameID quickgame : ", gameID, " type = ", typeof gameID);
+  setupGame(gameID);
 }
-function setupGame() {
+function setupGame(gameID) {
   let isPlaying;
   const canvas = document.querySelector("canvas");
   const ctx = canvas.getContext("2d");
@@ -290,12 +290,12 @@ function setupGame() {
       winner = "Player 1 Wins!";
       winnerId = 1;
       loserId = 2;
-      sendGameResult(winnerId, loserId, game.player1.score, game.player2.score, elapsedTime);
+      sendGameResult(winnerId, loserId, game.player1.score, game.player2.score, elapsedTime, gameID);
     } else {
       winner = "Player 2 Wins!";
       winnerId = 2;
       loserId = 1;
-      sendGameResult(winnerId, loserId, game.player2.score, game.player1.score, elapsedTime);
+      sendGameResult(winnerId, loserId, game.player2.score, game.player1.score, elapsedTime, gameID);
     }
     ctx.fillText(winner, canvasWidth / 2, canvasHeight / 2);
   }
@@ -335,7 +335,7 @@ function setupGame() {
     isPlaying = false;
     stop();
   });
-  async function sendGameResult(winnerId2, loserId2, winnerScore, loserScore, duration) {
+  async function sendGameResult(winnerId2, loserId2, winnerScore, loserScore, duration, id) {
     const res = await fetch("/api/game/end", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -344,7 +344,8 @@ function setupGame() {
         loser_id: loserId2,
         winner_score: winnerScore,
         loser_score: loserScore,
-        duration_game: duration
+        duration_game: duration,
+        id
       })
     });
     try {

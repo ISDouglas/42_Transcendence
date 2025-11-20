@@ -16,54 +16,31 @@ export class GameInfo
 				status INTEGER NOT NULL,
 				winner_id INTEGER,
 				loser_id INTEGER,
-				date_game TEXT NOT NULL,
+				date_game TEXT,
 				duration_game INTEGER DEFAULT 0,
-				adversary_name TEXT NOT NULL,
 				winner_score INTEGER,
 				loser_score INTEGER
 			)
 		`);
 	};
 
-	async createGame(adversary_name: string): Promise<number>
+	async finishGame(winner_id: number, loser_id: number, winner_score: number,
+		loser_score: number, duration_game: number, gameDate: string): Promise<void>
 	{
 		const query = `
 			INSERT INTO game_info (status, winner_id, loser_id,
-			 date_game, duration_game, adversary_name, winner_score, loser_score)
-			VALUES (?,NULL,NULL,?,0,?,0,0)
+			 date_game, duration_game, winner_score, loser_score)
+			VALUES (?,?,?,?,?,?,?)
 			`;
-		const parameters = [
-			GameInfoStatus.ongoing,
-			new Date(),
-			adversary_name
-		];
-
-		const lastId = await this._db.runAndReturnId(query, parameters);
-		return lastId;
-	}
-
-	async finishGame(id: number, winner_id: number, loser_id: number, winner_score: number,
-		loser_score: number, duration_game: number): Promise<void>
-	{
-		const query = `
-			UPDATE game_info
-			SET status = ?,
-			winner_id = ?,
-			loser_id = ?,
-			winner_score = ?,
-			loser_score = ?,
-			duration_game = ?
-			WHERE game_id = ?
-		`;
 
 		const parameters = [
 			GameInfoStatus.finished,
 			winner_id,
 			loser_id,
-			winner_score,
-			loser_score,
+			gameDate,
 			duration_game,
-			id
+			winner_score,
+			loser_score
 		];
 
 		await this._db.execute(query, parameters);

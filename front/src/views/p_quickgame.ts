@@ -4,10 +4,12 @@ export function QuickGameView(params?: any): string {
 
 export function initQuickGame(params?: any) {
 	console.log("Game ID =", params?.id);
-	setupGame();
+	const gameID: string = params?.id;
+	console.log("gameID quickgame : ", gameID, " type = ", typeof gameID);
+	setupGame(gameID);
 }
 
-function setupGame() {
+function setupGame(gameID: string) {
 
 	let isPlaying: boolean;
 	
@@ -283,14 +285,14 @@ function setupGame() {
 			winner = "Player 1 Wins!";
 			winnerId = 1;
 			loserId = 2;
-			sendGameResult(winnerId, loserId, game.player1.score, game.player2.score, elapsedTime);
+			sendGameResult(winnerId, loserId, game.player1.score, game.player2.score, elapsedTime, gameID);
 		}
 		else
 		{
 			winner = "Player 2 Wins!";
 			winnerId = 2;
 			loserId = 1;
-			sendGameResult(winnerId, loserId, game.player2.score, game.player1.score, elapsedTime);
+			sendGameResult(winnerId, loserId, game.player2.score, game.player1.score, elapsedTime, gameID);
 		}
 		ctx.fillText(winner, canvasWidth / 2, canvasHeight / 2);
 	}
@@ -341,8 +343,8 @@ function setupGame() {
 		isPlaying = false;
 		stop();
 	});
-	
-	async function sendGameResult(winnerId: number, loserId: number, winnerScore: number, loserScore: number, duration: number) {
+
+	async function sendGameResult(winnerId: number, loserId: number, winnerScore: number, loserScore: number, duration: number, id: string) {
 		const res = await fetch("/api/game/end", {
 			method: "POST",
 			headers: {"Content-Type": "application/json"},
@@ -351,7 +353,8 @@ function setupGame() {
 				loser_id: loserId,
 				winner_score: winnerScore,
 				loser_score: loserScore,
-				duration_game: duration
+				duration_game: duration,
+				id: id
 			})
 		});
 
