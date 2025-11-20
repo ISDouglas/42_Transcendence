@@ -70,34 +70,84 @@
 			<p class="absolute mb-4 opacity-60 bottom-0 w-full text-center">This isn't a bakery at all — it's the Pong game from 42!</p>
 		</main>
 	</template>
-
-	<template id="dashboardhtml">
-    <h1>Dashboard 🎮</h1>
+	
+	<template id="registerhtml">
+		<div class="register-container">
+			<h1>Register</h1>
+			<form id="register-form">
+				<input type="text" name="username" placeholder="Username" required />
+				<input type="email" name="email" placeholder="Email" required />
+				<input type="password" name="password" placeholder="Password" required />
+				<button type="submit">Register</button>
+			</form>
+			<p id="register-message"></p>
+		</div>
 	</template>
 
-  <template id="registerhtml">
-     <div class="register-container">
-      <h1>Register</h1>
-      <form id="register-form">
-        <input type="text" name="username" placeholder="Username" required />
-        <input type="email" name="email" placeholder="Email" required />
-        <input type="password" name="password" placeholder="Password" required />
-        <button type="submit">Register</button>
-      </form>
-      <p id="register-message"></p>
-    </div>
-  </template>
+	<template id="dashboardhtml">
+    <header class="flex items-center pb-2 h-28 bg-gray-200/20 backdrop-blur-sm shadow-md">
+		<a href="/homelogin" data-link class="block dark:hidden ml-4">
+			<img src="src/asset/image/croissant white.png" alt="croissantw"
+				class="w-24 duration-200 hover:-translate-y-1 rounded-full mt-3">
+		</a>
+		<a href="/homelogin" data-link class="hidden dark:block ml-4">
+			<img src="src/asset/image/croissant dark.png" alt="croissantd"
+				class="w-24 duration-200 hover:-translate-y-1 rounded-full mt-3">
+		</a>
+	</header>
+	<h1>Dashboard 🎮</h1>
+	</template>
 
   <template id="homeloginhtml">
-    <h1>Loged Homepage👋</h1>
+    <header class="flex items-center pb-2 h-28 bg-gray-200/20 backdrop-blur-sm shadow-md">
+		<a href="/homelogin" data-link class="block dark:hidden ml-4">
+			<img src="src/asset/image/croissant white.png" alt="croissantw"
+				class="w-24 duration-200 hover:-translate-y-1 rounded-full mt-3">
+		</a>
+		<a href="/homelogin" data-link class="hidden dark:block ml-4">
+			<img src="src/asset/image/croissant dark.png" alt="croissantd"
+				class="w-24 duration-200 hover:-translate-y-1 rounded-full mt-3">
+		</a>
+	</header>
+	<div>
+		<h1>Loged Homepage👋</h1>
+		<ul>
+			<li><a href="/profil" data-link class="btn w-48">Profil</a></li>
+			<li><a href="/game" data-link class="btn w-48">Game</a></li>
+			<li><a href="/dashboard" data-link class="btn w-48">Dashboard</a></li>
+			<li><a href="/tournament" data-link class="btn w-48">Tournament</a></li>
+		</ul>
+	</div>
   </template>
 
   <template id="profilhtml">
-    <h1>Page profil</h1>
+	<header class="flex items-center pb-2 h-28 bg-gray-200/20 backdrop-blur-sm shadow-md">
+		<a href="/homelogin" data-link class="block dark:hidden ml-4">
+			<img src="src/asset/image/croissant white.png" alt="croissantw"
+				class="w-24 duration-200 hover:-translate-y-1 rounded-full mt-3">
+		</a>
+		<a href="/homelogin" data-link class="hidden dark:block ml-4">
+			<img src="src/asset/image/croissant dark.png" alt="croissantd"
+				class="w-24 duration-200 hover:-translate-y-1 rounded-full mt-3">
+		</a>
+	</header>
+	<main>
+		<h1>Page profil</h1>
+	</main>
   </template>
 
   <template id="gamehtml">
-    <h1>Page game</h1>
+    <header class="flex items-center pb-2 h-28 bg-gray-200/20 backdrop-blur-sm shadow-md">
+		<a href="/homelogin" data-link class="block dark:hidden ml-4">
+			<img src="src/asset/image/croissant white.png" alt="croissantw"
+				class="w-24 duration-200 hover:-translate-y-1 rounded-full mt-3">
+		</a>
+		<a href="/homelogin" data-link class="hidden dark:block ml-4">
+			<img src="src/asset/image/croissant dark.png" alt="croissantd"
+				class="w-24 duration-200 hover:-translate-y-1 rounded-full mt-3">
+		</a>
+	</header>
+	<h1>Page game</h1>
     <div class="game-container">
       <div class="game-buttons">
         <button id="start-game">Start</button>
@@ -108,6 +158,16 @@
   </template>
 
   <template id="tournamenthtml">
+	<header class="flex items-center pb-2 h-28 bg-gray-200/20 backdrop-blur-sm shadow-md">
+		<a href="/homelogin" data-link class="block dark:hidden ml-4">
+			<img src="src/asset/image/croissant white.png" alt="croissantw"
+				class="w-24 duration-200 hover:-translate-y-1 rounded-full mt-3">
+		</a>
+		<a href="/homelogin" data-link class="hidden dark:block ml-4">
+			<img src="src/asset/image/croissant dark.png" alt="croissantd"
+				class="w-24 duration-200 hover:-translate-y-1 rounded-full mt-3">
+		</a>
+	</header>
     <h1>Page tournament</h1>
   </template>
 

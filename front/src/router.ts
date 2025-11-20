@@ -24,39 +24,19 @@ export function navigateTo(url: string) {
   router();
 }
 
-export function updateNav() {
-	const publicNav = document.getElementById("public-nav")!;
-	const privateNav = document.getElementById("private-nav")!;
-
-	if (isLoggedIn()) {
-	  publicNav.style.display = "none";
-	  privateNav.style.display = "block";
-	const button = document.getElementById("butlogout")!;
-	  button.addEventListener("click", () => {
-	  logout();
-	updateNav();
-	  navigateTo("/");
-	  });
-	}	else {
-  	publicNav.style.display = "block";
-	  privateNav.style.display = "none";
-	}
-}
-
 export function router() {
   const match = routes.find((r) => r.path === location.pathname);
-
+	console.log(match);
   if (!match) {
 	document.querySelector("#app")!.innerHTML = "<h1>404 Not Found</h1>";
 	return;
   }
   document.querySelector("#app")!.innerHTML = match.view();
   match.init?.();
-  updateNav();
   if (match.path == "/game")
   {
     const script = document.createElement("script");
-    script.src = "/../game/game.js";
+    script.src = "/src/game/game.js";
     script.defer = true;
     document.body.appendChild(script);
   }
@@ -64,14 +44,18 @@ export function router() {
 
 export function initRouter() {
   document.body.addEventListener("click", (e) => {
-	const target = e.target as HTMLElement;
-	if (target.matches("[data-link]")) {
-	  e.preventDefault();
-	  navigateTo(target.getAttribute("href")!);
-	}
+    const target = e.target as HTMLElement;
+    const link = target.closest("[data-link]") as HTMLElement | null;
+    if (link) {
+      e.preventDefault();
+      const url = (link as HTMLAnchorElement).getAttribute("href");
+      if (url) {
+        navigateTo(url);
+      }
+    }
   });
   window.addEventListener("popstate", router);
-  localStorage.removeItem("token") /*a enlever quand logout ok*/
   router();
+  localStorage.removeItem("token") /*a enlever quand logout ok*/
 }
 

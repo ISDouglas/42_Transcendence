@@ -22,12 +22,6 @@ async function login(username, password) {
     return false;
   }
 }
-function isLoggedIn() {
-  return localStorage.getItem("token") !== null;
-}
-function logout() {
-  localStorage.removeItem("token");
-}
 
 // front/src/views/login.ts
 function LoginView() {
@@ -117,35 +111,18 @@ function navigateTo(url) {
   history.pushState(null, "", url);
   router();
 }
-function updateNav() {
-  const publicNav = document.getElementById("public-nav");
-  const privateNav = document.getElementById("private-nav");
-  if (isLoggedIn()) {
-    publicNav.style.display = "none";
-    privateNav.style.display = "block";
-    const button = document.getElementById("butlogout");
-    button.addEventListener("click", () => {
-      logout();
-      updateNav();
-      navigateTo("/");
-    });
-  } else {
-    publicNav.style.display = "block";
-    privateNav.style.display = "none";
-  }
-}
 function router() {
   const match = routes.find((r) => r.path === location.pathname);
+  console.log(match);
   if (!match) {
     document.querySelector("#app").innerHTML = "<h1>404 Not Found</h1>";
     return;
   }
   document.querySelector("#app").innerHTML = match.view();
   match.init?.();
-  updateNav();
   if (match.path == "/game") {
     const script = document.createElement("script");
-    script.src = "/../game/game.js";
+    script.src = "/src/game/game.js";
     script.defer = true;
     document.body.appendChild(script);
   }
@@ -153,14 +130,18 @@ function router() {
 function initRouter() {
   document.body.addEventListener("click", (e) => {
     const target = e.target;
-    if (target.matches("[data-link]")) {
+    const link = target.closest("[data-link]");
+    if (link) {
       e.preventDefault();
-      navigateTo(target.getAttribute("href"));
+      const url = link.getAttribute("href");
+      if (url) {
+        navigateTo(url);
+      }
     }
   });
   window.addEventListener("popstate", router);
-  localStorage.removeItem("token");
   router();
+  localStorage.removeItem("token");
 }
 
 // front/src/main.ts
