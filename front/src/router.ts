@@ -30,7 +30,6 @@ export async function genericFetch(url: string, options: RequestInit = {}) {
 	});
 	if (res.status === 401) {
 		navigateTo("/login");
-		updateNav();
 		throw new Error("Unauthorized");
 	}
 	if (!res.ok){
@@ -39,40 +38,35 @@ export async function genericFetch(url: string, options: RequestInit = {}) {
 	return res;
 }
 
-
-export function updateNav() {
-	const publicNav = document.getElementById("public-nav")!;
-	const privateNav = document.getElementById("private-nav")!;
-	isLoggedIn().then(logged => {
-		if (logged) {
-			publicNav.style.display = "none";
-			privateNav.style.display = "block";
-		}	else {
-  			publicNav.style.display = "block";
-			privateNav.style.display = "none";
-		}
-	});
-}
-
 export function router() {
   const match = routes.find((r) => r.path === location.pathname);
-
+	console.log(match);
   if (!match) {
 	document.querySelector("#app")!.innerHTML = "<h1>404 Not Found</h1>";
 	return;
   }
   document.querySelector("#app")!.innerHTML = match.view();
   match.init?.();
-  updateNav();
+  if (match.path == "/game")
+  {
+    const script = document.createElement("script");
+    script.src = "/src/game/game.js";
+    script.defer = true;
+    document.body.appendChild(script);
+  }
 }
 
 export function initRouter() {
   document.body.addEventListener("click", (e) => {
-	const target = e.target as HTMLElement;
-	if (target.matches("[data-link]")) {
-	  e.preventDefault();
-	  navigateTo(target.getAttribute("href")!);
-	}
+    const target = e.target as HTMLElement;
+    const link = target.closest("[data-link]") as HTMLElement | null;
+    if (link) {
+      e.preventDefault();
+      const url = (link as HTMLAnchorElement).getAttribute("href");
+      if (url) {
+        navigateTo(url);
+      }
+    }
   });
   window.addEventListener("popstate", router);
   router();
@@ -84,5 +78,4 @@ export const logout = async() => {
 		credentials: "include"
 		});
 	navigateTo("/login");
-	updateNav();
 }

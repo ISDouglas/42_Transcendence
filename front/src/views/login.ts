@@ -1,4 +1,4 @@
-import { navigateTo, updateNav, genericFetch} from "../router";
+import { navigateTo, genericFetch} from "../router";
 
 export function LoginView(): string {
 	return (document.getElementById("loginhtml") as HTMLFormElement).innerHTML;
@@ -14,13 +14,10 @@ export function initLogin()
 
 	const success = await login(username, password)
    	if (success)
-	{
 		navigateTo("/homelogin");
-		updateNav();
-	}
-	else
-		alert("Invalid username or password");
-	});
+    else
+    	alert("Identifiants incorrects");
+    });
 }
 
 export async function login(username: string, password: string): Promise<boolean> {

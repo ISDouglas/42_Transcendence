@@ -3,6 +3,29 @@ function HomeView() {
   return document.getElementById("homehtml").innerHTML;
 }
 
+<<<<<<< HEAD
+=======
+// front/src/auth.ts
+async function login(username, password) {
+  try {
+    const res = await fetch("/api/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password })
+    });
+    const result = await res.json();
+    if (res.ok) {
+      localStorage.setItem("token", "OK");
+      return true;
+    } else
+      return false;
+  } catch (err) {
+    console.error("Erreur serveur:", err);
+    return false;
+  }
+}
+
+>>>>>>> noah
 // front/src/views/login.ts
 function LoginView() {
   return document.getElementById("loginhtml").innerHTML;
@@ -14,11 +37,18 @@ function initLogin() {
     const username = document.getElementById("username").value;
     const password = document.getElementById("password").value;
     const success = await login(username, password);
+<<<<<<< HEAD
     if (success) {
       navigateTo("/homelogin");
       updateNav();
     } else
       alert("Invalid username or password");
+=======
+    if (success)
+      navigateTo("/homelogin");
+    else
+      alert("Identifiants incorrects");
+>>>>>>> noah
   });
 }
 async function login(username, password) {
@@ -367,6 +397,7 @@ function navigateTo(url) {
   history.pushState(null, "", url);
   router();
 }
+<<<<<<< HEAD
 async function genericFetch(url, options = {}) {
   const res = await fetch(url, {
     ...options,
@@ -395,26 +426,43 @@ function updateNav() {
     }
   });
 }
+=======
+>>>>>>> noah
 function router() {
   const match = routes.find((r) => r.path === location.pathname);
+  console.log(match);
   if (!match) {
     document.querySelector("#app").innerHTML = "<h1>404 Not Found</h1>";
     return;
   }
   document.querySelector("#app").innerHTML = match.view();
   match.init?.();
+<<<<<<< HEAD
   updateNav();
+=======
+  if (match.path == "/game") {
+    const script = document.createElement("script");
+    script.src = "/src/game/game.js";
+    script.defer = true;
+    document.body.appendChild(script);
+  }
+>>>>>>> noah
 }
 function initRouter() {
   document.body.addEventListener("click", (e) => {
     const target = e.target;
-    if (target.matches("[data-link]")) {
+    const link = target.closest("[data-link]");
+    if (link) {
       e.preventDefault();
-      navigateTo(target.getAttribute("href"));
+      const url = link.getAttribute("href");
+      if (url) {
+        navigateTo(url);
+      }
     }
   });
   window.addEventListener("popstate", router);
   router();
+  localStorage.removeItem("token");
 }
 var logout = async () => {
   await fetch("/api/logout", {
