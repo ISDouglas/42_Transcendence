@@ -10,7 +10,7 @@ if (!secretkey)
 	throw new Error("SECRETKEY is missing in .env");
 
 export const createJWT = (id: number): string => {
-	return jwt.sign({ id }, secretkey, { expiresIn: "10s", algorithm: "HS256" });
+	return jwt.sign({ id }, secretkey, { expiresIn: "1h", algorithm: "HS256" });
 }
 
 export const checkAuth = async (token: string, reply: FastifyReply): Promise< Users | Error> => {

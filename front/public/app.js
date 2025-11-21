@@ -359,11 +359,16 @@ function ProfilView() {
 }
 async function initProfil() {
   const user_id = 1;
-  const profil = await genericFetch2("/api/private/profil", {
+  const res = await fetch("/api/private/profil", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ id: user_id })
   });
+  if (!res.ok) {
+    console.error("Cannot load profile");
+    return;
+  }
+  const profil = await res.json();
   document.getElementById("profil-id").textContent = profil.user_id;
   document.getElementById("profil-pseudo").textContent = profil.pseudo;
   document.getElementById("profil-email").textContent = profil.email;
@@ -402,7 +407,8 @@ var routes = [
   { path: "/tournament", view: TournamentView }
 ];
 function navigateTo(url) {
-  history.pushState(null, "", url);
+  const state = { previous: window.location.pathname };
+  history.pushState(state, "", url);
   router();
 }
 async function genericFetch2(url, options = {}) {
@@ -460,7 +466,15 @@ function initRouter() {
       }
     }
   });
-  window.addEventListener("popstate", router);
+  window.addEventListener("popstate", (event) => {
+    const path = window.location.pathname;
+    const previous = event.state?.previous;
+    const public_path = ["/", "/login", "/register"];
+    const is_private = !public_path.includes(path);
+    if (is_private && previous && public_path.includes(previous))
+      history.replaceState({ previous: "/homelogin" }, "", "/homelogin");
+    router();
+  });
   router();
 }
 
