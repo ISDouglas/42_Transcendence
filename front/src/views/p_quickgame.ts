@@ -3,9 +3,7 @@ export function QuickGameView(params?: any): string {
 }
 
 export function initQuickGame(params?: any) {
-	console.log("Game ID =", params?.id);
 	const gameID: string = params?.id;
-	console.log("gameID quickgame : ", gameID, " type = ", typeof gameID);
 	setupGame(gameID);
 }
 
@@ -109,6 +107,8 @@ function setupGame(gameID: string) {
 	const maxAngle: number = Math.PI / 4;
 	let startTime: number;
 	let elapsedTime: number;
+	const startBtn = document.querySelector('#start-game') as HTMLButtonElement;
+	const stopBtn = document.querySelector('#stop-game') as HTMLButtonElement;
 	
 	/**========================================================================
 	 *!                                  FUNCTIONS
@@ -300,6 +300,8 @@ function setupGame(gameID: string) {
 	function play() {
 		if (!isPlaying)
 		{
+			startBtn.disabled = true;
+			stopBtn.disabled = true;
 			stopTimer();
 			displayWinner();
 			return;
@@ -329,7 +331,8 @@ function setupGame(gameID: string) {
 		if (e.key === "l" || e.key === "L") game.player2.movingDown = false;
 	})
 	
-	document.querySelector('#start-game')?.addEventListener('click', () => {
+	startBtn?.addEventListener('click', () => {
+		startBtn.disabled = true;
 		audioCtx = new(window.AudioContext);
 		randomValue = Math.random() < 0.5 ? -2 : 2;
 		game.ball.speed.x = randomValue;
@@ -339,8 +342,9 @@ function setupGame(gameID: string) {
 		play();
 	});
 	
-	document.querySelector('#stop-game')?.addEventListener('click', () => {
+	stopBtn?.addEventListener('click', () => {
 		isPlaying = false;
+		startBtn.disabled = false;
 		stop();
 	});
 

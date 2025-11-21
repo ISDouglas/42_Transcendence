@@ -149,6 +149,8 @@ function setupGame(gameID) {
   const maxAngle = Math.PI / 4;
   let startTime;
   let elapsedTime;
+  const startBtn = document.querySelector("#start-game");
+  const stopBtn = document.querySelector("#stop-game");
   function startTimer() {
     startTime = Date.now();
   }
@@ -282,6 +284,8 @@ function setupGame(gameID) {
   }
   function play() {
     if (!isPlaying) {
+      startBtn.disabled = true;
+      stopBtn.disabled = true;
       stopTimer();
       displayWinner();
       return;
@@ -303,7 +307,8 @@ function setupGame(gameID) {
     if (e.key === "o" || e.key === "O") game.player2.movingUp = false;
     if (e.key === "l" || e.key === "L") game.player2.movingDown = false;
   });
-  document.querySelector("#start-game")?.addEventListener("click", () => {
+  startBtn?.addEventListener("click", () => {
+    startBtn.disabled = true;
     audioCtx = new window.AudioContext();
     randomValue = Math.random() < 0.5 ? -2 : 2;
     game.ball.speed.x = randomValue;
@@ -312,8 +317,9 @@ function setupGame(gameID) {
     startTimer();
     play();
   });
-  document.querySelector("#stop-game")?.addEventListener("click", () => {
+  stopBtn?.addEventListener("click", () => {
     isPlaying = false;
+    startBtn.disabled = false;
     stop();
   });
   async function sendGameResult(winnerId2, loserId2, winnerScore, loserScore, duration, id) {
