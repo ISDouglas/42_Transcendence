@@ -1,4 +1,5 @@
 import { register } from "module";
+import { navigateTo } from "../router";
 
 
 export function RegisterView(): string {
@@ -28,9 +29,14 @@ export function initRegister() {
 
       const result = await res.json();
       message.textContent = result.message;
+	  navigateTo("/registerok")
     } catch (err) {
       message.textContent = "Erreur serveur...";
       console.error(err);
     }
   });
+}
+
+export function RegisterValidView(): string {
+  return (document.getElementById("registerok") as HTMLFormElement).innerHTML;
 }
