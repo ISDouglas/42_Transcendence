@@ -30,7 +30,10 @@ INSERT INTO tournament (winner_id, second_place_id, third_place_id, fourth_place
 VALUES (16,13,6,3,7,2,5,4,1);
 INSERT INTO tournament (winner_id, second_place_id, third_place_id, fourth_place_id,
                         fifth_place_id, sixth_place_id, seventh_place_id, eighth_place_id, onchain)
-VALUES (12,16,11,3,10,6,1,14,1);
+VALUES (12,16,191,3,10,6,1,14,1);
+INSERT INTO tournament (winner_id, second_place_id, third_place_id, fourth_place_id,
+                        fifth_place_id, sixth_place_id, seventh_place_id, eighth_place_id, onchain)
+VALUES (8,15,6,1,9,12,16,11,1);
 
 EOF
 
