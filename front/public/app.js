@@ -81,19 +81,17 @@ function GameView() {
 function initGame() {
   const quickGameButton = document.getElementById("start-quickgame");
   quickGameButton?.addEventListener("click", async () => {
-    const res = await fetch("/api/private/game/create", {
+    const { gameId } = await genericFetch2("/api/private/game/create", {
       method: "POST"
     });
-    const { gameId } = await res.json();
     navigateTo(`/quickgame/${gameId}`);
   });
   const tournamentButton = document.getElementById("start-tournament");
   tournamentButton?.addEventListener("click", async () => {
-    const res = await fetch("/api/private/tournament/create", {
+    const { tournamentId } = await genericFetch2("/api/private/tournament/create", {
       method: "POST"
     });
-    const { gameId } = await res.json();
-    navigateTo(`/tournament`);
+    navigateTo(`/tournament/${tournamentId}`);
   });
 }
 var GameInstance = class {
@@ -161,6 +159,9 @@ var GameInstance = class {
     this.initPositions();
     this.draw();
     this.attachEvents();
+  }
+  getId() {
+    return this.gameID;
   }
   /** ============================================================
    ** INIT
@@ -390,7 +391,7 @@ var GameInstance = class {
           id
         })
       });
-      console.log("Saved data:", await res.json());
+      console.log("Saved data:", res);
     } catch (err) {
       console.error("Error saving game:", err);
     }
@@ -410,10 +411,24 @@ function initQuickGame(params) {
   }
   currentGame = new GameInstance(gameID);
 }
-function stopGame() {
+async function stopGame() {
   if (currentGame) {
+    const id = currentGame.getId();
+    console.log("id qg : ", id);
     currentGame.destroy();
     currentGame = null;
+    try {
+      const res = await genericFetch2("/api/private/game/error", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id
+        })
+      });
+      console.log("Saved data:", res);
+    } catch (err) {
+      console.error("Error saving game:", err);
+    }
   }
 }
 
@@ -437,7 +452,7 @@ function ProfilView() {
   return document.getElementById("profilhtml").innerHTML;
 }
 async function initProfil() {
-  const res = await genericFetch("/api/private/profil", {
+  const res = await genericFetch2("/api/private/profil", {
     method: "POST",
     credentials: "include"
   });
@@ -461,7 +476,7 @@ function UpdateInfoView() {
   return document.getElementById("updateinfohtml").innerHTML;
 }
 async function initUpdateInfo() {
-  const res = await genericFetch("/api/private/updateinfo", {
+  const res = await genericFetch2("/api/private/updateinfo", {
     method: "POST"
   });
   if (!res.ok) {
@@ -475,7 +490,7 @@ async function initUpdateInfo() {
     e.preventDefault();
     const newUsername = formUsername["new-username"].value;
     const password = formUsername["password"].value;
-    const response = await genericFetch("/api/private/changeusername", {
+    const response = await genericFetch2("/api/private/changeusername", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ newUsername, password })

@@ -7,22 +7,20 @@ export function GameView(): string {
 export function initGame() {
 	const quickGameButton = document.getElementById("start-quickgame");
 	quickGameButton?.addEventListener("click", async () => {
-		const res = await fetch("/api/private/game/create", {
+		const { gameId } = await genericFetch("/api/private/game/create", {
 			method: "POST"
 		});
-		const { gameId } = await res.json();
-
+		
 		navigateTo(`/quickgame/${gameId}`);
 	});
 
 	const tournamentButton = document.getElementById("start-tournament");
 	tournamentButton?.addEventListener("click", async () => {
-		const res = await fetch("/api/private/tournament/create", {
+		const { tournamentId } = await genericFetch("/api/private/tournament/create", {
 			method: "POST"
 		});
-		const { gameId } = await res.json();
 
-		navigateTo(`/tournament`);
+		navigateTo(`/tournament/${tournamentId}`);
 	});
 }
 
@@ -121,6 +119,11 @@ export class GameInstance {
 		this.initPositions();
 		this.draw();
 		this.attachEvents();
+	}
+
+	public getId()
+	{
+		return this.gameID;
 	}
 
 	/** ============================================================
@@ -437,7 +440,7 @@ export class GameInstance {
 				})
 			});
 
-			console.log("Saved data:", await res.json());
+			console.log("Saved data:", res);
 		} catch (err) {
 			console.error("Error saving game:", err);
 		}
