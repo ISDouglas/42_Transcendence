@@ -66,12 +66,39 @@ function initRegister() {
         body: JSON.stringify(data)
       });
       const result = await res.json();
-      message.textContent = result.message;
+      if (result.ok == true)
+        navigateTo("/registerok");
+      else {
+        const usernameInput = form.querySelector("input[name='username']");
+        const passwordInput = form.querySelector("input[name='password']");
+        const emailInput = form.querySelector("input[name='email']");
+        const usernameMsg = document.getElementById("username-message");
+        const emailMsg = document.getElementById("email-message");
+        const passwordMsg = document.getElementById("password-message");
+        [usernameMsg, emailMsg, passwordMsg].forEach((p) => p.textContent = "");
+        [usernameInput, emailInput, passwordInput].forEach((p) => p.classList.remove("error"));
+        if (result.field === "password") {
+          passwordInput.classList.add("error");
+          passwordMsg.textContent = result.message;
+        }
+        if (result.field === "username") {
+          usernameInput.classList.add("error");
+          usernameMsg.textContent = result.message;
+        }
+        if (result.field === "email") {
+          emailInput.classList.add("error");
+          emailMsg.textContent = result.message;
+        }
+        message.textContent = "";
+        message.append(result.message);
+      }
     } catch (err) {
-      message.textContent = "Erreur serveur...";
       console.error(err);
     }
   });
+}
+function RegisterValidView() {
+  return document.getElementById("registerok").innerHTML;
 }
 
 // front/src/views/p_game.ts
@@ -444,31 +471,26 @@ async function initHomePage() {
     });
     document.querySelector("#pseudo").textContent = result.pseudo;
   } catch (err) {
+    console.error(err);
   }
 }
 
-// front/src/views/p_profil.ts
-function ProfilView() {
-  return document.getElementById("profilhtml").innerHTML;
+// front/src/views/p_profile.ts
+function ProfileView() {
+  return document.getElementById("profilehtml").innerHTML;
 }
-async function initProfil() {
-  const res = await genericFetch2("/api/private/profil", {
-    method: "POST",
-    credentials: "include"
+async function initProfile() {
+  const profile = await genericFetch2("/api/private/profile", {
+    method: "POST"
   });
-  if (!res.ok) {
-    console.error("Cannot load profile");
-    return;
-  }
-  const profil = await res.json();
-  document.getElementById("profil-id").textContent = profil.user_id;
-  document.getElementById("profil-pseudo").textContent = profil.pseudo;
-  document.getElementById("profil-email").textContent = profil.email;
-  document.getElementById("profil-status").textContent = profil.status;
-  document.getElementById("profil-creation").textContent = profil.creation_date;
-  document.getElementById("profil-modification").textContent = profil.modification_date;
-  document.getElementById("profil-money").textContent = profil.money;
-  document.getElementById("profil-elo").textContent = profil.elo;
+  document.getElementById("profile-id").textContent = profile.user_id;
+  document.getElementById("profile-pseudo").textContent = profile.pseudo;
+  document.getElementById("profile-email").textContent = profile.email;
+  document.getElementById("profile-status").textContent = profile.status;
+  document.getElementById("profile-creation").textContent = profile.creation_date;
+  document.getElementById("profile-modification").textContent = profile.modification_date;
+  document.getElementById("profile-money").textContent = profile.money;
+  document.getElementById("profile-elo").textContent = profile.elo;
 }
 
 // front/src/views/p_updateinfo.ts
@@ -476,30 +498,43 @@ function UpdateInfoView() {
   return document.getElementById("updateinfohtml").innerHTML;
 }
 async function initUpdateInfo() {
-  const res = await genericFetch2("/api/private/updateinfo", {
+  const profil = await genericFetch2("/api/private/updateinfo", {
     method: "POST"
   });
-  if (!res.ok) {
-    console.error("Cannot load profile");
-    return;
-  }
-  const profil = await res.json();
-  document.getElementById("profil-username").textContent = profil.pseudo;
+  document.getElementById("profile-username").textContent = profil.pseudo;
   const formUsername = document.getElementById("change-username-form");
   formUsername.addEventListener("submit", async (e) => {
     e.preventDefault();
     const newUsername = formUsername["new-username"].value;
     const password = formUsername["password"].value;
-    const response = await genericFetch2("/api/private/changeusername", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ newUsername, password })
-    });
-    console.log("client initupdate: body", response.body);
-    if (!response.ok)
-      return alert("Error changing usename");
-    alert("Username is updated successfully!");
-    navigateTo("/homelogin");
+    try {
+      const response = await genericFetch2("/api/private/updateinfo/username", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ newUsername, password })
+      });
+      alert("Username updated successfully to <<  " + response.pseudo + "  >>");
+      navigateTo("/homelogin");
+    } catch (err) {
+      alert(err.message);
+    }
+  });
+  const formEmail = document.getElementById("change-email-form");
+  formEmail.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const newEmail = formEmail["new-email"].value;
+    const password = formEmail["password"].value;
+    try {
+      const response = await genericFetch2("/api/private/updateinfo/email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ newEmail, password })
+      });
+      alert("Username updated successfully to <<  " + response.email + "  >>");
+      navigateTo("/homelogin");
+    } catch (err) {
+      alert(err.message);
+    }
   });
 }
 
@@ -602,13 +637,13 @@ var routes = [
   { path: "/logout", init: initLogout },
   { path: "/dashboard", view: DashboardView },
   { path: "/register", view: RegisterView, init: initRegister },
+  { path: "/registerok", view: RegisterValidView },
   { path: "/homelogin", view: HomeLoginView, init: initHomePage },
   { path: "/game", view: GameView, init: initGame },
   { path: "/quickgame/:id", view: QuickGameView, init: initQuickGame, cleanup: stopGame },
-  { path: "/profil", view: ProfilView, init: initProfil },
+  { path: "/profile", view: ProfileView, init: initProfile },
   { path: "/updateinfo", view: UpdateInfoView, init: initUpdateInfo },
-  { path: "/tournament", view: TournamentView },
-  { path: "/changeusername" }
+  { path: "/tournament", view: TournamentView }
 ];
 var currentRoute = null;
 function navigateTo(url) {
@@ -626,10 +661,10 @@ async function genericFetch2(url, options = {}) {
     if (result.error === "TokenExpiredError")
       alert("Session expired, please login");
     navigateTo("/logout");
-    throw new Error(result.error);
+    throw new Error(result.error || result.message || "Unknown error");
   }
   if (!res.ok) {
-    throw new Error(result.error);
+    throw new Error(result.error || result.message || "Unknown error");
   }
   return result;
 }
