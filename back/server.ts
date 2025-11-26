@@ -197,7 +197,7 @@ fastify.get("/api/logout", async (request, reply) => {
 
 const start = async () => {
 	try {
-		await fastify.listen({ port: 8443, host: "0.0.0.0" });
+		await fastify.listen({ port: 3000, host: "0.0.0.0" });
 		await db.connect();
 		// await users.deleteUserTable();
 		await gameInfo.deleteGameInfoTable();
