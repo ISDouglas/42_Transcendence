@@ -38,7 +38,7 @@ export async function getUpdateUsername(fastify: FastifyInstance, request: Fasti
 
 		const isMatch = await bcrypt.compare(password, user.password);
 		if (!isMatch) {
-			return reply.code(401).send({ message: "Wrong password. Please try again!" });
+			return reply.code(400).send({ message: "Wrong password. Please try again!" });
 		}
 
 		const updatedUser = await users.updateUsername(id, newUsername);
@@ -70,7 +70,7 @@ export async function getUpdateEmail(fastify: FastifyInstance, request: FastifyR
 
 		const isMatch = await bcrypt.compare(password, user.password);
 		if (!isMatch) {
-			return reply.code(401).send({ message: "Wrong password. Please try again!" });
+			return reply.code(400).send({ message: "Wrong password. Please try again!" });
 		}
 
 		const updatedUser = await users.updateEmail(id, newE);
