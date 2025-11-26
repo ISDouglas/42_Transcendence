@@ -266,6 +266,12 @@
   .mr-4 {
     margin-right: calc(var(--spacing) * 4);
   }
+<<<<<<< HEAD
+  .mb-1\.5 {
+    margin-bottom: calc(var(--spacing) * 1.5);
+  }
+=======
+>>>>>>> main
   .mb-2 {
     margin-bottom: calc(var(--spacing) * 2);
   }
@@ -299,6 +305,18 @@
   .h-screen {
     height: 100vh;
   }
+<<<<<<< HEAD
+  .min-h-screen {
+    min-height: 100vh;
+  }
+  .w-1\/2 {
+    width: calc(1/2 * 100%);
+  }
+  .w-14 {
+    width: calc(var(--spacing) * 14);
+  }
+=======
+>>>>>>> main
   .w-24 {
     width: calc(var(--spacing) * 24);
   }
@@ -320,6 +338,20 @@
   .w-full {
     width: 100%;
   }
+<<<<<<< HEAD
+  .max-w-\[550px\] {
+    max-width: 550px;
+  }
+  .grow {
+    flex-grow: 1;
+  }
+  .animate-pulse {
+    animation: var(--animate-pulse);
+  }
+  .grid-cols-1 {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
+=======
   .grow {
     flex-grow: 1;
   }
@@ -329,6 +361,7 @@
   .animate-pulse {
     animation: var(--animate-pulse);
   }
+>>>>>>> main
   .grid-cols-2 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -488,6 +521,12 @@
   .text-amber-700 {
     color: var(--color-amber-700);
   }
+<<<<<<< HEAD
+  .text-gray-500 {
+    color: var(--color-gray-500);
+  }
+=======
+>>>>>>> main
   .text-gray-600 {
     color: var(--color-gray-600);
   }
