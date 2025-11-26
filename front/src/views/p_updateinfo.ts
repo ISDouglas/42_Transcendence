@@ -1,3 +1,4 @@
+import { format } from "path";
 import { navigateTo, genericFetch } from "../router";
 
 export function UpdateInfoView(): string {
@@ -28,7 +29,41 @@ export async function initUpdateInfo() {
     alert("Username is updated successfully!");
     navigateTo("/homelogin");
   });
+  await initAvatar();
+}
 
+  async function initAvatar() {
+    const formAvatar = document.getElementById("upload_avatar") as HTMLFormElement;
+    if (formAvatar instanceof HTMLFormElement) {
+      formAvatar.addEventListener("submit", async (e: SubmitEvent) => {
+      e.preventDefault();
+      const avatarInput = formAvatar.querySelector<HTMLInputElement>('input[name="avatar"]');
+      const avatarFile  = avatarInput?.files?.[0];
+      if (!avatarFile || avatarFile.size === 0 || !avatarFile.name)
+      {
+        alert ("Please upload an avatar");
+        return;
+      }
+      await uploadAvatar(avatarFile);
+    });
+    }
+  }
+  
+   async function uploadAvatar(avatar: File) {
+    const form = new FormData();
+    form.append("avatar", avatar);
+    try {
+      const result =  await genericFetch("/api/private/updateinfo/uploads", {
+        method: "POST",
+        body: form,
+        credentials: "include"
+      });
+      console.log("uplaod success ok : ", result);
+      navigateTo("/profile");
+      } catch (err) {
+		      console.error(err);
+	    }
+  }
   // HANDLE CHANGE EMAIL
   // const formEmail = document.getElementById("change-email-form") as HTMLFormElement;
   // formEmail.addEventListener("submit", async (e) => {
@@ -73,5 +108,4 @@ export async function initUpdateInfo() {
   //   alert("Password is updated successfully! Please re-log in!");
   // });
 
-}
-
+// }

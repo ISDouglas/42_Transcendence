@@ -186,18 +186,15 @@
 	<main>
 		<h1>Page profile</h1>
 		<a href="/updateinfo" data-link class="btn w-48">Update Profile</a>
-		<p><strong>ID:</strong> <span id="profil-id"></span></p>
-        <p><strong>Username:</strong> <span id="profil-pseudo"></span></p>
-        <p><strong>Email:</strong> <span id="profil-email"></span></p>
-        <p><strong>Status:</strong> <span id="profil-status"></span></p>
-        <p><strong>Creation:</strong> <span id="profil-creation"></span></p>
-        <p><strong>Modification:</strong> <span id="profil-modification"></span></p>
-        <p><strong>Money:</strong> <span id="profil-money"></span></p>
-        <p><strong>ELO:</strong> <span id="profil-elo"></span></p>
-		<form id="upload_avatar" action ="/api/private/uploads" method="post" enctype="multipart/form-data">
-			<input type="file" name="avatar" accept="image/png, image/jpeg" />
-			<button type="submit">Upload</button>
-		</form>
+		<p><img id="profile-avatar" src="" alt="Your avatar" width="150"></span></p>
+		<p><strong>ID:</strong> <span id="profile-id"></span></p>
+        <p><strong>Username:</strong> <span id="profile-pseudo"></span></p>
+        <p><strong>Email:</strong> <span id="profile-email"></span></p>
+        <p><strong>Status:</strong> <span id="profile-status"></span></p>
+        <p><strong>Creation:</strong> <span id="profile-creation"></span></p>
+        <p><strong>Modification:</strong> <span id="profile-modification"></span></p>
+        <p><strong>Money:</strong> <span id="profile-money"></span></p>
+        <p><strong>ELO:</strong> <span id="profile-elo"></span></p>
 	</main>
 	</template>
 
@@ -234,6 +231,11 @@
 			<input type="password" name="confirm-new-password" placeholder="Confirm New Password" required />
             <button type="submit">Update Email</button>
         </form>
+		<h2><strong>Upload avatar</strong></h2>
+		<form id="upload_avatar" method="POST" enctype="multipart/form-data">
+			<input type="file" name="avatar" accept="image/png, image/jpeg"/>
+			<button type="submit">Upload</button>
+		</form>
 	</main>
   </template>
 

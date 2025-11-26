@@ -10,8 +10,7 @@ import fastifyCookie from "@fastify/cookie";
 import { tokenOK } from "./middleware/jwt";
 import { CookieSerializeOptions } from "@fastify/cookie";
 import multipart from "@fastify/multipart"
-import path from "path"
-import { pipeline } from "stream/promises"
+
 import { navigateTo } from "../front/src/router";
 import { collapseTextChangeRangesAcrossMultipleVersions } from "typescript";
 import bcrypt from "bcryptjs";
@@ -21,8 +20,10 @@ import FastifyHttpsAlwaysPlugin, { HttpsAlwaysOptions } from "fastify-https-alwa
 import { Tournament } from './DB/tournament';
 import { uploadPendingTournaments } from "./routes/tournament/tournament.service";
 import * as avalancheService from "./blockchain/avalanche.service";
-import { getProfile } from "./routes/profile/profile";
-import { getUpdateInfo, getUpdateUsername } from "./routes/profile/getUpdate";
+import { getProfile, displayAvatar } from "./routes/profile/profile";
+import { getUpdateInfo, getUpdateUsername, getUploadAvatar } from "./routes/profile/getUpdate";
+import { request } from "http";
+
 
 export const db = new ManageDB("./back/DB/database.db");
 export const users = new Users(db);
@@ -68,8 +69,12 @@ fastify.register(multipart, {
 fastify.addHook("onRequest", async(request: FastifyRequest, reply: FastifyReply) => {
 	if (request.url.startsWith("/api/private")) {
 		const user = await tokenOK(request, reply);
-		if (user !== null)
-			request.user = user;
+		if (user !== null) {
+			request.user = {
+				...user,
+				avatar: "/api/private/avatar"
+			};
+		}
 	}
 })
 
@@ -102,19 +107,6 @@ fastify.post("/api/private/profile", async (request: FastifyRequest, reply: Fast
 	return await getProfile(fastify, request, reply);
 });
 
-fastify.post("/api/private/uploads", async (request, reply) => {
-	const avatar = await request.file();
-	// console.log("avatar = ", avatar);
-	if (!avatar?.filename) {
-		return reply.status(400).send({ error:  "Nothing uploaded"});
-	}
-	const avatar_name = request.user?.user_id + "_" + avatar.filename;
-	const avatar_path = path.join(__dirname, "uploads", avatar_name);
-	await pipeline(avatar.file, fs.createWriteStream(avatar_path));
-	// navigateTo("/profil");
-	return reply.send({ message: "Upload succes", filename: avatar_name})
-
-});
 
 fastify.post("/api/private/updateinfo", async (request: FastifyRequest, reply: FastifyReply) => {
 	return await getUpdateInfo(fastify, request, reply);
@@ -123,6 +115,14 @@ fastify.post("/api/private/updateinfo", async (request: FastifyRequest, reply: F
 fastify.post("/api/private/updateinfo/username", async (request: FastifyRequest, reply: FastifyReply) => {
 	return await getUpdateUsername(fastify, request, reply);
 })
+
+fastify.post("/api/private/updateinfo/uploads", async (request, reply) => {
+	return await getUploadAvatar(request, reply);
+});
+
+fastify.get("/api/private/avatar", async (request: FastifyRequest, reply: FastifyReply) => {
+	return await displayAvatar(request, reply);
+});
 
 fastify.post("/api/private/game/create", async (request, reply) => {
 	const playerId = request.user?.user_id as any;
@@ -213,7 +213,7 @@ fastify.get("/api/logout", async (request, reply) => {
 
 const start = async () => {
 	try {
-		await fastify.listen({ port: 3000, host: "0.0.0.0" });
+		await fastify.listen({ port: 8443, host: "0.0.0.0" });
 		await db.connect();
 		// await users.deleteUserTable();
 		await gameInfo.deleteGameInfoTable();
