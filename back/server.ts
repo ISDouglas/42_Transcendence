@@ -67,7 +67,7 @@ fastify.addHook("onRequest", async(request: FastifyRequest, reply: FastifyReply)
 	if (request.url.startsWith("/api/private")) {
 		const user = await tokenOK(request, reply);
 		if (user !== null)
-			request.user = user
+			request.user = user;
 	}
 })
 

@@ -115,6 +115,10 @@ export class Users
 		const updatedUser = await this.getIDUser(id);
 		return updatedUser;
 	}
+
+	async updateAvatar(id: number, newAvatar: string) {
+		await this._db.execute(`UPDATE Users SET avatar = ? WHERE user_id = ?`, [newAvatar, id])
+	}
 }
 
 enum UserStatus

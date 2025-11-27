@@ -811,6 +811,9 @@ function navigateTo(url) {
   const state = { previous: window.location.pathname };
   history.pushState(state, "", url);
   router();
+  const avatar = document.getElementById("profile-avatar");
+  if (avatar)
+    avatar.src = "/api/private/avatar?ts=" + Date.now();
 }
 async function genericFetch2(url, options = {}) {
   const res = await fetch(url, {

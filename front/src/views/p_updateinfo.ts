@@ -105,6 +105,10 @@ export async function initUpdateInfo() {
         return;
       }     
       await uploadAvatar(avatarFile);
+      // const avatar = document.getElementById("profile-avatar") as HTMLImageElement;
+      // if (avatar) {
+      //   avatar.src = "/api/private/avatar?ts=" + Date.now();
+      // }
     });
     }
   }
