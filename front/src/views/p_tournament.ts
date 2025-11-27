@@ -1,4 +1,4 @@
-import { navigateTo } from "../router";
+import { navigateTo, genericFetch } from "../router";
 
 export function TournamentView(): string {
   const html = (document.getElementById("tournamenthtml") as HTMLTemplateElement).innerHTML;
@@ -40,12 +40,11 @@ function initTournamentPage() {
 async function testTournamentDB() {
   const testRanking = generateRandomRanking();
   try {
-    const res = await fetch("/api/private/tournament/add", {
+    const data = await genericFetch("/api/private/tournament/add", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ ranking: testRanking })
     });
-    const data = await res.json();
     const dbPanel = document.getElementById("db-panel");
     if (dbPanel) {
       dbPanel.innerHTML = `
@@ -65,9 +64,7 @@ async function testTournamentDB() {
 // ===================== Show DB vs Blockchain =====================
 async function showDBOnChain() {
   try {
-    const res = await fetch("/api/private/tournament/all");
-    const data = await res.json();
-
+    const data = await genericFetch("/api/private/tournament/all");
     const dbPanel = document.getElementById("db-panel");
     const chainPanel = document.getElementById("chain-panel");
     if (!dbPanel || !chainPanel) return;
