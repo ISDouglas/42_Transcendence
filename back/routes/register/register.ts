@@ -38,10 +38,10 @@ async function checkEmail(email: string)
 		throw { field: "email", message: "Email already in use." };
 }
 
-export const ALLOWED_SPECIALS = [
+export const ALLOWED_SPECIALS = new Set([
   '!', '#', '$', '%', '&', '(', ')', '*', '+', '-', '.',
   '=', '?', '@', '\\', '^', '_',
-];
+]);
 
 async function checkPassword(password: string)
 {
@@ -63,11 +63,8 @@ async function checkPassword(password: string)
     	check++;
 	if (check !== 6)
 		throw { field: "password", message: "error password"};
-	const allowedCharsRegex = new RegExp(
-    `^[A-Za-z0-9${escapeForRegex(ALLOWED_SPECIALS.join(''))}]+$`
-  );
+    const forbiddenChars = [...password].filter(c => !ALLOWED_SPECIALS.has(c) && !/[a-zA-Z0-9]/.test(c));
+	if (forbiddenChars.length > 0)
+		throw { field: "password", message: "error password"};
 }
 
-function escapeForRegex(str: string): string {
-  return str.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
-}
