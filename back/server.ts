@@ -6,19 +6,23 @@ import { Users } from './DB/users';
 import { manageLogin } from './routes/login/login';
 import { manageRegister } from "./routes/register/register";
 import { GameInfo } from "./DB/gameinfo";
-import fastifyCookie from "fastify-cookie";
+import fastifyCookie from "@fastify/cookie";
 import { tokenOK } from "./middleware/jwt";
-import { CookieSerializeOptions } from "fastify-cookie";
+import { CookieSerializeOptions } from "@fastify/cookie";
+import multipart from "@fastify/multipart"
+
+import { navigateTo } from "../front/src/router";
 import { collapseTextChangeRangesAcrossMultipleVersions } from "typescript";
 import bcrypt from "bcryptjs";
 import { createGame, joinGame, endGame, updateGamePos, updateGameStatus, displayGameList } from "./routes/game/game";
 import fs from "fs";
 import FastifyHttpsAlwaysPlugin, { HttpsAlwaysOptions } from "fastify-https-always"
 import { Tournament } from './DB/tournament';
-import { uploadPendingTournaments } from "./routes/tournament/tournament.service";
+import * as tournamentService from "./routes/tournament/tournament.service";
 import * as avalancheService from "./blockchain/avalanche.service";
-import { getProfile } from "./routes/profile/profile";
-import { getUpdateInfo, getUpdateUsername } from "./routes/profile/getUpdate";
+import { getProfile, displayAvatar } from "./routes/profile/profile";
+import { getUpdateInfo, getUpdateUsername, getUpdateEmail, getUploadAvatar } from "./routes/profile/getUpdate";
+
 
 export const db = new ManageDB("./back/DB/database.db");
 export const users = new Users(db);
@@ -52,11 +56,18 @@ fastify.register(fastifyCookie, {
 
 fastify.register(FastifyHttpsAlwaysPlugin, httpsAlwaysOpts)
 
+fastify.register(multipart, {
+	limits:{
+		fileSize: 2 * 1024 * 1024,
+		files: 1,
+	}
+})
+
 fastify.addHook("onRequest", async(request: FastifyRequest, reply: FastifyReply) => {
 	if (request.url.startsWith("/api/private")) {
 		const user = await tokenOK(request, reply);
 		if (user !== null)
-			request.user = user;
+			request.user = user
 	}
 })
 
@@ -93,6 +104,7 @@ fastify.post("/api/private/profile", async (request: FastifyRequest, reply: Fast
 	return await getProfile(fastify, request, reply);
 });
 
+
 fastify.post("/api/private/updateinfo", async (request: FastifyRequest, reply: FastifyReply) => {
 	return await getUpdateInfo(fastify, request, reply);
 });
@@ -100,6 +112,17 @@ fastify.post("/api/private/updateinfo", async (request: FastifyRequest, reply: F
 fastify.post("/api/private/updateinfo/username", async (request: FastifyRequest, reply: FastifyReply) => {
 	return await getUpdateUsername(fastify, request, reply);
 })
+
+fastify.post("/api/private/updateinfo/email", async (request: FastifyRequest, reply: FastifyReply) => {
+	return await getUpdateEmail(fastify, request, reply);
+})
+fastify.post("/api/private/updateinfo/uploads", async (request, reply) => {
+	return await getUploadAvatar(request, reply);
+});
+
+fastify.get("/api/private/avatar", async (request: FastifyRequest, reply: FastifyReply) => {
+	return await displayAvatar(request, reply);
+});
 
 fastify.post("/api/private/game/create", async (request, reply) => {
 	const playerId = request.user?.user_id as any;
@@ -140,52 +163,13 @@ fastify.post("/api/private/game/end", async (request, reply) => {
 	return { message: "Game saved!" };
 });
 
-fastify.post("/api/private/tournament/add", async (request, reply) => {
-	try {
-	  const { ranking } = request.body as any;
-	  if (!Array.isArray(ranking) || ranking.length !== 8) {
-		return reply.status(400).send({ error: "Ranking must be an array of 8 numbers" });
-	  }
-	  const id = await tournament.insertTournament(ranking);
-	  try {
-		await uploadPendingTournaments();
-	  } catch (err) {
-		console.error("Failed to upload tournaments on-chain:", err);
-	  } 
-	  return reply.send({
-		message: "Tournament saved!",
-		tournamentId: id
-	  });
-	} catch (err) {
-	  console.error("Error saving tournament:", err);
-	  return reply.status(500).send({ error: "Internal server error" });
-	}
-});
 
-fastify.get("/api/private/tournament/all", async (_, reply) => {
-	try {
-	  const all = await tournament.getAllTournaments();  
-	  const result = [];
-  
-	  for (const t of all) {
-		const ranking = [
-		  t.winner_id, t.second_place_id, t.third_place_id, t.fourth_place_id,
-		  t.fifth_place_id, t.sixth_place_id, t.seventh_place_id, t.eighth_place_id
-		];
-		const onChain = t.onchain === 1;
-		const blockchainRanking = onChain ? await avalancheService.getTournament(t.id) : null;
-		result.push({
-		  tournamentId: t.id,
-		  ranking,
-		  onChain,
-		  blockchainRanking
-		});
-	  }
-	  return reply.send(result);
-	} catch (err) {
-	  console.error("Error fetching tournaments:", err);
-	  return reply.status(500).send({ error: "Internal server error" });
-	}
+fastify.post("/api/private/tournament/add", (req, reply) => {
+	return tournamentService.updateTournament(req, reply);
+	});
+	  
+fastify.get("/api/private/tournament/all", (req, reply) => {
+	return tournamentService.getAllTournamentsDetailed(req, reply);
 });
 
 fastify.get("/api/logout", async (request, reply) => {
@@ -198,6 +182,8 @@ fastify.get("/api/logout", async (request, reply) => {
 	reply.clearCookie("token", options);
 	return { message: "is logged out" };
 })
+
+
 
 const start = async () => {
 	try {

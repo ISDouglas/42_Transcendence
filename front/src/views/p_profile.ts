@@ -1,4 +1,4 @@
-import { genericFetch } from "../router";
+import { genericFetch, navigateTo } from "../router";
 
 export function ProfileView(): string {
   return (document.getElementById("profilehtml") as HTMLTemplateElement).innerHTML;
@@ -10,12 +10,16 @@ export async function initProfile() {
     method: "POST",
   });
 
+  let status = "online";
+  if (profile.status === 0)
+    status = "offline";
   (document.getElementById("profile-id") as HTMLElement).textContent = profile.user_id;
   (document.getElementById("profile-pseudo") as HTMLElement).textContent = profile.pseudo;
   (document.getElementById("profile-email") as HTMLElement).textContent = profile.email;
-  (document.getElementById("profile-status") as HTMLElement).textContent = profile.status;
+  (document.getElementById("profile-status") as HTMLElement).textContent = status;
   (document.getElementById("profile-creation") as HTMLElement).textContent = profile.creation_date;
   (document.getElementById("profile-modification") as HTMLElement).textContent = profile.modification_date;
   (document.getElementById("profile-money") as HTMLElement).textContent = profile.money;
   (document.getElementById("profile-elo") as HTMLElement).textContent = profile.elo;
 }
+

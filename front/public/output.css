@@ -284,9 +284,12 @@
   .mr-4 {
     margin-right: calc(var(--spacing) * 4);
   }
+<<<<<<< HEAD
   .mb-0\.5 {
     margin-bottom: calc(var(--spacing) * 0.5);
   }
+=======
+>>>>>>> main
   .mb-2 {
     margin-bottom: calc(var(--spacing) * 2);
   }
@@ -702,6 +705,7 @@
       display: none;
     }
   }
+<<<<<<< HEAD
   .dark\:bg-amber-950\/30 {
     &:where(.dark, .dark *) {
       background-color: color-mix(in srgb, oklch(27.9% 0.077 45.635) 30%, transparent);
@@ -718,6 +722,8 @@
       }
     }
   }
+=======
+>>>>>>> main
   .dark\:bg-black\/30 {
     &:where(.dark, .dark *) {
       background-color: color-mix(in srgb, #000 30%, transparent);
@@ -726,11 +732,14 @@
       }
     }
   }
+<<<<<<< HEAD
   .dark\:text-white {
     &:where(.dark, .dark *) {
       color: var(--color-white);
     }
   }
+=======
+>>>>>>> main
 }
 @layer base;
 @layer components {

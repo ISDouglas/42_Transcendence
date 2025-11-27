@@ -1,3 +1,4 @@
+import { format } from "path";
 import { navigateTo, genericFetch } from "../router";
 
 export function UpdateInfoView(): string {
@@ -19,59 +20,108 @@ export async function initUpdateInfo() {
     const newUsername = formUsername["new-username"].value;
     const password = formUsername["password"].value;
 
-    const response = await genericFetch("/api/private/updateinfo/username", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", },
-      body: JSON.stringify({ newUsername, password })
-    });
+    try {
+      const response = await genericFetch("/api/private/updateinfo/username", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", },
+        body: JSON.stringify({ newUsername, password })
+      });
 
-    alert("Username is updated successfully!");
-    navigateTo("/homelogin");
+      alert("Username updated successfully to <<  " + response.pseudo + "  >>");
+      navigateTo("/homelogin");
+
+    } catch (err: any) {
+      alert(err.message);
+    }
   });
 
-  // HANDLE CHANGE EMAIL
-  // const formEmail = document.getElementById("change-email-form") as HTMLFormElement;
-  // formEmail.addEventListener("submit", async (e) => {
-  //   e.preventDefault();
+    // HANDLE CHANGE EMAIL
+  const formEmail = document.getElementById("change-email-form") as HTMLFormElement;
+  formEmail.addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-  //   const newEmail = formEmail["new-email"].value;
-  //   const password = formEmail["password"].value;
+    const newEmail = formEmail["new-email"].value;
+    const password = formEmail["password"].value;
 
-  //   const response = await genericFetch("/api/private/change-email", {
-  //     method: "POST",
-  //     credentials: "include",
-  //     body: JSON.stringify({ newEmail, password })
-  //   });
+    try {
+      const response = await genericFetch("/api/private/updateinfo/email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", },
+        body: JSON.stringify({ newEmail, password })
+      });
 
-  //   if (!response.ok)
-  //     return alert("Error changing email");
-  //   alert("Email is updated successfully!");
-  // });
+      alert("Username updated successfully to <<  " + response.email + "  >>");
+      navigateTo("/homelogin");
 
-  // // HANDLE CHANGE PASSWORD
+    } catch (err: any) {
+      alert(err.message);
+    }
+  });
+
+         // // HANDLE CHANGE PASSWORD
   // const formPassword = document.getElementById("change-password-form") as HTMLFormElement;
   // formPassword.addEventListener("submit", async (e) => {
   //   e.preventDefault();
 
   //   const oldPw = formPassword["old-password"].value;
   //   const newPw = formPassword["new-password"].value;
-  //   const confirmPw = formPassword["confirm-new-password"].value;
+  //   const confirm = formPassword["confirm-new-password"].value;
 
-  //   if (newPw !== confirmPw) {
+  //   if (newPw !== confirm) {
   //     alert("New password and confirmation do not match!");
   //     return ;
   //   }
 
-  //   const response = await genericFetch("/api/private/change-password", {
-  //     method: "POST",
-  //     credentials: "include",
-  //     body: JSON.stringify({ oldPw, newPw })
-  //   });
+  //   try {
+  //     const response = await genericFetch("/api/private/updateinfo/password", {
+  //       method: "POST",
+  //       credentials: "include",
+  //       body: JSON.stringify({ newPw, oldPw })
+  //     });
 
-  //   if (!response.ok)
-  //     return alert("Error changing password!");
-  //   alert("Password is updated successfully! Please re-log in!");
+  //     if (!response.ok)
+  //       return alert("Error changing password!");
+  //     alert("Password is updated successfully! Please re-log in!");
+
+  //   } catch (err: any) {
+
+  //   }
   // });
 
+
+  await initAvatar();
 }
 
+  async function initAvatar() {
+    const formAvatar = document.getElementById("upload_avatar") as HTMLFormElement;
+    if (formAvatar instanceof HTMLFormElement) {
+      formAvatar.addEventListener("submit", async (e: SubmitEvent) => {
+      e.preventDefault();
+      const avatarInput = formAvatar.querySelector<HTMLInputElement>('input[name="avatar"]');
+      const avatarFile  = avatarInput?.files?.[0];
+      if (!avatarFile || avatarFile.size === 0 || !avatarFile.name)
+      {
+        alert ("Please upload an avatar");
+        return;
+      }     
+      await uploadAvatar(avatarFile);
+    });
+    }
+  }
+  
+   async function uploadAvatar(avatar: File) {
+    const form = new FormData();
+    form.append("avatar", avatar);
+    try {
+      const result =  await genericFetch("/api/private/updateinfo/uploads", {
+        method: "POST",
+        body: form,
+        credentials: "include"
+      });
+      console.log("uplaod success ok : ", result);
+      navigateTo("/profile");
+      } catch (err) {
+		      console.error(err);
+	    }
+  }
+ 
