@@ -7,9 +7,10 @@ export function GameView(): string {
 export function initGame() {
 	const createGameButton = document.getElementById("create-game");
 	createGameButton?.addEventListener("click", async () => {
-		await genericFetch("/api/private/game/create", {
+		const { gameId } = await genericFetch("/api/private/game/create", {
 			method: "POST"
 		});
+		navigateTo(`/quickgame/${gameId}`);
 	});
 
 	const gameListButton = document.getElementById("display-game-list");
@@ -30,6 +31,7 @@ export function initGame() {
 async function loadGames()
 {
 	const { games } = await genericFetch("/api/private/game/list");
+	console.log("list : ", ...games);
 	renderGameList(games);
 }
 
@@ -45,10 +47,11 @@ function renderGameList(games: any[]) {
 	container.innerHTML = games.map(game => `
 	<div class="game-item">
 		<p>Game #${game.id}</p>
-		<p>Player1 : ${game.playerId1}</p>
-		<p>Player2 : ${game.playerId2}</p>
+		<p>Player1 : ${game.player1.pseudo}</p>
+		<p>Player2 : ${game.player2.pseudo}</p>
 		<p>Status : ${game.state}</p>
-		<button data-game-id="${game.id}" class="join-game-btn">Rejoindre</button>
+		<p>Date : ${game.createdAt}</p>
+		<button data-game-id="${game.id}" class="join-game-btn btn w-32">Rejoindre</button>
 	</div>
 	`).join("");
 
@@ -62,7 +65,7 @@ function renderGameList(games: any[]) {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({
-					id: id
+					gameId: id
 				})
 			});
 			console.log("Saved data:", res);

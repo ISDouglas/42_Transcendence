@@ -1,5 +1,6 @@
 export const games = new Map<number, Game>();
 import { GameInfo } from "./../../DB/gameinfo";
+import { users } from '../../server';
 
 export class Game {
 
@@ -75,20 +76,20 @@ export function updateGameStatus(gameId: number, status: string)
 		game.status = status;
 }
 
-export function displayGameList()
+export async function displayGameList()
 {
 	const list: any = [];
 
 	for (const game of games.values()) {
 		list.push({
 			id: game.id,
-			player1: game.idPlayer1,
-			player2: game.idPlayer2,
+			player1: await users.getPseudoFromId(game.idPlayer1),
+			player2: await users.getPseudoFromId(game.idPlayer2),
 			state: game.status,
 			createdAt: game.gameDate
 		});
 	}
-
+	console.log("list :", list);
 	return list;
 }
 
@@ -96,7 +97,13 @@ export function joinGame(playerId: number, gameId: number)
 {
 	const game = games.get(gameId);
 	if (game)
-		game.idPlayer1 = playerId;
+		{
+			if (isNaN(game.idPlayer2))
+			game.idPlayer2 = playerId;
+		else
+			console.log("Game is already full.");
+	}
+	console.log(game);
 }
 
 export async function endGame(winner_id: number, loser_id: number, winner_score: number,
