@@ -9,16 +9,11 @@ import { GameInfo } from "./DB/gameinfo";
 import fastifyCookie from "@fastify/cookie";
 import { tokenOK } from "./middleware/jwt";
 import multipart from "@fastify/multipart"
-
-import { navigateTo } from "../front/src/router";
-import { collapseTextChangeRangesAcrossMultipleVersions } from "typescript";
-import bcrypt from "bcryptjs";
 import { createGame, joinGame, endGame, updateGamePos, updateGameStatus, displayGameList } from "./routes/game/game";
 import fs from "fs";
 import FastifyHttpsAlwaysPlugin, { HttpsAlwaysOptions } from "fastify-https-always"
 import { Tournament } from './DB/tournament';
 import * as tournamentService from "./routes/tournament/tournament.service";
-import * as avalancheService from "./blockchain/avalanche.service";
 import { getProfile, displayAvatar } from "./routes/profile/profile";
 import { getUpdateInfo, getUpdateUsername, getUpdateEmail, getUploadAvatar, getUpdatePassword, getUpdateStatus } from "./routes/profile/getUpdate";
 import { logout } from "./routes/logout/logout";
