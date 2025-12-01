@@ -6,7 +6,7 @@ export interface IUsers {
 	email: string;
 	password: string;
 	avatar: string;
-	status: UserStatus;
+	status: string;
 	creation_date: Date;
 	modification_date: Date;
 	money: number;
@@ -31,7 +31,7 @@ export class Users
                 email TEXT NOT NULL,
                 password TEXT NOT NULL,
 				avatar TEXT NOT NULL,
-                status INTEGER NOT NULL,
+                status TEXT NOT NULL,
                 creation_date TEXT NOT NULL,
 				modification_date TEXT NOT NULL,
                 money INTEGER DEFAULT 0,
@@ -51,7 +51,7 @@ export class Users
 		email,
 		password,
 		"0.png",
-		UserStatus.offline,
+		"online",
 		new Date().toISOString().replace("T", " ").split(".")[0],
 		new Date().toISOString().replace("T", " ").split(".")[0],
 		0,
@@ -132,15 +132,17 @@ export class Users
 	}
 
 	async updateAvatar(id: number, newAvatar: string) {
-		await this._db.execute(`UPDATE Users SET avatar = ? WHERE user_id = ?`, [newAvatar, id])
+		await this._db.execute(`UPDATE Users SET avatar = ? WHERE user_id = ?`, [newAvatar, id]);
 		const updatedTime = new Date().toISOString().replace("T", " ").split(".")[0];
 		await this._db.query(`UPDATE Users SET modification_date = ? WHERE user_id = ?`, [updatedTime, id]);
 	}
-}
 
-enum UserStatus
-{
-	offline, 
-	online,
-	playing
+
+	async updateStatus(id: number, status: string): Promise < IUsers> { 
+		console.log("ID =", id);
+		await this._db.execute(`UPDATE Users SET status = ? WHERE user_id = ?`, [status, id]);
+		const updatedUser = await this.getIDUser(id);
+		console.log("TSATUS = ", updatedUser.status);
+		return updatedUser;
+	}
 }

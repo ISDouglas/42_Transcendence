@@ -20,6 +20,11 @@ export const checkAuth = async (token: string, reply: FastifyReply): Promise< IU
 		return user;
 	} catch  (error) {
 		const err = error as Error;
+		if (err.name === "TokenExpiredError")
+		{
+			const id = jwt.decode(token) as { id : number }
+			await users.updateStatus(id.id, "offline");
+		}
 		return err;
 	}
 }

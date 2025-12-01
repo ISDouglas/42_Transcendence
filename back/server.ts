@@ -8,7 +8,6 @@ import { manageRegister } from "./routes/register/register";
 import { GameInfo } from "./DB/gameinfo";
 import fastifyCookie from "@fastify/cookie";
 import { tokenOK } from "./middleware/jwt";
-import { CookieSerializeOptions } from "@fastify/cookie";
 import multipart from "@fastify/multipart"
 
 import { navigateTo } from "../front/src/router";
@@ -21,7 +20,8 @@ import { Tournament } from './DB/tournament';
 import * as tournamentService from "./routes/tournament/tournament.service";
 import * as avalancheService from "./blockchain/avalanche.service";
 import { getProfile, displayAvatar } from "./routes/profile/profile";
-import { getUpdateInfo, getUpdateUsername, getUpdateEmail, getUploadAvatar, getUpdatePassword } from "./routes/profile/getUpdate";
+import { getUpdateInfo, getUpdateUsername, getUpdateEmail, getUploadAvatar, getUpdatePassword, getUpdateStatus } from "./routes/profile/getUpdate";
+import { logout } from "./routes/logout/logout";
 
 
 export const db = new ManageDB("./back/DB/database.db");
@@ -104,6 +104,9 @@ fastify.post("/api/private/profile", async (request: FastifyRequest, reply: Fast
 	return await getProfile(fastify, request, reply);
 });
 
+fastify.post("/api/private/updateinfo/status", async (request: FastifyRequest, reply: FastifyReply) => {
+	return await getUpdateStatus(request, reply);
+});
 
 fastify.post("/api/private/updateinfo", async (request: FastifyRequest, reply: FastifyReply) => {
 	return await getUpdateInfo(fastify, request, reply);
@@ -178,14 +181,7 @@ fastify.get("/api/private/tournament/all", (req, reply) => {
 });
 
 fastify.get("/api/logout", async (request, reply) => {
-	const options: CookieSerializeOptions = {
-		httpOnly: true,
-		secure: false, /*ATTENTION METTRE TRUE QUAND ON SERA EN HTTPS*/
-		sameSite: "strict",
-		path: "/",
-	};
-	reply.clearCookie("token", options);
-	return { message: "is logged out" };
+	return await logout(request, reply);
 })
 
 
