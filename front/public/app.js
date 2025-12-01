@@ -612,13 +612,23 @@ async function initProfile() {
   const profile = await genericFetch2("/api/private/profile", {
     method: "POST"
   });
-  let status = "online";
-  if (profile.status === 0)
-    status = "offline";
   document.getElementById("profile-id").textContent = profile.user_id;
   document.getElementById("profile-pseudo").textContent = profile.pseudo;
   document.getElementById("profile-email").textContent = profile.email;
-  document.getElementById("profile-status").textContent = status;
+  const select = document.getElementById("profile-status");
+  if (select) {
+    select.value = profile.status;
+    select.addEventListener("change", async (e) => {
+      const status = e.target.value;
+      console.log("DANS EVENT");
+      await genericFetch2("/api/private/updateinfo/status", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status })
+      });
+      console.log("Status changed :", status);
+    });
+  }
   document.getElementById("profile-creation").textContent = profile.creation_date;
   document.getElementById("profile-modification").textContent = profile.modification_date;
   document.getElementById("profile-money").textContent = profile.money;

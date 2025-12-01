@@ -136,3 +136,9 @@ export async function getUploadAvatar(request: FastifyRequest, reply: FastifyRep
 		// console.log("nom avatar : ", avatar_name);
 		return reply.status(200).send({ message: "Upload succes", filename: avatar_name})
 }
+
+export async function getUpdateStatus(request: FastifyRequest, reply: FastifyReply) {
+	const { status } = request.body as { status: string };
+	const updatedUser = await users.updateStatus(request.user!.user_id, status);
+	return reply.status(200).send({ message: "new status", status: updatedUser.status});
+}

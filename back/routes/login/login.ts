@@ -14,10 +14,11 @@ export async function manageLogin(pseudo: string, password: string, reply: Fasti
 		const jwtoken = createJWT(info.user_id);
 		const options: CookieSerializeOptions = {
 			httpOnly: true,
-			secure: false, /*ATTENTION METTRE TRUE QUAND ON SERA EN HTTPS*/
+			secure: true,
 			sameSite: "strict",
 			path: "/",
 		};
+		users.updateStatus(info.user_id, "online");
 		reply.setCookie("token", jwtoken, options).status(200).send({ ok:true, message: "Login successful"})
 	}
 	catch (err)
