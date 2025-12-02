@@ -9,6 +9,8 @@ import { ProfileView, initProfile} from "./views/p_profile";
 import { UpdateInfoView, initUpdateInfo } from "./views/p_updateinfo";
 import { TournamentView} from "./views/p_tournament";
 import { initLogout } from "./views/logout";
+import { fromTwos } from "ethers";
+import { Statement } from "sqlite3";
 
 const routes = [
   { path: "/", view: HomeView, init: initHome},
@@ -26,17 +28,17 @@ const routes = [
 ];
 
 let currentRoute: any = null;
+let currentPath: string
 
 export function navigateTo(url: string) {
-	const state = { previous: window.location.pathname};
+	const state = { from: window.location.pathname };
 	history.pushState(state, "", url);
-  router();
+	currentPath = url;
+	router();
 	const avatar = document.getElementById("profile-avatar") as HTMLImageElement;
   	if (avatar) 
     	avatar.src = "/api/private/avatar?ts=" + Date.now();
 }
-
-
 
 export async function genericFetch(url: string, options: RequestInit = {}) {
 	const res = await fetch(url, {
@@ -99,25 +101,47 @@ export function router() {
 }
 
 export function initRouter() {
-  document.body.addEventListener("click", (e) => {
-    const target = e.target as HTMLElement;
-    const link = target.closest("[data-link]") as HTMLElement | null;
-    if (link) {
-      e.preventDefault();
-      const url = (link as HTMLAnchorElement).getAttribute("href");
-      if (url) {
-        navigateTo(url);
-      }
-    }
+	document.body.addEventListener("click", (e) => {
+    	const target = e.target as HTMLElement;
+    	const link = target.closest("[data-link]") as HTMLElement | null;
+    	if (link) {
+    		e.preventDefault();
+    		const url = (link as HTMLAnchorElement).getAttribute("href");
+    		if (url) {
+    			navigateTo(url);
+    		}
+    	}
   });
-  window.addEventListener("popstate", (event) => {
-	const path = window.location.pathname;
-	const previous = event.state?.previous;
-	const public_path = ["/", "/login", "/register"];
-	const is_private = !public_path.includes(path)
-	if (is_private && previous && public_path.includes(previous))
-		history.replaceState( { previous: "/homelogin" }, "", "/homelogin");
-	router();
+  	history.replaceState({ from: "/" }, "", "/");
+	currentPath = "/";
+  	window.addEventListener("popstate", (event) => {	
+		popState();
 	});
   router();
+}
+
+function popState() {
+	const path = window.location.pathname;
+	const publicPath = ["/", "/login", "/register", "/logout"];
+	const toIsPrivate = !publicPath.includes(path);
+	const fromIsPrivate = !publicPath.includes(currentPath);
+	if (!history.state.from && fromIsPrivate)
+	{
+		history.replaceState({ from: "/homelogin" }, "", "/homelogin");
+		currentPath = "/homelogin";
+		navigateTo("/logout");
+	}
+	else if (!history.state.from && !fromIsPrivate)
+    {
+		history.replaceState({ from: "/" }, "", "/");
+		currentPath = "/";
+	}
+	else if (!toIsPrivate && fromIsPrivate)
+	{
+		history.replaceState( { from: "/homelogin" }, "", "/homelogin");
+		currentPath = "/homelogin";
+	}
+	else
+		currentPath = path;
+	router();
 }

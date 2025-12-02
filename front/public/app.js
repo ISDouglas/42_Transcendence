@@ -858,8 +858,10 @@ var init_logout = __esm({
 
 // front/src/router.ts
 function navigateTo(url) {
-  const state = { previous: window.location.pathname };
+  const state = { from: window.location.pathname };
+  console.log(state.from);
   history.pushState(state, "", url);
+  currentPath = url;
   router();
   const avatar = document.getElementById("profile-avatar");
   if (avatar)
@@ -925,18 +927,33 @@ function initRouter() {
       }
     }
   });
+  history.replaceState({ from: "/" }, "", "/");
+  currentPath = "/";
   window.addEventListener("popstate", (event) => {
-    const path = window.location.pathname;
-    const previous = event.state?.previous;
-    const public_path = ["/", "/login", "/register"];
-    const is_private = !public_path.includes(path);
-    if (is_private && previous && public_path.includes(previous))
-      history.replaceState({ previous: "/homelogin" }, "", "/homelogin");
-    router();
+    popState();
   });
   router();
 }
-var routes, currentRoute;
+function popState() {
+  const path = window.location.pathname;
+  const publicPath = ["/", "/login", "/register", "/logout"];
+  const toIsPrivate = !publicPath.includes(path);
+  const fromIsPrivate = !publicPath.includes(currentPath);
+  if (!history.state.from && fromIsPrivate) {
+    history.replaceState({ from: "/homelogin" }, "", "/homelogin");
+    currentPath = "/homelogin";
+    navigateTo("/logout");
+  } else if (!history.state.from && !fromIsPrivate) {
+    history.replaceState({ from: "/" }, "", "/");
+    currentPath = "/";
+  } else if (!toIsPrivate && fromIsPrivate) {
+    history.replaceState({ from: "/homelogin" }, "", "/homelogin");
+    currentPath = "/homelogin";
+  } else
+    currentPath = path;
+  router();
+}
+var routes, currentRoute, currentPath;
 var init_router = __esm({
   "front/src/router.ts"() {
     "use strict";
