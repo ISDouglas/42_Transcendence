@@ -901,6 +901,9 @@ async function loadHeader() {
   const container = document.getElementById("header-container");
   if (container) container.innerHTML = html;
   getPseudoHeader3();
+  const avatar = document.getElementById("profile-avatar");
+  if (avatar)
+    avatar.src = "/api/private/avatar?ts=" + Date.now();
 }
 async function getPseudoHeader3() {
   try {
@@ -920,7 +923,8 @@ function router() {
   }
   const match = matchRoute(location.pathname);
   if (!match) {
-    document.querySelector("#app").innerHTML = "<h1>404 Not Found</h1>";
+    const error = document.getElementById("error");
+    document.querySelector("#app").innerHTML = error.innerHTML;
     return;
   }
   const { route, params } = match;

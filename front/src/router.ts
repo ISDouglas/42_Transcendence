@@ -36,8 +36,8 @@ export function navigateTo(url: string) {
 	currentPath = url;
 	router();
 	const avatar = document.getElementById("profile-avatar") as HTMLImageElement;
-  	if (avatar) 
-    	avatar.src = "/api/private/avatar?ts=" + Date.now();
+	if (avatar) 
+		avatar.src = "/api/private/avatar?ts=" + Date.now();
 }
 
 export async function genericFetch(url: string, options: RequestInit = {}) {
@@ -76,11 +76,14 @@ function matchRoute(pathname: string) {
 }
 
 export async function loadHeader() {
-    const response = await fetch('/header.html');
-    const html = await response.text();
-    const container = document.getElementById('header-container');
-    if (container) container.innerHTML = html;
+	const response = await fetch('/header.html');
+	const html = await response.text();
+	const container = document.getElementById('header-container');
+	if (container) container.innerHTML = html;
 	getPseudoHeader()
+	const avatar = document.getElementById("profile-avatar") as HTMLImageElement;
+	if (avatar) 
+		avatar.src = "/api/private/avatar?ts=" + Date.now();
 }
 
 export async function getPseudoHeader()
@@ -107,7 +110,8 @@ export function router() {
 	const match = matchRoute(location.pathname);
 
 	if (!match) {
-		document.querySelector("#app")!.innerHTML = "<h1>404 Not Found</h1>";
+		const error = document.getElementById("error") as HTMLTemplateElement;
+		document.querySelector("#app")!.innerHTML = error.innerHTML;
 		return;
 	}
 

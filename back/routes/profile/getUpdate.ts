@@ -117,7 +117,6 @@ export async function getUpdatePassword(fastify: FastifyInstance, request: Fasti
 
 export async function getUploadAvatar(request: FastifyRequest, reply: FastifyReply) {
 	const avatar = await request.file();
-		// console.log("avatar = ", avatar);
 		if (!avatar?.filename) {
 			return reply.status(400).send({ error: "Nothing uploaded"});
 		}
@@ -125,15 +124,10 @@ export async function getUploadAvatar(request: FastifyRequest, reply: FastifyRep
 		if (!image)
 			return reply.status(400).send({ error: "Bad file"})
 		const type =  mime.extension(image);
-		// if (request.user?.avatar !== "0.png")
-  		// 	fs.unlinkSync(path.join(__dirname, "../../uploads", request.user!.avatar));
-
-		// const avatar_name = request.user!.user_id + "_" + Date.now() + "." + type;
 		const avatar_name = request.user!.user_id + "." + type;
 		const avatar_path = path.join(__dirname, "../../uploads", avatar_name);
 		await pipeline(avatar.file, fs.createWriteStream(avatar_path));
 		await users.updateAvatar(request.user!.user_id, avatar_name);
-		// console.log("nom avatar : ", avatar_name);
 		return reply.status(200).send({ message: "Upload succes", filename: avatar_name})
 }
 

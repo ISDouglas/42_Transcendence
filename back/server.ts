@@ -125,8 +125,9 @@ fastify.post("/api/private/updateinfo/uploads", async (request, reply) => {
 	return await getUploadAvatar(request, reply);
 });
 
-
-
+fastify.get("/api/private/avatar", async (request: FastifyRequest, reply: FastifyReply) => {
+	return await displayAvatar(request, reply);
+});
 
 fastify.post("/api/private/game/create", async (request, reply) => {
 	const playerId = request.user?.user_id as any;
