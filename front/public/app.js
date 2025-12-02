@@ -12,7 +12,6 @@ function HomeView() {
 }
 async function initHome() {
   const res = await fetch("/api/checkLogin", { method: "GET", credentials: "include" });
-  console.log(res.ok);
   if (res.ok) {
     navigateTo("/homelogin");
   }
@@ -620,7 +619,6 @@ async function initProfile() {
     select.value = profile.status;
     select.addEventListener("change", async (e) => {
       const status = e.target.value;
-      console.log("DANS EVENT");
       await genericFetch2("/api/private/updateinfo/status", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -858,7 +856,6 @@ var init_logout = __esm({
 // front/src/router.ts
 function navigateTo(url) {
   const state = { from: window.location.pathname };
-  console.log(state.from);
   history.pushState(state, "", url);
   currentPath = url;
   router();
@@ -944,8 +941,7 @@ function initRouter() {
       }
     }
   });
-  history.replaceState({ from: "/" }, "", "/");
-  currentPath = "/";
+  currentPath = window.location.pathname;
   window.addEventListener("popstate", (event) => {
     popState();
   });

@@ -44,7 +44,7 @@ const httpsAlwaysOpts: HttpsAlwaysOptions = {
 
 fastify.register(fastifyStatic, {
   root: join(process.cwd(), "front"),
-  prefix: "/public/",
+  prefix: "/",
 });
 
 fastify.register(fastifyCookie, {
@@ -125,9 +125,8 @@ fastify.post("/api/private/updateinfo/uploads", async (request, reply) => {
 	return await getUploadAvatar(request, reply);
 });
 
-fastify.get("/api/private/avatar", async (request: FastifyRequest, reply: FastifyReply) => {
-	return await displayAvatar(request, reply);
-});
+
+
 
 fastify.post("/api/private/game/create", async (request, reply) => {
 	const playerId = request.user?.user_id as any;
@@ -191,7 +190,6 @@ fastify.setNotFoundHandler((request: FastifyRequest, reply: FastifyReply) => {
 const start = async () => {
 	const PORT = 3000
 	try {
-		console.log("DANS SERVER");
 		await fastify.listen({ port: PORT, host: "0.0.0.0" });
 		console.log(`Server running on port ${PORT}`);
 		await db.connect();

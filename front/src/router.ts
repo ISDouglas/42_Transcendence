@@ -132,8 +132,8 @@ export function initRouter() {
     		}
     	}
   });
-  	history.replaceState({ from: "/" }, "", "/");
-	currentPath = "/";
+  	// history.replaceState({ from: "/" }, "", "/");
+	currentPath = window.location.pathname;
   	window.addEventListener("popstate", (event) => {	
 		popState();
 	});
