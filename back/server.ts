@@ -17,6 +17,7 @@ import * as tournamentService from "./routes/tournament/tournament.service";
 import { getProfile, displayAvatar } from "./routes/profile/profile";
 import { getUpdateInfo, getUpdateUsername, getUpdateEmail, getUploadAvatar, getUpdatePassword, getUpdateStatus } from "./routes/profile/getUpdate";
 import { logout } from "./routes/logout/logout";
+import { request } from "http";
 
 
 export const db = new ManageDB("./back/DB/database.db");
@@ -42,7 +43,7 @@ const httpsAlwaysOpts: HttpsAlwaysOptions = {
 
 fastify.register(fastifyStatic, {
   root: join(process.cwd(), "front"),
-  prefix: "/",
+  prefix: "/public/",
 });
 
 fastify.register(fastifyCookie, {
@@ -73,9 +74,9 @@ fastify.addHook("onRequest", async(request: FastifyRequest, reply: FastifyReply)
 // 	return { logged: false };
 // })
 
-fastify.get("/", async (request, reply) => {
-  return reply.sendFile("index.html");
-});
+// fastify.get("/", async (request, reply) => {
+//   return reply.sendFile("index.html");
+// });
 
 fastify.get("/api/checkLogin", async (request, reply) => {
 	return tokenOK(request, reply);
@@ -179,11 +180,17 @@ fastify.get("/api/logout", async (request, reply) => {
 	return await logout(request, reply);
 })
 
+fastify.setNotFoundHandler((request: FastifyRequest, reply: FastifyReply) => {
+	if (request.url.startsWith("/api"))
+		return reply.code(404).send({ error: "Not found" });
+	return reply.sendFile("index.html");
+})
 
 
 const start = async () => {
 	const PORT = 3000
 	try {
+		console.log("DANS SERVER");
 		await fastify.listen({ port: PORT, host: "0.0.0.0" });
 		console.log(`Server running on port ${PORT}`);
 		await db.connect();
@@ -195,6 +202,7 @@ const start = async () => {
 		// const hashedPassword = await bcrypt.hash("42", 12);
 		// users.addUser("42", "42", hashedPassword);
 	} catch (err) {
+		console.log(err);
 		fastify.log.error(err);
 		process.exit(1);
 	}
