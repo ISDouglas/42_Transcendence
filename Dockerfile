@@ -5,7 +5,7 @@ FROM node:20-alpine AS base
 WORKDIR /app
 
 # Install Python + SQLite
-RUN apk add --no-cache python3 sqlite sqlite-dev build-base
+RUN apk add --no-cache sqlite sqlite-dev build-base
 
 # Install dependencies first (cache optimization)
 COPY package*.json ./
@@ -36,7 +36,7 @@ FROM node:20-alpine AS production
 WORKDIR /app
 
 # Install SQLite + Python (runtime if needed)
-RUN apk add --no-cache python3 sqlite
+RUN apk add --no-cache sqlite
 
 # Install only production dependencies
 COPY package*.json ./
