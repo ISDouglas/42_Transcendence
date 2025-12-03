@@ -18,6 +18,12 @@ interface PaddleMoveData {
   y: number;
 }
 
+interface BallMoveData {
+  gameId: number;
+  y: number;
+  x: number;
+}
+
 export class GameNetwork {
   private socket: Socket;
   private game: GameInstance;
@@ -84,7 +90,7 @@ export class GameNetwork {
    */
   public sendPaddleMove(player: "player1" | "player2", y: number) {
     const now = performance.now();
-    if (now - this.lastSend < 33) return; // ~30 updates/s
+    // if (now - this.lastSend < 33) return; // ~30 updates/s
     this.lastSend = now;
 
     const payload: PaddleMoveData = {
@@ -93,6 +99,19 @@ export class GameNetwork {
       y
     };
     this.socket.emit("paddleMove", payload);
+  }
+
+  public sendBallMove(y: number, x: number) {
+    const now = performance.now();
+    // if (now - this.lastSend < 33) return; // ~30 updates/s
+    this.lastSend = now;
+
+    const payload: BallMoveData = {
+      gameId: this.gameId,
+      y,
+      x
+    };
+    this.socket.emit("ballMove", payload);
   }
 
   public disconnect() {

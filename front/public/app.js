@@ -278,8 +278,6 @@ var init_gameInstance = __esm({
          *============================================================ */
         this.play = () => {
           if (!this.isPlaying) {
-            this.stopBtn.disabled = true;
-            this.startBtn.disabled = true;
             this.stopTimer();
             this.displayWinner();
             return;
@@ -291,8 +289,6 @@ var init_gameInstance = __esm({
         this.gameID = gameID;
         this.canvas = document.querySelector("canvas");
         this.ctx = this.canvas.getContext("2d");
-        this.startBtn = document.querySelector("#start-game");
-        this.stopBtn = document.querySelector("#stop-game");
         this.initPositions();
         this.draw();
         this.attachEvents();
@@ -344,8 +340,6 @@ var init_gameInstance = __esm({
       attachEvents() {
         document.addEventListener("keydown", this.keydownHandler);
         document.addEventListener("keyup", this.keyupHandler);
-        this.startBtn.addEventListener("click", () => this.start());
-        this.stopBtn.addEventListener("click", () => this.stop());
       }
       /** ============================================================
        ** START / STOP
@@ -366,8 +360,6 @@ var init_gameInstance = __esm({
         } catch (err) {
           console.error("Error saving game:", err);
         }
-        this.startBtn.disabled = true;
-        this.stopBtn.disabled = false;
         this.audioCtx = new AudioContext();
         this.randomizeBall();
         if (this.role === "player1") {
@@ -379,8 +371,6 @@ var init_gameInstance = __esm({
       stop() {
         this.isPlaying = false;
         cancelAnimationFrame(this.anim);
-        this.startBtn.disabled = false;
-        this.stopBtn.disabled = true;
         this.resetGame();
       }
       destroy() {
@@ -439,6 +429,9 @@ var init_gameInstance = __esm({
           this.collide(this.game.player1, this.game.player2);
         ball.x += ball.speed.x;
         ball.y += ball.speed.y;
+        if (this.network) {
+          this.network.sendBallMove(this.game.ball.y, this.game.ball.x);
+        }
       }
       collide(player, otherPlayer) {
         const ball = this.game.ball;
@@ -4200,7 +4193,6 @@ var init_gameNetwork = __esm({
        */
       sendPaddleMove(player, y) {
         const now = performance.now();
-        if (now - this.lastSend < 33) return;
         this.lastSend = now;
         const payload = {
           gameId: this.gameId,
@@ -4208,6 +4200,16 @@ var init_gameNetwork = __esm({
           y
         };
         this.socket.emit("paddleMove", payload);
+      }
+      sendBallMove(y, x) {
+        const now = performance.now();
+        this.lastSend = now;
+        const payload = {
+          gameId: this.gameId,
+          y,
+          x
+        };
+        this.socket.emit("ballMove", payload);
       }
       disconnect() {
         this.socket.disconnect();
@@ -4234,6 +4236,11 @@ function initQuickGame(params) {
       currentGame.setNetwork(net, role);
   });
   net["socket"].emit("joinGame", gameID);
+  net["socket"].on("startGame", () => {
+    console.log("phoque it");
+    if (currentGame)
+      currentGame.start();
+  });
 }
 async function stopGame() {
   if (currentGame) {

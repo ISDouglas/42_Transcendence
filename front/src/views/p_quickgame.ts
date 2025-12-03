@@ -31,6 +31,11 @@ export function initQuickGame(params?: any) {
 	});
 	// ----------- 4) Connexion à la room du serveur ----------------
 	net["socket"].emit("joinGame", gameID);
+	net["socket"].on("startGame", () => {
+		console.log("phoque it");
+		if (currentGame)
+			currentGame.start();
+	});
 }
 
 //global function to stop game correctly

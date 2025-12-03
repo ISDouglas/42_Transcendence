@@ -57,9 +57,6 @@ export class GameInstance {
 	private startTime = 0;
 	private elapsedTime = 0;
 
-	private startBtn: HTMLButtonElement;
-	private stopBtn: HTMLButtonElement;
-
 	private network?: GameNetwork;
 	private role: "player1" | "player2" = "player1";
 
@@ -105,9 +102,6 @@ export class GameInstance {
 
 		this.canvas = document.querySelector("canvas") as HTMLCanvasElement;
 		this.ctx = this.canvas.getContext("2d")!;
-
-		this.startBtn = document.querySelector('#start-game')!;
-		this.stopBtn = document.querySelector('#stop-game')!;
 
 		this.initPositions();
 		this.draw();
@@ -167,15 +161,11 @@ export class GameInstance {
 	private attachEvents() {
 		document.addEventListener("keydown", this.keydownHandler);
 		document.addEventListener("keyup", this.keyupHandler);
-
-		this.startBtn.addEventListener("click", () => this.start());
-		this.stopBtn.addEventListener("click", () => this.stop());
 	}
-
 	/** ============================================================
 	 ** START / STOP
 	 *============================================================ */
-	private async start() {
+	public async start() {
 		if (this.isPlaying) return;
 
 		this.isPlaying = true;
@@ -196,9 +186,6 @@ export class GameInstance {
 			console.error("Error saving game:", err);
 		}
 
-		this.startBtn.disabled = true;
-		this.stopBtn.disabled = false;
-
 		this.audioCtx = new AudioContext();
 		this.randomizeBall();
 
@@ -212,10 +199,6 @@ export class GameInstance {
 	private stop() {
 		this.isPlaying = false;
 		cancelAnimationFrame(this.anim);
-
-		this.startBtn.disabled = false;
-		this.stopBtn.disabled = true;
-
 		this.resetGame();
 	}
 
@@ -249,8 +232,6 @@ export class GameInstance {
 	 *============================================================ */
 	private play = () => {
 		if (!this.isPlaying) {
-			this.stopBtn.disabled = true;
-			this.startBtn.disabled = true;
 			this.stopTimer();
 			this.displayWinner();
 			return;
@@ -307,6 +288,10 @@ export class GameInstance {
 
 		ball.x += ball.speed.x;
 		ball.y += ball.speed.y;
+		if (this.network)
+		{
+			this.network.sendBallMove(this.game.ball.y, this.game.ball.x);
+		}
 	}
 
 	private collide(player: any, otherPlayer: any) {
@@ -494,4 +479,5 @@ export class GameInstance {
 			console.error("Error saving game:", err);
 		}
 	}
+
 }
