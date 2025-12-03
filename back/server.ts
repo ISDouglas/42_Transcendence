@@ -18,6 +18,7 @@ import { getProfile, displayAvatar } from "./routes/profile/profile";
 import bcrypt from "bcryptjs";
 import { getUpdateInfo, getUpdateUsername, getUpdateEmail, getUploadAvatar, getUpdatePassword, getUpdateStatus } from "./routes/profile/getUpdate";
 import { logout } from "./routes/logout/logout";
+import { request } from "http";
 
 export const db = new ManageDB("./back/DB/database.db");
 export const users = new Users(db);
@@ -73,9 +74,9 @@ fastify.addHook("onRequest", async(request: FastifyRequest, reply: FastifyReply)
 // 	return { logged: false };
 // })
 
-fastify.get("/", async (request, reply) => {
-  return reply.sendFile("index.html");
-});
+// fastify.get("/", async (request, reply) => {
+//   return reply.sendFile("index.html");
+// });
 
 fastify.get("/api/checkLogin", async (request, reply) => {
 	return tokenOK(request, reply);
@@ -179,6 +180,13 @@ fastify.get("/api/logout", async (request, reply) => {
 	return await logout(request, reply);
 })
 
+fastify.setNotFoundHandler((request: FastifyRequest, reply: FastifyReply) => {
+	if (request.url.startsWith("/api"))
+		return reply.code(404).send({ error: "Not found" });
+	return reply.sendFile("index.html");
+})
+
+
 const start = async () => {
 	const PORT = 3000
 	try {
@@ -194,6 +202,7 @@ const start = async () => {
 		// const hashedPassword = await bcrypt.hash("42", 12);
 		// users.addUser("42", "42", hashedPassword);
 	} catch (err) {
+		console.log(err);
 		fastify.log.error(err);
 		process.exit(1);
 	}
