@@ -264,10 +264,14 @@ export class GameInstance {
 	}
 
 	private movePlayer(player: any) {
-		if (player.movingUp && player.y > 0) player.y -= player.speed;
-		if (player.movingDown && player.y + 60 < this.canvas.height) player.y += player.speed;
+		if (!this.network)
+		{
+			if (player.movingUp && player.y > 0) player.y -= player.speed;
+			if (player.movingDown && player.y + 60 < this.canvas.height) player.y += player.speed;
+			return;
+		}
 
-		if (this.network && player === this.getLocalPlayer()) {
+		if (player === this.getLocalPlayer()) {
 			this.network.sendPaddleMove(this.role === "player1" ? "player1" : "player2", player.y);
 		}
 	}

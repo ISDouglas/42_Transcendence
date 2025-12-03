@@ -425,9 +425,12 @@ var init_gameInstance = __esm({
         this.moveBall();
       }
       movePlayer(player) {
-        if (player.movingUp && player.y > 0) player.y -= player.speed;
-        if (player.movingDown && player.y + 60 < this.canvas.height) player.y += player.speed;
-        if (this.network && player === this.getLocalPlayer()) {
+        if (!this.network) {
+          if (player.movingUp && player.y > 0) player.y -= player.speed;
+          if (player.movingDown && player.y + 60 < this.canvas.height) player.y += player.speed;
+          return;
+        }
+        if (player === this.getLocalPlayer()) {
           this.network.sendPaddleMove(this.role === "player1" ? "player1" : "player2", player.y);
         }
       }
@@ -478,9 +481,6 @@ var init_gameInstance = __esm({
         this.game.player2.y = this.canvas.height / 2 - 30;
         this.game.ball.x = this.canvas.width / 2;
         this.game.ball.y = this.canvas.height / 2;
-        if (this.network) {
-          this.network.sendBallMove(this.game.ball.y, this.game.ball.x, this.game.ball.speed.x, this.game.ball.speed.y);
-        }
         const b = this.game.ball;
         b.speed.y = Math.random() * (b.speed.maxY - b.speed.minY) + b.speed.minY;
       }
@@ -539,9 +539,6 @@ var init_gameInstance = __esm({
           10,
           60
         );
-        if (this.network) {
-          this.network.sendBallMove(this.game.ball.y, this.game.ball.x, this.game.ball.speed.x, this.game.ball.speed.y);
-        }
         ctx.beginPath();
         ctx.arc(this.game.ball.x, this.game.ball.y, 5, 0, Math.PI * 2);
         ctx.fill();
