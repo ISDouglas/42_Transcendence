@@ -25,10 +25,7 @@
     --color-gray-300: oklch(87.2% 0.01 258.338);
     --color-gray-600: oklch(44.6% 0.03 256.802);
     --color-gray-700: oklch(37.3% 0.034 259.733);
-<<<<<<< HEAD
-=======
     --color-gray-800: oklch(27.8% 0.033 256.848);
->>>>>>> main
     --color-black: #000;
     --color-white: #fff;
     --spacing: 0.25rem;
@@ -295,18 +292,12 @@
   .mr-10 {
     margin-right: calc(var(--spacing) * 10);
   }
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
   .mr-12 {
     margin-right: calc(var(--spacing) * 12);
   }
->>>>>>> main
   .mb-0\.5 {
     margin-bottom: calc(var(--spacing) * 0.5);
   }
->>>>>>> main
   .mb-2 {
     margin-bottom: calc(var(--spacing) * 2);
   }
@@ -379,12 +370,9 @@
   .animate-pulse {
     animation: var(--animate-pulse);
   }
-<<<<<<< HEAD
-=======
   .cursor-pointer {
     cursor: pointer;
   }
->>>>>>> main
   .grid-cols-2 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -411,9 +399,6 @@
   }
   .justify-end {
     justify-content: flex-end;
-  }
-  .justify-start {
-    justify-content: flex-start;
   }
   .gap-3 {
     gap: calc(var(--spacing) * 3);
@@ -581,12 +566,9 @@
   .text-amber-700 {
     color: var(--color-amber-700);
   }
-<<<<<<< HEAD
-=======
   .text-blue-500 {
     color: var(--color-blue-500);
   }
->>>>>>> main
   .text-gray-600 {
     color: var(--color-gray-600);
   }
@@ -752,8 +734,6 @@
       display: none;
     }
   }
-<<<<<<< HEAD
-=======
   .dark\:bg-black\/20 {
     &:where(.dark, .dark *) {
       background-color: color-mix(in srgb, #000 20%, transparent);
@@ -762,7 +742,6 @@
       }
     }
   }
->>>>>>> main
   .dark\:bg-black\/30 {
     &:where(.dark, .dark *) {
       background-color: color-mix(in srgb, #000 30%, transparent);
@@ -771,13 +750,7 @@
       }
     }
   }
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-  .dark\:bg-gray-800 {
-=======
   .dark\:bg-gray-800\/90 {
->>>>>>> main
     &:where(.dark, .dark *) {
       background-color: color-mix(in srgb, oklch(27.8% 0.033 256.848) 90%, transparent);
       @supports (color: color-mix(in lab, red, red)) {
@@ -790,7 +763,6 @@
       color: var(--color-white);
     }
   }
->>>>>>> main
 }
 @layer base;
 @layer components {

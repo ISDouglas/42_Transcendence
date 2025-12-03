@@ -22,6 +22,14 @@ interface BallMoveData {
   gameId: number;
   y: number;
   x: number;
+  speedX: number;
+  speedY: number;
+}
+
+interface ScoreData {
+  gameId: number;
+  scoreP1: number;
+  scoreP2: number;
 }
 
 export class GameNetwork {
@@ -68,8 +76,12 @@ export class GameNetwork {
     });
 
     // update ciblé pour la balle
-    this.socket.on("ballUpdate", (pos: { x: number; y: number }) => {
+    this.socket.on("ballMove", (pos: { x: number; y: number }) => {
       this.game.applyServerState({ ball: { x: pos.x, y: pos.y } });
+    });
+
+    this.socket.on("updateScore", (score: { scoreP1: number; scoreP2: number }) => {
+      this.game.applyServerState({score: {player1: score.scoreP1, player2: score.scoreP2} });
     });
 
     // network events — on ne touche pas au game.status côté front
@@ -101,7 +113,7 @@ export class GameNetwork {
     this.socket.emit("paddleMove", payload);
   }
 
-  public sendBallMove(y: number, x: number) {
+  public sendBallMove(y: number, x: number, speedX: number, speedY: number) {
     const now = performance.now();
     // if (now - this.lastSend < 33) return; // ~30 updates/s
     this.lastSend = now;
@@ -109,9 +121,24 @@ export class GameNetwork {
     const payload: BallMoveData = {
       gameId: this.gameId,
       y,
-      x
+      x,
+      speedX,
+      speedY
     };
     this.socket.emit("ballMove", payload);
+  }
+
+    public updateScore(scoreP1: number, scoreP2: number) {
+    const now = performance.now();
+    // if (now - this.lastSend < 33) return; // ~30 updates/s
+    this.lastSend = now;
+
+    const payload: ScoreData = {
+      gameId: this.gameId,
+      scoreP1,
+      scoreP2
+    };
+    this.socket.emit("updateScore", payload);
   }
 
   public disconnect() {

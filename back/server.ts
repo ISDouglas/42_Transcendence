@@ -8,7 +8,6 @@ import { manageRegister } from "./routes/register/register";
 import { GameInfo } from "./DB/gameinfo";
 import fastifyCookie from "@fastify/cookie";
 import { tokenOK } from "./middleware/jwt";
-import { CookieSerializeOptions } from "fastify-cookie";
 import { collapseTextChangeRangesAcrossMultipleVersions } from "typescript";
 import bcrypt from "bcryptjs";
 import { games_map, createGame, joinGame, getPlayersId, endGame, updateGamePos, updateGameStatus, displayGameList, Game } from "./routes/game/game";
@@ -274,18 +273,36 @@ function setupSocket(io: Server) {
 			socket.to(`game-${gameId}`).emit("paddleMove", { player, y });
 		});
 
-		socket.on("ballMove", ({ gameId, y, x }: { 
+		socket.on("ballMove", ({ gameId, y, x, speedX, speedY }: { 
 			gameId: string, 
 			y: number,
-			x: number
+			x: number,
+			speedX: number,
+			speedY: number
 		}) => {
 			const game = games_map.get(Number(gameId));
 			if (!game) return;
 
 			game.ballPos.x = x;
 			game.ballPos.y = y;
+			game.ballSpeed.x = speedX;
+			game.ballSpeed.y = speedY;
 
-			socket.to(`game-${gameId}`).emit("ballMove", { x, y });
+			socket.to(`game-${gameId}`).emit("ballMove", { x, y, speedX, speedY });
+		});
+
+		socket.on("scoreUpdate", ({ gameId, scoreP1, scoreP2}: { 
+			gameId: string, 
+			scoreP1: number,
+			scoreP2: number
+		}) => {
+			const game = games_map.get(Number(gameId));
+			if (!game) return;
+
+			game.score.player1 = scoreP1;
+			game.score.player2 = scoreP2;
+
+			socket.to(`game-${gameId}`).emit("ballMove", { scoreP1, scoreP2 });
 		});
 	});
 

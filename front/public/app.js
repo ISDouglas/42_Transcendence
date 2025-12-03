@@ -246,7 +246,7 @@ var init_gameInstance = __esm({
         this.networkStatus = "ok";
         this.isPlaying = false;
         this.anim = 0;
-        this.maxScore = 4;
+        this.maxScore = 10;
         this.increaseSpeed = -1.1;
         this.maxAngle = Math.PI / 4;
         this.startTime = 0;
@@ -375,9 +375,9 @@ var init_gameInstance = __esm({
           console.error("Error saving game:", err);
         }
         this.audioCtx = new AudioContext();
-        this.randomizeBall();
         if (this.role === "player1") {
           this.resetGame();
+          this.randomizeBall();
           this.startTimer();
         }
         this.play();
@@ -444,7 +444,7 @@ var init_gameInstance = __esm({
         ball.x += ball.speed.x;
         ball.y += ball.speed.y;
         if (this.network) {
-          this.network.sendBallMove(this.game.ball.y, this.game.ball.x);
+          this.network.sendBallMove(this.game.ball.y, this.game.ball.x, this.game.ball.speed.x, this.game.ball.speed.y);
         }
       }
       collide(player, otherPlayer) {
@@ -459,19 +459,28 @@ var init_gameInstance = __esm({
           this.playSound(700, 80);
           this.modifyBallAngle(player);
           this.increaseBallSpeed();
+          if (this.network) {
+            this.network.sendBallMove(this.game.ball.y, this.game.ball.x, this.game.ball.speed.x, this.game.ball.speed.y);
+          }
         }
       }
       /** ============================================================
        ** UTILS FUNCTIONS
        *============================================================ */
       randomizeBall() {
-        this.game.ball.speed.x = Math.random() < 0.5 ? -2 : 2;
+        const angle = Math.random() * (Math.PI / 3) - Math.PI / 6;
+        const speed = 4;
+        this.game.ball.speed.x = Math.cos(angle) * speed * (Math.random() < 0.5 ? -1 : 1);
+        this.game.ball.speed.y = Math.sin(angle) * speed;
       }
       resetPos() {
         this.game.player1.y = this.canvas.height / 2 - 30;
         this.game.player2.y = this.canvas.height / 2 - 30;
         this.game.ball.x = this.canvas.width / 2;
         this.game.ball.y = this.canvas.height / 2;
+        if (this.network) {
+          this.network.sendBallMove(this.game.ball.y, this.game.ball.x, this.game.ball.speed.x, this.game.ball.speed.y);
+        }
         const b = this.game.ball;
         b.speed.y = Math.random() * (b.speed.maxY - b.speed.minY) + b.speed.minY;
       }
@@ -530,6 +539,9 @@ var init_gameInstance = __esm({
           10,
           60
         );
+        if (this.network) {
+          this.network.sendBallMove(this.game.ball.y, this.game.ball.x, this.game.ball.speed.x, this.game.ball.speed.y);
+        }
         ctx.beginPath();
         ctx.arc(this.game.ball.x, this.game.ball.y, 5, 0, Math.PI * 2);
         ctx.fill();
@@ -4191,8 +4203,11 @@ var init_gameNetwork = __esm({
           const paddles = data.player === "player1" ? { player1: data.y } : { player2: data.y };
           this.game.applyServerState({ paddles });
         });
-        this.socket.on("ballUpdate", (pos) => {
+        this.socket.on("ballMove", (pos) => {
           this.game.applyServerState({ ball: { x: pos.x, y: pos.y } });
+        });
+        this.socket.on("updateScore", (score) => {
+          this.game.applyServerState({ score: { player1: score.scoreP1, player2: score.scoreP2 } });
         });
         this.socket.on("disconnect", (reason) => {
           console.warn("[WS] disconnected", reason);
@@ -4215,15 +4230,27 @@ var init_gameNetwork = __esm({
         };
         this.socket.emit("paddleMove", payload);
       }
-      sendBallMove(y, x) {
+      sendBallMove(y, x, speedX, speedY) {
         const now = performance.now();
         this.lastSend = now;
         const payload = {
           gameId: this.gameId,
           y,
-          x
+          x,
+          speedX,
+          speedY
         };
         this.socket.emit("ballMove", payload);
+      }
+      updateScore(scoreP1, scoreP2) {
+        const now = performance.now();
+        this.lastSend = now;
+        const payload = {
+          gameId: this.gameId,
+          scoreP1,
+          scoreP2
+        };
+        this.socket.emit("updateScore", payload);
       }
       disconnect() {
         this.socket.disconnect();
@@ -4243,7 +4270,7 @@ function initQuickGame(params) {
     currentGame.destroy();
     currentGame = null;
   }
-  const serverUrl = "https://localhost:8443";
+  const serverUrl = "https://localhost:3000";
   currentGame = new GameInstance(gameID);
   net = new GameNetwork(serverUrl, currentGame, Number(gameID));
   net["socket"].on("assignRole", (role) => {
@@ -4652,17 +4679,7 @@ function initRouter() {
   });
   currentPath = window.location.pathname;
   window.addEventListener("popstate", (event) => {
-<<<<<<< HEAD
-    const path = window.location.pathname;
-    const previous = event.state?.previous;
-    const public_path = ["/", "/login", "/register"];
-    const is_private = !public_path.includes(path);
-    if (is_private && previous && public_path.includes(previous))
-      history.replaceState({ previous: "/home" }, "", "/home");
-    router();
-=======
     popState();
->>>>>>> cd128435084d6eba185a4b199cf32dc30c1e5cbf
   });
   router();
 }

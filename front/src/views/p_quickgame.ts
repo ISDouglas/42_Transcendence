@@ -19,7 +19,7 @@ export function initQuickGame(params?: any) {
 		currentGame = null;
 	}
 
-	const serverUrl = "https://localhost:8443";
+	const serverUrl = "https://localhost:3000";
 
 	// ----------- 2) Création de l’instance de jeu locale ----------------
 	currentGame = new GameInstance(gameID);

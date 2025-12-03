@@ -9,7 +9,9 @@ export class Game {
 	idPlayer1: number;
 	idPlayer2: number;
 	ballPos: { x: number, y: number};
+	ballSpeed: { x: number, y: number};
 	paddlePos: { player1: number, player2: number};
+	score: { player1: number, player2: number};
 	status: string;
 	gameDate: string;
 	sockets: { player1: string | null, player2: string | null };
@@ -20,7 +22,9 @@ export class Game {
 		this.idPlayer1 = playerId1;
 		this.idPlayer2 = playerId2;
 		this.ballPos = { x: 0, y: 0};
+		this.ballSpeed = { x: 0, y: 0};
 		this.paddlePos = { player1: 0, player2: 0};
+		this.score = { player1: 0, player2: 0};
 		this.status = "waiting";
 		this.gameDate = new Date().toISOString().replace("T", " ").split(".")[0];
 		this.sockets = { player1: null, player2: null };

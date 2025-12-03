@@ -50,7 +50,7 @@ export class GameInstance {
 
 	private audioCtx!: AudioContext;
 
-	private maxScore = 4;
+	private maxScore = 10;
 	private increaseSpeed = -1.1;
 	private maxAngle = Math.PI / 4;
 
@@ -187,10 +187,10 @@ export class GameInstance {
 		}
 
 		this.audioCtx = new AudioContext();
-		this.randomizeBall();
-
+		
 		if (this.role === "player1") {
 			this.resetGame();
+			this.randomizeBall();
 			this.startTimer();
 		}
 		this.play();
@@ -260,7 +260,6 @@ export class GameInstance {
 	 *============================================================ */
 	private moveAll() {
 		this.movePlayer(this.getLocalPlayer());
-		// this.movePlayer(this.game.player2);
 		this.moveBall();
 	}
 
@@ -290,7 +289,7 @@ export class GameInstance {
 		ball.y += ball.speed.y;
 		if (this.network)
 		{
-			this.network.sendBallMove(this.game.ball.y, this.game.ball.x);
+			this.network.sendBallMove(this.game.ball.y, this.game.ball.x, this.game.ball.speed.x, this.game.ball.speed.y);
 		}
 	}
 
@@ -310,6 +309,10 @@ export class GameInstance {
 			this.playSound(700, 80);
 			this.modifyBallAngle(player);
 			this.increaseBallSpeed();
+			if (this.network)
+			{
+				this.network.sendBallMove(this.game.ball.y, this.game.ball.x, this.game.ball.speed.x, this.game.ball.speed.y);
+			}
 		}
 	}
 
@@ -317,7 +320,13 @@ export class GameInstance {
 	 ** UTILS FUNCTIONS
 	 *============================================================ */
 	private randomizeBall() {
-		this.game.ball.speed.x = Math.random() < 0.5 ? -2 : 2;
+		const angle = (Math.random() * (Math.PI / 3)) - (Math.PI / 6);
+		// angle entre -30° et +30°
+
+		const speed = 4; // vitesse initiale
+
+		this.game.ball.speed.x = Math.cos(angle) * speed * (Math.random() < 0.5 ? -1 : 1);
+		this.game.ball.speed.y = Math.sin(angle) * speed;
 	}
 
 	private resetPos() {
