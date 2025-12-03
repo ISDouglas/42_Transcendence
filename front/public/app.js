@@ -27,7 +27,11 @@ var init_home = __esm({
 function LoginView() {
   return document.getElementById("loginhtml").innerHTML;
 }
-function initLogin() {
+async function initLogin() {
+  const res = await fetch("/api/checkLogin", { method: "GET", credentials: "include" });
+  if (res.ok) {
+    navigateTo("/home");
+  }
   const form = document.getElementById("login-form");
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -95,7 +99,11 @@ var init_p_dashboard = __esm({
 function RegisterView() {
   return document.getElementById("registerhtml").innerHTML;
 }
-function initRegister() {
+async function initRegister() {
+  const res = await fetch("/api/checkLogin", { method: "GET", credentials: "include" });
+  if (res.ok) {
+    navigateTo("/home");
+  }
   const form = document.getElementById("register-form");
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -107,12 +115,12 @@ function initRegister() {
       confirm: formData.get("confirm-password")
     };
     try {
-      const res = await fetch("/api/register", {
+      const res2 = await fetch("/api/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data)
       });
-      const result = await res.json();
+      const result = await res2.json();
       if (result.ok == true)
         navigateTo("/registerok");
       else {
@@ -895,7 +903,6 @@ function ErrorView() {
   return document.getElementById("errorhtml").innerHTML;
 }
 function initError() {
-  console.log("dans errro page");
 }
 var init_error = __esm({
   "front/src/views/error.ts"() {
@@ -998,17 +1005,7 @@ function initRouter() {
   });
   currentPath = window.location.pathname;
   window.addEventListener("popstate", (event) => {
-<<<<<<< HEAD
-    const path = window.location.pathname;
-    const previous = event.state?.previous;
-    const public_path = ["/", "/login", "/register"];
-    const is_private = !public_path.includes(path);
-    if (is_private && previous && public_path.includes(previous))
-      history.replaceState({ previous: "/home" }, "", "/home");
-    router();
-=======
     popState();
->>>>>>> cd128435084d6eba185a4b199cf32dc30c1e5cbf
   });
   router();
 }
@@ -1054,15 +1051,9 @@ var init_router = __esm({
       { path: "/logout", init: initLogout },
       { path: "/register", view: RegisterView, init: initRegister },
       { path: "/registerok", view: RegisterValidView },
-<<<<<<< HEAD
-      { path: "/homelogin", view: HomeLoginView, init: initHomePage },
+      { path: "/home", view: homeView, init: initHomePage },
       { path: "/dashboard", view: DashboardView },
       { path: "/friends", view: FriendsView, init: initFriends },
-=======
-      { path: "/home", view: homeView, init: initHomePage },
-      { path: "/game", view: GameView, init: initGame },
-      { path: "/quickgame/:id", view: QuickGameView, init: initQuickGame, cleanup: stopGame },
->>>>>>> main
       { path: "/profile", view: ProfileView, init: initProfile },
       { path: "/updateinfo", view: UpdateInfoView, init: initUpdateInfo },
       { path: "/game", view: GameView, init: initGame },
