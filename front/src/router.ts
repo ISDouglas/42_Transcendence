@@ -1,10 +1,10 @@
-import { HomeView, initHome } from "./views/home";
+import { View, init } from "./views/home";
 import { LoginView, initLogin } from "./views/login";
 import { DashboardView } from "./views/p_dashboard";
 import { RegisterValidView, RegisterView, initRegister } from "./views/register";
 import { GameView, initGame} from "./views/p_game";
 import { QuickGameView, initQuickGame, stopGame} from "./views/p_quickgame";
-import { HomeLoginView, initHomePage } from "./views/p_homelogin";
+import { homeView, initHomePage } from "./views/p_homelogin";
 import { ProfileView, initProfile} from "./views/p_profile";
 import { UpdateInfoView, initUpdateInfo } from "./views/p_updateinfo";
 import { TournamentView} from "./views/p_tournament";
@@ -15,20 +15,21 @@ import { FriendsView, initFriends } from "./views/p_friends";
 import { ErrorView, initError } from "./views/error";
 
 const routes = [
-	{ path: "/", view: HomeView, init: initHome},
-	{ path: "/login", view: LoginView, init:initLogin},
-	{ path: "/logout", init: initLogout},
-	{ path: "/register", view: RegisterView, init: initRegister},
-	{ path: "/registerok", view: RegisterValidView},
-	{ path: "/homelogin", view: HomeLoginView, init: initHomePage},
-	{ path: "/dashboard", view: DashboardView },
-	{ path: "/friends", view: FriendsView, init: initFriends },
-	{ path: "/profile", view: ProfileView, init: initProfile},
-	{ path: "/updateinfo", view: UpdateInfoView, init: initUpdateInfo},
-	{ path: "/game", view: GameView, init: initGame},
-	{ path: "/quickgame/:id", view: QuickGameView, init: initQuickGame, cleanup: stopGame },
-	{ path: "/tournament", view: TournamentView},
-	{ path: "/error", view: ErrorView, init:initError},
+  { path: "/", view: View, init: init},
+  { path: "/login", view: LoginView, init:initLogin},
+  { path: "/logout", init: initLogout},
+  { path: "/register", view: RegisterView, init: initRegister},
+  { path: "/registerok", view: RegisterValidView},
+  { path: "/home", view: homeView, init: initHomePage},
+  { path: "/dashboard", view: DashboardView },
+  { path: "/friends", view: FriendsView, init: initFriends },
+  { path: "/profile", view: ProfileView, init: initProfile},
+  { path: "/updateinfo", view: UpdateInfoView, init: initUpdateInfo},
+  { path: "/game", view: GameView, init: initGame},
+  { path: "/quickgame/:id", view: QuickGameView, init: initQuickGame, cleanup: stopGame },
+  { path: "/tournament", view: TournamentView},
+  { path: "/error", view: ErrorView, init:initError},
+
 ];
 
 let currentRoute: any = null;

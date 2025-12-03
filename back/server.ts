@@ -21,7 +21,6 @@ import { logout } from "./routes/logout/logout";
 import { Friends } from "./DB/friend";
 import { displayFriendPage } from "./routes/friends/friends";
 
-
 export const db = new ManageDB("./back/DB/database.db");
 export const users = new Users(db);
 export const friends = new Friends(db);
@@ -201,6 +200,7 @@ const start = async () => {
 		await friends.createFriendsTable();
 		await gameInfo.createGameInfoTable();
 		await tournament.createTournamentTable();
+		await users.CreateUserIA();
 		// const hashedPassword = await bcrypt.hash("42", 12);
 		// users.addUser("42", "42", hashedPassword);
 		// friends.addFriendship(7, 11);
