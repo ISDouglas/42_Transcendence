@@ -11,7 +11,7 @@ export function initGame() {
 		const { gameId } = await genericFetch("/api/private/game/create", {
 			method: "POST"
 		});
-		navigateTo(`/quickgame/${gameId}`);
+		navigateTo(`/pongmatch/${gameId}`);
 	});
 
 	const gameListButton = document.getElementById("display-game-list");
@@ -73,7 +73,7 @@ function renderGameList(games: any[]) {
 			console.error("Error saving game:", err);
 		}
 	
-		navigateTo(`/quickgame/${id}`);
+		navigateTo(`/pongmatch/${id}`);
 	});
 	});
 }
