@@ -1,8 +1,8 @@
 import { Server, Socket } from "socket.io";
 import { applyInput, GameState, updateBall } from "./gameEngine";
-import { ServerGame, games_map } from "../routes/game/game";
+import { ServerGame, games_map } from "../routes/game/serverGame";
 
-const TICK_RATE = 16;
+const TICK_RATE = 16; //60 FPS (62.5 exactly : 1000ms / 16ms)
 
 export function setupGameServer(io: Server) {
 	io.on("connection", (socket) => {
@@ -11,15 +11,16 @@ export function setupGameServer(io: Server) {
 		socket.on("joinGame", (gameId: number) => {
 			let game = games_map.get(gameId);
 
-			// Si pas existant, créer une partie
+			// create game if doesn't exist
 			if (!game) {
 				game = new ServerGame(gameId);
 				games_map.set(gameId, game);
 			}
 
+			// join room
 			socket.join(`game-${gameId}`);
 
-			// Assignation automatique
+			// automatic assignation
 			let role: "player1" | "player2";
 			if (!game.sockets.player1) {
 				game.sockets.player1 = socket.id;
@@ -38,13 +39,13 @@ export function setupGameServer(io: Server) {
 
 			socket.emit("assignRole", role);
 
-			// Démarrer la game si 2 joueurs présents
+			// start game when 2 players are in the game
 			if (game.sockets.player1 && game.sockets.player2 && game.status === "waiting") {
 				game.status = "playing";
 				io.to(`game-${gameId}`).emit("startGame");
 			}
 
-			// Envoi de l'état initial
+			// send initial state
 			socket.emit("state", game);
 
 			// Paddle move
@@ -63,8 +64,11 @@ export function setupGameServer(io: Server) {
 
 			// Disconnect
 			socket.on("disconnect", () => {
-				if (game!.sockets.player1 === socket.id) game!.sockets.player1 = null;
-				if (game!.sockets.player2 === socket.id) game!.sockets.player2 = null;
+				if (game!.sockets.player1 === socket.id)
+					game!.sockets.player1 = null;
+
+				if (game!.sockets.player2 === socket.id)
+					game!.sockets.player2 = null;
 				console.log("Client disconnected:", socket.id);
 			});
 		});

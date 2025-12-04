@@ -24,16 +24,16 @@ export interface GameState {
 }
 
 export function updateBall(game: GameState) {
-	// 1️⃣ Déplacement
+	// 1Déplacement
 	game.ball.x += game.ball.speedX;
 	game.ball.y += game.ball.speedY;
 
-	// 2️⃣ Collision murs
+	// Collision murs
 	if (game.ball.y <= 0 || game.ball.y >= game.height) {
 		game.ball.speedY *= -1;
 	}
 
-	// 3️⃣ Collision paddles
+	// Collision paddles
 	const paddleWidth = 10;
 	const paddleHeight = 60;
 
@@ -49,7 +49,7 @@ export function updateBall(game: GameState) {
 		game.ball.speedX *= -1;
 	}
 
-	// 4️⃣ Score
+	// Score
 	if (game.ball.x <= 0) {
 		game.score.player2++;
 		resetBall(game);

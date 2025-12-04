@@ -21,6 +21,7 @@ appelle-la avec state comme argument”.
 En gros, c’est un relais propre entre le socket et le front,
 pour que le front n’ait jamais à manipuler le socket directement.
 */
+
 	private onRoleCallback?: (role: "player1" | "player2") => void;
 
 	constructor(serverUrl: string, gameId: number) {
@@ -57,9 +58,5 @@ pour que le front n’ait jamais à manipuler le socket directement.
 
 	disconnect() {
 		this.socket.disconnect();
-	}
-
-	public getSocket(): Socket {
-		return this.socket;
 	}
 }

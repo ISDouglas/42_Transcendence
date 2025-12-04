@@ -3896,9 +3896,6 @@ var init_gameNetwork = __esm({
       disconnect() {
         this.socket.disconnect();
       }
-      getSocket() {
-        return this.socket;
-      }
     };
   }
 });

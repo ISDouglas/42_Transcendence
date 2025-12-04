@@ -1,11 +1,10 @@
 export const games_map = new Map<number, ServerGame>();
-import { GameInfo } from "./../../DB/gameinfo";
+import { GameInfo } from "../../DB/gameinfo";
 import { users } from '../../server';
 import { Socket } from "socket.io";
 import { GameState } from "../../pong/gameEngine";
 
 export class ServerGame {
-
 	id: number;
 	idPlayer1: number | null;
 	idPlayer2: number | null;

@@ -10,7 +10,7 @@ import fastifyCookie from "@fastify/cookie";
 import { tokenOK } from "./middleware/jwt";
 import { collapseTextChangeRangesAcrossMultipleVersions } from "typescript";
 import bcrypt from "bcryptjs";
-import { games_map, createGame, joinGame, getPlayersId, endGame, displayGameList, ServerGame } from "./routes/game/game";
+import { games_map, createGame, joinGame, getPlayersId, endGame, displayGameList, ServerGame } from "./routes/game/serverGame";
 import fs from "fs";
 import { Tournament } from './DB/tournament';
 import { uploadPendingTournaments } from "./routes/tournament/tournament.service";
@@ -23,7 +23,7 @@ import { getProfile, displayAvatar } from "./routes/profile/profile";
 import { getUpdateInfo, getUpdateUsername, getUpdateEmail, getUploadAvatar, getUpdatePassword, getUpdateStatus } from "./routes/profile/getUpdate";
 import { logout } from "./routes/logout/logout";
 import { request } from "http";
-import { setupGameServer } from "./pong/gameServer";
+import { setupGameServer } from "./pong/pongServer";
 import { Friends } from "./DB/friend";
 import { displayFriendPage } from "./routes/friends/friends";
 
