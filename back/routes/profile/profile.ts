@@ -21,11 +21,11 @@ export async function getProfile(fastify: FastifyInstance, request: FastifyReque
 export async function displayAvatar( request: FastifyRequest, reply: FastifyReply) {
 	const avatar = request.user?.avatar;
 	if (!avatar)
-		return;
+		return reply.code(404).send({message: "Avatar not found"});
 	const avatarPath = path.join(__dirname, "../../uploads", avatar);
 	const type = mime.lookup(avatarPath);
 	if (type !== "image/png" && type !== "image/jpeg")
-		return;
+		return reply.code(404).send({message: "Extension file should be PNG or JPEG"});
 	const stream = fs.createReadStream(avatarPath);
 	// const etag = Date.now().toString();
 	return reply.type(type).send(stream);

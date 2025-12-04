@@ -116,7 +116,7 @@ export async function getUpdatePassword(fastify: FastifyInstance, request: Fasti
 }
 
 export async function getUploadAvatar(request: FastifyRequest, reply: FastifyReply) {
-	const MAX_SIZE = 2 * 1024 * 1024;
+	const MAX_SIZE = 6 * 1024 * 1024;
     const ALLOWED_MIME = ["image/png", "image/jpeg"];
 	
 	const avatar = await request.file();

@@ -19,7 +19,7 @@ import bcrypt from "bcryptjs";
 import { getUpdateInfo, getUpdateUsername, getUpdateEmail, getUploadAvatar, getUpdatePassword, getUpdateStatus } from "./routes/profile/getUpdate";
 import { logout } from "./routes/logout/logout";
 import { Friends } from "./DB/friend";
-import { displayFriendPage } from "./routes/friends/friends";
+import { displayFriendPage, displayFriendAvatar } from "./routes/friends/friends";
 
 export const db = new ManageDB("./back/DB/database.db");
 export const users = new Users(db);
@@ -56,7 +56,7 @@ fastify.register(FastifyHttpsAlwaysPlugin, httpsAlwaysOpts)
 
 fastify.register(multipart, {
 	limits:{
-		fileSize: 2 * 1024 * 1024,
+		fileSize: 6 * 1024 * 1024,
 		files: 1,
 	}
 })
@@ -119,16 +119,24 @@ fastify.post("/api/private/updateinfo/password", async (request: FastifyRequest,
 })
 
 fastify.post("/api/private/updateinfo/uploads", async (request, reply) => {
-	return await getUploadAvatar(request, reply);
+	await getUploadAvatar(request, reply);
 });
 
 fastify.get("/api/private/avatar", async (request: FastifyRequest, reply: FastifyReply) => {
-	return await displayAvatar(request, reply);
+	await displayAvatar(request, reply);
 });
 
 fastify.post("/api/private/friend", async (request: FastifyRequest, reply: FastifyReply) => {
-	return await displayFriendPage(request.user!.user_id);
+	const friends =  await displayFriendPage(request, reply);
+	// if (friends !== null)
+	// 	request.myfriends = friends;
+	// return friends;
 })
+
+
+fastify.get("/api/private/avatar/:id", async (request: FastifyRequest, reply: FastifyReply) => {
+	await displayFriendAvatar(request, reply);
+});
 
 fastify.post("/api/private/game/create", async (request, reply) => {
 	const playerId = request.user?.user_id as any;
@@ -178,7 +186,7 @@ fastify.get("/api/private/tournament/all", (req, reply) => {
 	return tournamentService.getAllTournamentsDetailed(req, reply);
 });
 
-fastify.get("/api/logout", async (request, reply) => {
+fastify.get("/api/private/logout", async (request, reply) => {
 	return await logout(request, reply);
 })
 
@@ -203,7 +211,9 @@ const start = async () => {
 		await users.CreateUserIA();
 		// const hashedPassword = await bcrypt.hash("42", 12);
 		// users.addUser("42", "42", hashedPassword);
+		// friends.deleteFriendTable();
 		// friends.addFriendship(7, 11);
+		// friends.addFriendship(10, 7);
 	} catch (err) {
 		console.log(err);
 		fastify.log.error(err);

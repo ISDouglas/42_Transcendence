@@ -765,6 +765,7 @@ async function uploadAvatar(avatar) {
     console.log("uplaod success ok : ", result);
     navigateTo("/profile");
   } catch (err) {
+    alert(err);
     console.error(err);
   }
 }
@@ -870,7 +871,7 @@ var init_logout = __esm({
     "use strict";
     init_router();
     initLogout = async () => {
-      await fetch("/api/logout", {
+      await fetch("/api/private/logout", {
         method: "GET",
         credentials: "include"
       });
@@ -901,7 +902,12 @@ async function initFriends() {
       const ul = divFriend.querySelector("ul");
       myfriends.forEach((friend) => {
         const li = document.createElement("li");
-        li.textContent = friend.toString();
+        li.textContent = "Pseudo: " + friend.pseudo + ", status: " + friend.webStatus + ", invitation: " + friend.friendship_status + ", friend since: " + friend.friendship_date;
+        const img = document.createElement("img");
+        img.src = friend.avatar;
+        img.alt = `${friend.pseudo}'s avatar`;
+        img.width = 64;
+        li.appendChild(img);
         ul?.appendChild(li);
       });
     }
@@ -996,9 +1002,7 @@ function router() {
     if (typeof currentRoute.cleanup === "function")
       currentRoute.cleanup();
   }
-  console.log("pathname= ", location.pathname);
   const match = matchRoute(location.pathname);
-  console.log("match= ", match?.route.path);
   if (!match) {
     navigateTo("/error");
     return;

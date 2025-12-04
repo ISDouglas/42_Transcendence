@@ -105,16 +105,6 @@ export async function getPseudoHeader()
 	}
 }
 
-export function isError(url: string): number {
-	for (let i: number = 0; i < routes.length; i++) {
-		let newUrl = new RegExp("^" + routes[i].path.replace(/:\w+/g, "([^/]+)") + "$");
-		if (newUrl.test(url))
-			return 0;
-	}
-	return 1;
-}
-
-
 export function router() {
 	//clean route who got cleanup function (game)
 	if (currentRoute?.cleanup)
@@ -122,19 +112,11 @@ export function router() {
 		if (typeof currentRoute.cleanup === "function")
 			currentRoute.cleanup();
 	}
-	console.log("pathname= ", location.pathname);
 	const match = matchRoute(location.pathname);
-	console.log("match= ", match?.route.path);
-	// if (isError(currentRoute))
-	// 	navigateTo("/error");
-
-	// if (!match) 
-	// 	return errorPage();
-
-		if (!match) {
-			navigateTo("/error");
-			return;
-	}
+	if (!match) {
+		navigateTo("/error");
+		return;
+		}
 
 	const { route, params } = match;
 	if (route.view)

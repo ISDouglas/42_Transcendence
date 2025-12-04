@@ -7,6 +7,16 @@ export interface IFriends {
 	friendship_date: Date;
 	status: string;
 }
+
+export interface IMyFriend {
+	id: number;
+	avatar: string;
+	pseudo: string;
+	webStatus: string;
+	friendship_date: Date;
+	friendship_status: string;
+}
+
 export class Friends
 {
 	private _db: ManageDB;

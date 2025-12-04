@@ -169,6 +169,7 @@ export class Users
 	async updateStatus(id: number, status: string): Promise < IUsers> {
 		await this._db.execute(`UPDATE Users SET status = ? WHERE user_id = ?`, [status, id]);
 		const updatedUser = await this.getIDUser(id);
+		// console.log("dans upadte", updatedUser.status);
 		return updatedUser;
 	}
 }
