@@ -20,6 +20,7 @@ import { getUpdateInfo, getUpdateUsername, getUpdateEmail, getUploadAvatar, getU
 import { logout } from "./routes/logout/logout";
 import { Friends } from "./DB/friend";
 import { displayFriendPage, displayFriendAvatar } from "./routes/friends/friends";
+import { dashboardInfo } from "./routes/dashboard/dashboard";
 
 export const db = new ManageDB("./back/DB/database.db");
 export const users = new Users(db);
@@ -195,6 +196,9 @@ fastify.setNotFoundHandler((request: FastifyRequest, reply: FastifyReply) => {
 	return reply.sendFile("index.html");
 })
 
+fastify.get("/api/private/dashboard", async (request, reply) => {
+	return dashboardInfo(request, reply);
+});
 
 const start = async () => {
 	const PORT = 3000
@@ -212,8 +216,8 @@ const start = async () => {
 		// const hashedPassword = await bcrypt.hash("42", 12);
 		// users.addUser("42", "42", hashedPassword);
 		// friends.deleteFriendTable();
-		// friends.addFriendship(7, 11);
-		// friends.addFriendship(10, 7);
+		// friends.addFriendship(12, 11);
+		// friends.addFriendship(12, 7);
 	} catch (err) {
 		console.log(err);
 		fastify.log.error(err);
