@@ -26,7 +26,7 @@ export class ServerGame {
 		this.state = {
 			ball: { x: width / 2, y: height / 2, speedX: 2, speedY: 2 },
 			paddles: { player1: height / 2 - 30, player2: height / 2 - 30 },
-			score: { player1: 0, player2: 0 },
+			score: { player1: 0, player2: 0, max: 11 },
 			width,
 			height
 		};
@@ -56,36 +56,32 @@ export function getPlayersId(id: number)
 	return ids;
 }
 
-export function createGame()
+export function createGame(PlayerId: number)
 {
 	let id: number = 1;
 	while (games_map.has(id))
 		id++;
 	const gameId = id;
 	const game = new ServerGame(gameId);
+	game.idPlayer1 = PlayerId;
 	games_map.set(gameId, game);
-	console.log(["games_map", ...games_map]);
+	// console.log(["games_map", ...games_map]);
 	return gameId;
 }
-
-
-// export function updateGameStatus(gameId: number, status: string)
-// {
-// 	const game = games_map.get(gameId);
-// 	if (game)
-// 		game.status = status;
-// }
 
 export async function displayGameList()
 {
 	const list: any = [];
 
 	for (const game of games_map.values()) {
-		list.push({
-			id: game.id,
-			state: game.status,
-			createdAt: game.gameDate
-		});
+		if (game.status == "waiting")
+		{
+			list.push({
+				id: game.id,
+				state: game.status,
+				createdAt: game.gameDate
+			});
+		}
 	}
 	console.log("list :", list);
 	return list;
@@ -105,25 +101,9 @@ export function joinGame(playerId: number, gameId: number)
 }
 
 export async function endGame(winner_id: number, loser_id: number, winner_score: number,
-	loser_score: number, duration_game: number, id: number, gameInfo: GameInfo): Promise<void>
+	loser_score: number, duration_game: number, gameid: number, gameInfo: GameInfo): Promise<void>
 {
-	const gameid = Number(id);
-	const gameDate: any = getDate(gameid);
-	let winner: any;
-	let loser: any;
-	if (winner_id == 1)
-	{
-		winner = getIdPlayer1(gameid);
-		loser = getIdPlayer2(gameid);
-	}
-	else
-	{
-		loser = getIdPlayer1(gameid);
-		winner = getIdPlayer2(gameid);
-	}
-	// const game = games_map.get(gameid);
-	// // if (game)
-	// // 	updateGameStatus(gameid, "finished");
-	await gameInfo.finishGame(winner, loser, winner_score, loser_score, duration_game, gameDate);
+	const gameDate: any = getDate(Number(gameid));
+	await gameInfo.finishGame(winner_id, loser_id, winner_score, loser_score, duration_game, gameDate);
 	games_map.delete(gameid);
 }

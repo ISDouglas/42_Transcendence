@@ -80,9 +80,16 @@ export function setupGameServer(io: Server) {
 			if (game.status === "playing") {
 				updateBall(game.state);
 				io.to(`game-${game.id}`).emit("state", serializeForClient(game.state));
+				checkForWinner(game);
 			}
 		}
 	}, TICK_RATE);
+}
+
+function checkForWinner(game: ServerGame)
+{
+	if (game.state.score.player2 === game.state.score.max || game.state.score.player1 === game.state.score.max)
+		game.status = "finished";
 }
 
 function serializeForClient(state: GameState) {

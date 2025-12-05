@@ -146,7 +146,8 @@ fastify.get("/api/private/avatar/:id", async (request: FastifyRequest, reply: Fa
 });
 
 fastify.post("/api/private/game/create", async (request, reply) => {
-	const gameId = createGame();
+	const playerId = request.user?.user_id as any;
+	const gameId = createGame(Number(playerId));
 	reply.send({ gameId });
 });
 
