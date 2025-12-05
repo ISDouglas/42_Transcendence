@@ -172,13 +172,6 @@ fastify.get("/api/private/game/list", async (request, reply) => {
 	return { games: list };
 })
 
-fastify.post("/api/private/game/update/status", async (request, reply) => {
-	const { id, status } = request.body as any;
-	const gameid = Number(id);
-	// updateGameStatus(gameid, status);
-	return { message: "Game status updated!" };
-});
-
 fastify.post("/api/private/game/end", async (request, reply) => {
 	const { winner_id, loser_id, winner_score, loser_score, duration_game, id } = request.body as any;
 

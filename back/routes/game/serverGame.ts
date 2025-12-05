@@ -6,8 +6,8 @@ import { GameState } from "../../pong/gameEngine";
 
 export class ServerGame {
 	id: number;
-	idPlayer1: number | null;
-	idPlayer2: number | null;
+	idPlayer1: number;
+	idPlayer2: number;
 	status: "waiting" | "playing" | "finished";
 	gameDate: string;
 	sockets: { player1: string | null, player2: string | null };
@@ -17,8 +17,8 @@ export class ServerGame {
 	constructor(id: number, width = 600, height = 480)
 	{
 		this.id = id;
-		this.idPlayer1 = null;
-		this.idPlayer2 = null;
+		this.idPlayer1 = 0;
+		this.idPlayer2 = 0;
 		this.status = "waiting";
 		this.gameDate = new Date().toISOString().replace("T", " ").split(".")[0];
 		this.sockets = { player1: null, player2: null };
@@ -26,7 +26,7 @@ export class ServerGame {
 		this.state = {
 			ball: { x: width / 2, y: height / 2, speedX: 2, speedY: 2 },
 			paddles: { player1: height / 2 - 30, player2: height / 2 - 30 },
-			score: { player1: 0, player2: 0, max: 11 },
+			score: { player1: 0, player2: 0, max: 1 },
 			width,
 			height
 		};
