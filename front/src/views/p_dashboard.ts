@@ -23,20 +23,35 @@ export async function initDashboard()
         dashboards.forEach(async (game : any) => {
             const item = document.createElement("div") as HTMLDivElement;
             item.classList.add("dash");
-			console.log("test", game.WinnerPath)
+			// console.log("test", game.GameDate)
             item.innerHTML = `
-                <div class="flex flex-row">
-					<img class="rounded-full w-20 h-20" id="profile-avatar" src="${game.WinnerPath}" alt="Your avatar" width="70">
-					<section>
-					<div class="flex justify-between mb-2">
-						<span class="font-semibold">Winner: ${game.WinnerPseudo}</span>
-						<span>${new Date(game.GameDate).toLocaleDateString()}</span>
+					<!-- WINNER -->
+					<div class="flex items-center gap-4 w-1/3">
+						<img src="${game.WinnerPath}" alt="winner avatar"
+							class="w-16 h-16 rounded-full object-cover border-2 border-green-400">
+						
+						<div>
+							<p class="text-lg font-semibold text-green-300">${game.WinnerPseudo}</p>
+							<p class="text-2xl font-bold">${game.WinnerScore}</p>
+						</div>
 					</div>
-					<p class="opacity-80">Winner Score: ${game.WinnerScore}</p>
-					<p class="opacity-80">Loser Score: ${game.LoserScore}</p>
-					<p class="opacity-60">Duration: ${game.GameDuration}</p>
-					</section>
-				</div>
+
+					<!-- CENTER : DATE + DURÉE -->
+					<div class="flex flex-col items-center w-1/3">
+						<p class="text-sm text-gray-300">${new Date(game.DateGame).toLocaleDateString()}</p>
+						<p class="text-xs text-gray-400">Durée : ${game.GameDuration}</p>
+					</div>
+
+					<!-- LOSER -->
+					<div class="flex items-center gap-4 w-1/3 justify-end">
+						<div class="text-right">
+							<p class="text-lg font-semibold text-red-300">${game.LoserPseudo}</p>
+							<p class="text-2xl font-bold">${game.LoserScore}</p>
+						</div>
+
+						<img src="${game.LoserPath}" alt="loser avatar"
+							class="w-16 h-16 rounded-full object-cover border-2 border-red-400">
+					</div>
             `;
 
             container.appendChild(item);

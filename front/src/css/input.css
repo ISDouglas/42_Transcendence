@@ -9,7 +9,7 @@
 
 @layer components {
 	.dash {
-		@apply p-4 rounded-lg bg-gray-800 text-white shadow-md border border-gray-300;
+		@apply w-full max-w-3xl mx-auto bg-gray-800 text-white rounded-xl p-4 flex items-center justify-between shadow-lg;
 	}
 }
 

@@ -4,7 +4,7 @@ export interface IGameInfo {
     status: string;
     winner_id: number;
     loser_id: number;
-    date_game: Date;
+    date_game: string;
     duration_game: number;
     winner_score: number;
     loser_score: number;
@@ -67,7 +67,7 @@ export class GameInfo
 		`;
 
 		const rows = await this._db.query(sql, [userId, userId]);
-
+		
 		return rows.map((row: IGameInfo) => ({
 			status: row.status,
 			winner_id: row.winner_id,

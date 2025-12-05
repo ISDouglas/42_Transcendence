@@ -12,7 +12,7 @@ export interface IDashBoard
 	LoserPseudo: string,
 	LoserPath: string,
 	LoserScore: number,
-	GameDate: string,
+	DateGame: string,
 	GameDuration: number
 }
 
@@ -38,7 +38,6 @@ export async function dashboardInfo(request: FastifyRequest, reply: FastifyReply
 				loserpseudo = await users.getIDUser(0);
 			else
 				loserpseudo = await users.getIDUser(game.loser_id);
-
 			const winnerPath = await getAvatarFromID(winnerpseudo.user_id);
 			const loserPath = await getAvatarFromID(loserpseudo.user_id);
 			return {
@@ -48,7 +47,7 @@ export async function dashboardInfo(request: FastifyRequest, reply: FastifyReply
 				LoserPseudo: loserpseudo.pseudo,
 				LoserPath: loserPath,
 				LoserScore: game.loser_score,
-				GameDate: game.game_date,
+				DateGame: game.date_game,
 				GameDuration: game.duration_game
 				};
 		}));
