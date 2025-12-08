@@ -3884,6 +3884,10 @@ var init_gameNetwork = __esm({
         this.socket.on("state", (state) => {
           this.onStateCallback?.(state);
         });
+        this.socket.on("gameOver", () => {
+          console.log("Game over, closing socket...");
+          this.socket.close();
+        });
       }
       onRole(cb) {
         this.onRoleCallback = cb;

@@ -103,6 +103,7 @@ function checkForWinner(game: ServerGame, io: Server)
 		{
 			endGame(game.idPlayer2, game.idPlayer1, game.state.score.player2, game.state.score.player1, 5 , game.id, gameInfo);
 		}
+		io.to(`game-${game.id}`).emit("gameOver");
 		io.in(`game-${game.id}`).socketsLeave(`game-${game.id}`);
 	}
 }
