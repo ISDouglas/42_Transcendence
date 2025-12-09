@@ -165,8 +165,10 @@ fastify.get("/api/private/avatar/:id", async (request: FastifyRequest, reply: Fa
 });
 
 fastify.post("/api/private/game/create", async (request, reply) => {
+	const { localMode } = request.body as { localMode: boolean };
+	console.log("localmode /create : ", localMode);
 	const playerId = request.user?.user_id as any;
-	const gameId = createGame(Number(playerId));
+	const gameId = createGame(Number(playerId), localMode);
 	reply.send({ gameId });
 });
 

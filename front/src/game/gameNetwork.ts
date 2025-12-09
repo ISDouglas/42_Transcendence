@@ -10,18 +10,6 @@ export class GameNetwork {
 	private socket: Socket;
 	private onStateCallback?: (state: GameState) => void;
 
-/*
-onStateCallback est une fonction que le front va définir pour savoir
-quoi faire quand le serveur envoie un state.
-
-La ligne this.onStateCallback?.(state) signifie :
-“si quelqu’un a défini une fonction pour traiter le state,
-appelle-la avec state comme argument”.
-
-En gros, c’est un relais propre entre le socket et le front,
-pour que le front n’ait jamais à manipuler le socket directement.
-*/
-
 	private onRoleCallback?: (role: "player1" | "player2") => void;
 
 	constructor(serverUrl: string, gameId: number) {
@@ -54,8 +42,8 @@ pour que le front n’ait jamais à manipuler le socket directement.
 		this.onStateCallback = cb;
 	}
 
-	sendInput(direction: "up" | "down" | "stop") {
-		this.socket.emit("input", { direction });
+	sendInput(direction: "up" | "down" | "stop", player?: "player1" | "player2") {
+		this.socket.emit("input", { direction, player });
 	}
 
 	join(gameId: number) {

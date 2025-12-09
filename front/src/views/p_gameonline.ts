@@ -9,7 +9,9 @@ export function GameOnlineinit() {
 	const createGameButton = document.getElementById("create-onlinegame");
 	createGameButton?.addEventListener("click", async () => {
 		const { gameId } = await genericFetch("/api/private/game/create", {
-			method: "POST"
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({ localMode: false })
 		});
 		navigateTo(`/pongmatch/${gameId}`);
 	});

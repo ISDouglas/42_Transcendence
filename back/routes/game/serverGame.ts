@@ -10,23 +10,25 @@ export class ServerGame {
 	idPlayer2: number;
 	status: "waiting" | "playing" | "finished";
 	gameDate: string;
+	isLocal: boolean;
 	sockets: { player1: string | null, player2: string | null };
 
 	state: GameState;
 
-	constructor(id: number, width = 600, height = 480)
+	constructor(id: number, isLocal: boolean, width = 600, height = 480)
 	{
 		this.id = id;
 		this.idPlayer1 = 0;
 		this.idPlayer2 = 0;
 		this.status = "waiting";
 		this.gameDate = new Date().toISOString().replace("T", " ").split(".")[0];
+		this.isLocal = isLocal;
 		this.sockets = { player1: null, player2: null };
 		
 		this.state = {
 			ball: { x: width / 2, y: height / 2, speedX: 2, speedY: 2 },
 			paddles: { player1: height / 2 - 30, player2: height / 2 - 30 },
-			score: { player1: 0, player2: 0, max: 1 },
+			score: { player1: 0, player2: 0, max: 4 },
 			width,
 			height
 		};
@@ -56,13 +58,13 @@ export function getPlayersId(id: number)
 	return ids;
 }
 
-export function createGame(PlayerId: number)
+export function createGame(PlayerId: number, isLocal: boolean)
 {
 	let id: number = 1;
 	while (games_map.has(id))
 		id++;
 	const gameId = id;
-	const game = new ServerGame(gameId);
+	const game = new ServerGame(gameId, isLocal);
 	game.idPlayer1 = PlayerId;
 	games_map.set(gameId, game);
 	// console.log(["games_map", ...games_map]);

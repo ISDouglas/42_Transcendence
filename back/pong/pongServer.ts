@@ -12,55 +12,70 @@ export function setupGameServer(io: Server) {
 		socket.on("joinGame", async (gameId: number) => {
 			let game = games_map.get(gameId);
 
-			// create game if doesn't exist
-			if (!game) {
-				game = new ServerGame(gameId);
-				games_map.set(gameId, game);
-			}
+			if (!game)
+				return;
 
 			// join room
 			socket.join(`game-${gameId}`);
 
-			// automatic assignation
-			let role: "player1" | "player2";
-			if (!game.sockets.player1) {
-				game.sockets.player1 = socket.id;
-				role = "player1";
-			} else if (!game.sockets.player2 && game.sockets.player1 !== socket.id) {
-				game.sockets.player2 = socket.id;
-				role = "player2";
-			} else if (game.sockets.player1 === socket.id) {
-				role = "player1";
-			} else if (game.sockets.player2 === socket.id) {
-				role = "player2";
-			} else {
-				socket.emit("gameFull");
-				return;
+			if (game.isLocal === true)
+			{
+				if (!game.sockets.player1 && !game.sockets.player2) {
+					game.sockets.player1 = socket.id;
+					game.sockets.player2 = socket.id;
+
+					game.status = "playing";
+					socket.emit("assignRole", "player1");
+					io.to(`game-${gameId}`).emit("startGame");
+					socket.emit("state", game);
+				} else {
+					// Already taken (another local session occupying it)
+					socket.emit("gameFull");
+				}
 			}
-
-			socket.emit("assignRole", role);
-
-			// start game when 2 players are in the game
-			if (game.sockets.player1 && game.sockets.player2 && game.status === "waiting") {
-				game.status = "playing";
-				io.to(`game-${gameId}`).emit("startGame");
+			else
+			{
+				// automatic assignation
+				let role: "player1" | "player2";
+				if (!game.sockets.player1) {
+					game.sockets.player1 = socket.id;
+					role = "player1";
+				} else if (!game.sockets.player2 && game.sockets.player1 !== socket.id) {
+					game.sockets.player2 = socket.id;
+					role = "player2";
+				} else if (game.sockets.player1 === socket.id) {
+					role = "player1";
+				} else if (game.sockets.player2 === socket.id) {
+					role = "player2";
+				} else {
+					socket.emit("gameFull");
+					return;
+				}
+	
+				socket.emit("assignRole", role);
+	
+				// start game when 2 players are in the game
+				if (game.sockets.player1 && game.sockets.player2 && game.status === "waiting") {
+					game.status = "playing";
+					io.to(`game-${gameId}`).emit("startGame");
+				}
+	
+				// send initial state
+				socket.emit("state", game);
+	
 			}
-
-			// send initial state
-			socket.emit("state", game);
-
+			
 			// Paddle move
-			socket.on("input", ({ direction }) => {
+			socket.on("input", ({ direction, player }: { direction: "up" | "down" | "stop", player?: "player1" | "player2" }) => {
 				const game = games_map.get(gameId);
 				if (!game)
 					return;
 
-				const player = getPlayer(game, socket);
-				if (!player)
+				const actualPlayer = game.isLocal ? player : getPlayer(game, socket);
+				if (!actualPlayer)
 					return;
 
-				if (player === "player1" || player === "player2")
-					applyInput(game?.state, player, direction);
+				applyInput(game?.state, actualPlayer, direction);
 			});
 
 			// Disconnect

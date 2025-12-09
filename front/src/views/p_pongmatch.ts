@@ -14,6 +14,8 @@ export function PongMatchView(params?: any): string {
 
 export function initPongMatch(params?: any) {
 	const gameID: string = params?.id;
+	const url = new URL(window.location.href);
+	const localMode = url.searchParams.get("local") === "1";
 
 	const serverUrl = "https://localhost:3000";
 
@@ -22,6 +24,9 @@ export function initPongMatch(params?: any) {
 
 	// 2. Prepare drawing system
 	renderer = new GameRenderer();
+
+	if (localMode)
+		currentGame.enableLocalMode();
 
 	// 3. Connect to server
 	net = new GameNetwork(serverUrl, Number(gameID));
@@ -49,11 +54,28 @@ export function initPongMatch(params?: any) {
 
 	// 7. Send inputs to server
 	window.addEventListener("keydown", (e) => {
-		if (e.key === "w" || e.key === "W")
-			currentGame?.sendInput("up");
+		if (currentGame?.isLocalMode())
+		{
+			if (e.key === "w" || e.key === "W")
+				currentGame?.sendInput("up", "player1");
 
-		if (e.key === "s" || e.key === "S")
-			currentGame?.sendInput("down");
+			if (e.key === "s" || e.key === "S")
+				currentGame?.sendInput("down", "player1");
+
+			if (e.key === "ArrowUp")
+				currentGame?.sendInput("up", "player2");
+
+			if (e.key === "ArrowDown")
+				currentGame?.sendInput("down", "player2");
+		}
+		else
+		{
+			if (e.key === "w" || e.key === "W")
+				currentGame?.sendInput("up");
+			
+			if (e.key === "s" || e.key === "S")
+				currentGame?.sendInput("down");
+		}
 	});
 
 	window.addEventListener("keyup", () => {

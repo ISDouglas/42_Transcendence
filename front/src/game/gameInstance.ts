@@ -9,6 +9,7 @@ export class GameInstance {
 		score: { player1: 0, player2: 0 }
 	};
 	private network: GameNetwork | null = null;
+	private localMode: boolean = false;
 
 	setNetwork(network: GameNetwork, role: "player1" | "player2") {
 		this.network = network;
@@ -23,10 +24,30 @@ export class GameInstance {
 		return this.currentState;
 	}
 
-	sendInput(direction: "up" | "down" | "stop") {
-		if (!this.network || !this.role)
+	sendInput(direction: "up" | "down" | "stop", player?: "player1" | "player2") {
+		if (!this.network)
 			return;
-		this.network.sendInput(direction);
+
+		if (this.localMode)
+		{
+			if (!player)
+				return;
+			this.network.sendInput(direction, player);
+		}
+		else
+		{
+			if (!this.role)
+				return;
+			this.network.sendInput(direction, this.role);
+		}
+	}
+
+	enableLocalMode() {
+		this.localMode = true;
+	}
+
+	isLocalMode() {
+		return this.localMode;
 	}
 }
 
