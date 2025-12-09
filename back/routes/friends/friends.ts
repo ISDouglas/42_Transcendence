@@ -1,10 +1,9 @@
 import { db, friends, users } from '../../server';
 import { IFriends, IMyFriend } from '../../DB/friend';
-import { FastifyReply, FastifyRequest } from 'fastify';
+import { FastifyReply, FastifyRequest, FastifySerializerCompiler } from 'fastify';
 import path from "path";
 import fs from "fs";
 import mime from "mime-types";
-import { isJsxFragment } from 'typescript';
 
 export async function displayFriendPage(request: FastifyRequest, reply: FastifyReply): Promise< IMyFriend[] | undefined> 
 {
@@ -29,7 +28,6 @@ function friendsID(infoFriends: IFriends[], id: number): Partial<IMyFriend>[] {
 		}
 	});
 }
-
 
 async function allMyFriendsInfo(allMyFrd: Partial<IMyFriend>[]): Promise<IMyFriend[]> {
 	const myFriendsinfo: IMyFriend[] = await Promise.all(
@@ -70,5 +68,19 @@ export async function displayFriendAvatar( request: FastifyRequest, reply: Fasti
 	}
 	catch (err) {
 		console.log(err);
+	}
+}
+
+export async function searchUser(request: FastifyRequest, reply: FastifyReply) {
+	const { member } = request.body as { member: string };
+	try {
+		if (!member)
+			return reply.code(400).send({ message: "Need pseudo to find members" });
+		const allMembers = await users.searchMember(member, request.user!.user_id);
+		return reply.code(200).send(allMembers);
+	}
+	catch (err)  {
+		console.log(err);
+		return reply.code(500).send({ error: err});
 	}
 }

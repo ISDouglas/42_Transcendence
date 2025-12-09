@@ -4353,9 +4353,42 @@ async function initFriends() {
         ul?.appendChild(li);
       });
     }
+    search();
   } catch (err) {
     console.log(err);
   }
+}
+async function search() {
+  const input = document.getElementById("searchInput");
+  const listedMember = document.getElementById("members");
+  if (!input || !listedMember)
+    return;
+  input.addEventListener("input", async () => {
+    const memberSearched = input.value?.trim();
+    if (memberSearched === "") {
+      listedMember.innerHTML = "";
+      return;
+    }
+    try {
+      const existedMember = await genericFetch2("/api/private/friend/search", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ member: memberSearched })
+      });
+      listedMember.innerHTML = "";
+      if (existedMember.length === 0)
+        listedMember.innerHTML = "<li>No result</li>";
+      else {
+        existedMember.forEach((member) => {
+          const li = document.createElement("li");
+          li.textContent = member.pseudo;
+          listedMember?.appendChild(li);
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  });
 }
 var init_p_friends = __esm({
   "front/src/views/p_friends.ts"() {

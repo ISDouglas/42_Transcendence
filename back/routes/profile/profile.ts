@@ -27,11 +27,5 @@ export async function displayAvatar( request: FastifyRequest, reply: FastifyRepl
 	if (type !== "image/png" && type !== "image/jpeg")
 		return reply.code(404).send({message: "Extension file should be PNG or JPEG"});
 	const stream = fs.createReadStream(avatarPath);
-	// const etag = Date.now().toString();
 	return reply.type(type).send(stream);
-
-	// .header("Cache-Control", "no-store, no-cache, must-revalidate")
-				// .header("Pragma", "no-cache")
-  				// .header("Expires", "0")
-				// .header("ETag", etag)
 }

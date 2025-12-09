@@ -22,10 +22,9 @@ import * as tournamentService from "./routes/tournament/tournament.service";
 import { getProfile, displayAvatar } from "./routes/profile/profile";
 import { getUpdateInfo, getUpdateUsername, getUpdateEmail, getUploadAvatar, getUpdatePassword, getUpdateStatus } from "./routes/profile/getUpdate";
 import { logout } from "./routes/logout/logout";
-import { request } from "http";
 import { setupGameServer } from "./pong/pongServer";
 import { Friends } from "./DB/friend";
-import { displayFriendPage, displayFriendAvatar } from "./routes/friends/friends";
+import { displayFriendPage, displayFriendAvatar, searchUser } from "./routes/friends/friends";
 import { dashboardInfo } from "./routes/dashboard/dashboard";
 import { request } from "http";
 import { getAvatarFromID } from "./routes/avatar/avatar";
@@ -78,7 +77,6 @@ fastify.register(async function (instance) {
     prefix: "/files/",
     index: false,
   });
-
 });
 
 fastify.addHook("onRequest", async(request: FastifyRequest, reply: FastifyReply) => {
@@ -155,10 +153,11 @@ fastify.get("/api/private/avatar", async (request: FastifyRequest, reply: Fastif
 });
 
 fastify.post("/api/private/friend", async (request: FastifyRequest, reply: FastifyReply) => {
-	const friends =  await displayFriendPage(request, reply);
-	// if (friends !== null)
-	// 	request.myfriends = friends;
-	// return friends;
+	await displayFriendPage(request, reply);
+})
+
+fastify.post("/api/private/friend/search", async( request: FastifyRequest, reply: FastifyReply) => {
+	await searchUser(request, reply);
 })
 
 fastify.get("/api/private/avatar/:id", async (request: FastifyRequest, reply: FastifyReply) => {
@@ -247,8 +246,8 @@ const start = async () => {
 		// const hashedPassword = await bcrypt.hash("42", 12);
 		// users.addUser("42", "42", hashedPassword);
 		// friends.deleteFriendTable();
-		// friends.addFriendship(12, 11);
-		// friends.addFriendship(12, 7);
+		// friends.addFriendship(1, 3);
+		// friends.addFriendship(1, 2);
 	} catch (err) {
 		console.log(err);
 		fastify.log.error(err);
