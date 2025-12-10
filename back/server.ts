@@ -157,14 +157,15 @@ fastify.post("/api/private/friend/search", async( request: FastifyRequest, reply
 })
 
 fastify.post("/api/private/game/create", async (request, reply) => {
+	const { localMode } = request.body as { localMode: boolean };
 	const playerId = request.user?.user_id as any;
 	const { vsAI } = request.body as { vsAI: boolean };
 	let gameId: number;
 	console.log(`vsAI is: ${vsAI}`);
 	if (vsAI) {
-		gameId = createGame(Number(playerId), { vsAI: true });
+		gameId = createGame(Number(playerId), localMode, { vsAI: true });
 	} else {
-		gameId = createGame(Number(playerId), { vsAI: false });
+		gameId = createGame(Number(playerId), localMode, { vsAI: false });
 	}
 	reply.send({ gameId });
 });
@@ -176,14 +177,6 @@ fastify.post("/api/private/game/join", async (request, reply) => {
 	joinGame(playerId, id);
 	reply.send({ message: "Player joined game" });
 });
-
-fastify.post("/api/private/game/start", async (request, reply) => {
-	const { gameId } = request.body as any;
-
-	const playersId = getPlayersId(gameId);
-	return { playersId };
-});
-
 
 fastify.get("/api/private/game/list", async (request, reply) => {
 	const list = await displayGameList();

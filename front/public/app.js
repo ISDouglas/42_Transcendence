@@ -218,7 +218,9 @@ function GameOnlineinit() {
   const createGameButton = document.getElementById("create-onlinegame");
   createGameButton?.addEventListener("click", async () => {
     const { gameId } = await genericFetch2("/api/private/game/create", {
-      method: "POST"
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ localMode: false })
     });
     navigateTo(`/pongmatch/${gameId}`);
   });
@@ -281,9 +283,11 @@ function GameLocalinit() {
   const pvpButton = document.getElementById("pvp");
   pvpButton?.addEventListener("click", async () => {
     const { gameId } = await genericFetch2("/api/private/game/create", {
-      method: "POST"
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ localMode: true })
     });
-    navigateTo(`/pongmatch/${gameId}`);
+    navigateTo(`/pongmatch/${gameId}?local=1`);
   });
   const pvaiButton = document.getElementById("pvai");
   pvaiButton?.addEventListener("click", async () => {
@@ -3959,8 +3963,8 @@ var init_gameNetwork = __esm({
       onState(cb) {
         this.onStateCallback = cb;
       }
-      sendInput(direction) {
-        this.socket.emit("input", { direction });
+      sendInput(direction, player) {
+        this.socket.emit("input", { direction, player });
       }
       join(gameId) {
         this.socket.emit("joinGame", gameId);
@@ -3986,6 +3990,7 @@ var init_gameInstance = __esm({
           score: { player1: 0, player2: 0 }
         };
         this.network = null;
+        this.localMode = false;
       }
       setNetwork(network, role) {
         this.network = network;
@@ -3997,10 +4002,24 @@ var init_gameInstance = __esm({
       getCurrentState() {
         return this.currentState;
       }
-      sendInput(direction) {
-        if (!this.network || !this.role)
+      sendInput(direction, player) {
+        if (!this.network)
           return;
-        this.network.sendInput(direction);
+        if (this.localMode) {
+          if (!player)
+            return;
+          this.network.sendInput(direction, player);
+        } else {
+          if (!this.role)
+            return;
+          this.network.sendInput(direction, this.role);
+        }
+      }
+      enableLocalMode() {
+        this.localMode = true;
+      }
+      isLocalMode() {
+        return this.localMode;
       }
     };
   }
@@ -4013,9 +4032,13 @@ function PongMatchView(params) {
 }
 function initPongMatch(params) {
   const gameID = params?.id;
+  const url2 = new URL(window.location.href);
+  const localMode = url2.searchParams.get("local") === "1";
   const serverUrl = "https://localhost:3000";
   currentGame = new GameInstance();
   renderer = new GameRenderer();
+  if (localMode)
+    currentGame.enableLocalMode();
   net = new GameNetwork(serverUrl, Number(gameID));
   net.onRole((role) => {
     if (net)
@@ -4029,10 +4052,21 @@ function initPongMatch(params) {
     renderer.draw(currentGame.getCurrentState());
   });
   window.addEventListener("keydown", (e) => {
-    if (e.key === "w" || e.key === "W")
-      currentGame?.sendInput("up");
-    if (e.key === "s" || e.key === "S")
-      currentGame?.sendInput("down");
+    if (currentGame?.isLocalMode()) {
+      if (e.key === "w" || e.key === "W")
+        currentGame?.sendInput("up", "player1");
+      if (e.key === "s" || e.key === "S")
+        currentGame?.sendInput("down", "player1");
+      if (e.key === "ArrowUp")
+        currentGame?.sendInput("up", "player2");
+      if (e.key === "ArrowDown")
+        currentGame?.sendInput("down", "player2");
+    } else {
+      if (e.key === "w" || e.key === "W")
+        currentGame?.sendInput("up");
+      if (e.key === "s" || e.key === "S")
+        currentGame?.sendInput("down");
+    }
   });
   window.addEventListener("keyup", () => {
     currentGame?.sendInput("stop");

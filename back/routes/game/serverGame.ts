@@ -1,7 +1,5 @@
 export const games_map = new Map<number, ServerGame>();
 import { GameInfo } from "../../DB/gameinfo";
-import { users } from '../../server';
-import { Socket } from "socket.io";
 import { GameState } from "../../pong/gameEngine";
 
 let maxGameId = 0;
@@ -12,17 +10,19 @@ export class ServerGame {
 	idPlayer2: number;
 	status: "waiting" | "playing" | "finished";
 	gameDate: string;
+	isLocal: boolean;
 	sockets: { player1: string | null, player2: string | null };
 
 	state: GameState & { aiLastUpdate?: number };
 
-	constructor(id: number, width = 600, height = 480)
+	constructor(id: number, isLocal: boolean, width = 600, height = 480)
 	{
 		this.id = id;
 		this.idPlayer1 = 0;
 		this.idPlayer2 = 0;
 		this.status = "waiting";
 		this.gameDate = new Date().toISOString().replace("T", " ").split(".")[0];
+		this.isLocal = isLocal;
 		this.sockets = { player1: null, player2: null };
 		
 		this.state = {
@@ -59,16 +59,17 @@ export function getPlayersId(id: number)
 	return ids;
 }
 
-export function createGame(PlayerId: number, options: { vsAI: boolean }): number 
+export function createGame(PlayerId: number,  isLocal: boolean, options: { vsAI: boolean }): number 
 {
-	maxGameId++;
-	const gameId = maxGameId;
-	const game = new ServerGame(gameId);
+	let id: number = 1;
+	while (games_map.has(id))
+		id++;
+	const gameId = id;
+	const game = new ServerGame(gameId, isLocal);
 	game.idPlayer1 = PlayerId;
 	if (options.vsAI)
 		game.idPlayer2 = -1;
 	games_map.set(gameId, game);
-	// console.log(["games_map", ...games_map]);
 	return gameId;
 }
 
@@ -86,7 +87,6 @@ export async function displayGameList()
 			});
 		}
 	}
-	console.log("list :", list);
 	return list;
 }
 
@@ -107,6 +107,6 @@ export async function endGame(winner_id: number, loser_id: number, winner_score:
 	loser_score: number, duration_game: number, gameid: number, gameInfo: GameInfo): Promise<void>
 {
 	const gameDate: any = getDate(Number(gameid));
-	await gameInfo.finishGame(gameid, winner_id, loser_id, winner_score, loser_score, duration_game, gameDate);
+	await gameInfo.finishGame(winner_id, loser_id, winner_score, loser_score, duration_game, gameDate);
 	games_map.delete(gameid);
 }
