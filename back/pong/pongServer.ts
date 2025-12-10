@@ -114,17 +114,20 @@ function checkForWinner(game: ServerGame, io: Server)
 
 	if (game.status == "finished")
 	{
+		const duration = (Date.now() - game.duration) / 1000;
+		game.duration = Math.round(duration * 10) / 10;
 		if (game.state.score.player1 > game.state.score.player2)
 		{
-			endGame(game.idPlayer1, game.idPlayer2, game.state.score.player1, game.state.score.player2, 5 , game.id, gameInfo);
+			endGame(game.idPlayer1, game.idPlayer2, game.state.score.player1, game.state.score.player2, game.duration , game.id, gameInfo);
 		}
 		else
 		{
-			endGame(game.idPlayer2, game.idPlayer1, game.state.score.player2, game.state.score.player1, 5 , game.id, gameInfo);
+			endGame(game.idPlayer2, game.idPlayer1, game.state.score.player2, game.state.score.player1, game.duration , game.id, gameInfo);
 		}
 		io.to(`game-${game.id}`).emit("gameOver");
 		io.in(`game-${game.id}`).socketsLeave(`game-${game.id}`);
 	}
+	//Math.floor((Date.now() - this.startTime) / 1000);
 }
 
 function serializeForClient(state: GameState) {

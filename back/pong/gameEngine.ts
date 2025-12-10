@@ -41,12 +41,14 @@ export function updateBall(game: GameState) {
 	if (game.ball.x <= paddleWidth &&
 		game.ball.y >= game.paddles.player1 &&
 		game.ball.y <= game.paddles.player1 + paddleHeight) {
+		modifyBallAngle(game.paddles.player1, game.ball);
 		increaseBallSpeed(game.ball);
 	}
 
 	if (game.ball.x >= game.width - paddleWidth &&
 		game.ball.y >= game.paddles.player2 &&
 		game.ball.y <= game.paddles.player2 + paddleHeight) {
+		modifyBallAngle(game.paddles.player2, game.ball);
 		increaseBallSpeed(game.ball);
 	}
 
@@ -64,6 +66,21 @@ export function updateBall(game: GameState) {
 		resetPaddles(game);
 	}
 }
+
+
+	function modifyBallAngle(player: number, ball: Ball) {
+		const paddleCenter = player + 30;
+		let hitPos = ball.y - paddleCenter;
+
+		const normalized = hitPos / 30;
+		const bounceAngle = normalized * (Math.PI / 4);
+
+		const speed = Math.sqrt(
+			ball.speedX ** 2 + ball.speedY ** 2
+		);
+
+		ball.speedY = speed * Math.sin(bounceAngle);
+	}
 
 export function resetBall(game: GameState) {
 	game.ball.x = game.width / 2;

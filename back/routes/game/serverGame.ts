@@ -10,6 +10,7 @@ export class ServerGame {
 	idPlayer2: number;
 	status: "waiting" | "playing" | "finished";
 	gameDate: string;
+	duration: number;
 	isLocal: boolean;
 	sockets: { player1: string | null, player2: string | null };
 
@@ -22,13 +23,14 @@ export class ServerGame {
 		this.idPlayer2 = 0;
 		this.status = "waiting";
 		this.gameDate = new Date().toISOString().replace("T", " ").split(".")[0];
+		this.duration = Date.now();
 		this.isLocal = isLocal;
 		this.sockets = { player1: null, player2: null };
 		
 		this.state = {
 			ball: { x: width / 2, y: height / 2, speedX: 2.5, speedY: 2 },
 			paddles: { player1: height / 2 - 30, player2: height / 2 - 30 },
-			score: { player1: 0, player2: 0, max: 440 },
+			score: { player1: 0, player2: 0, max: 4 },
 			width,
 			height,
 			aiLastUpdate: 0
