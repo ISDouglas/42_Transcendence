@@ -180,14 +180,6 @@ fastify.post("/api/private/game/join", async (request, reply) => {
 	reply.send({ message: "Player joined game" });
 });
 
-fastify.post("/api/private/game/start", async (request, reply) => {
-	const { gameId } = request.body as any;
-
-	const playersId = getPlayersId(gameId);
-	return { playersId };
-});
-
-
 fastify.get("/api/private/game/list", async (request, reply) => {
 	const list = await displayGameList();
 	return { games: list };

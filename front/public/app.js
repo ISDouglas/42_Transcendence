@@ -4021,7 +4021,6 @@ var init_gameInstance = __esm({
         }
       }
       enableLocalMode() {
-        console.log("Local mode activated");
         this.localMode = true;
       }
       isLocalMode() {
@@ -4059,10 +4058,8 @@ function initPongMatch(params) {
   });
   window.addEventListener("keydown", (e) => {
     if (currentGame?.isLocalMode()) {
-      if (e.key === "w" || e.key === "W") {
-        console.log("input w received");
+      if (e.key === "w" || e.key === "W")
         currentGame?.sendInput("up", "player1");
-      }
       if (e.key === "s" || e.key === "S")
         currentGame?.sendInput("down", "player1");
       if (e.key === "ArrowUp")
