@@ -103,7 +103,6 @@ export async function getPseudoHeader()
 	document.getElementById("pseudo-header")!.textContent = result.pseudo;
 	const avatar = document.getElementById("profile-avatar") as HTMLImageElement;
 	avatar.src = result.avatar + "?ts" + Date.now();
-	console.log("avatar =", result.avatar);
 	} catch (err) {
 		console.error(err);
 	}

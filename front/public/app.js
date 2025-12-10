@@ -4034,7 +4034,7 @@ function initPongMatch(params) {
   const gameID = params?.id;
   const url2 = new URL(window.location.href);
   const localMode = url2.searchParams.get("local") === "1";
-  const serverUrl = "https://127.0.0.1:3000";
+  const serverUrl = "https://127.0.0.1:3002";
   currentGame = new GameInstance();
   renderer = new GameRenderer();
   if (localMode)
@@ -4409,42 +4409,60 @@ async function initFriends() {
         ul?.appendChild(li);
       });
     }
-    search();
+    doSearch();
   } catch (err) {
     console.log(err);
   }
 }
-async function search() {
+function debounce(fn, delay) {
+  console.log("dasn debounce");
+  let timeout;
+  return (...args) => {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => {
+      fn(...args);
+    }, delay);
+  };
+}
+function doSearch() {
+  console.log("dasn doseqrch");
   const input = document.getElementById("searchInput");
-  const listedMember = document.getElementById("members");
-  if (!input || !listedMember)
+  if (!input)
     return;
-  input.addEventListener("input", async () => {
+  const debouncedSearch = debounce(search, 300);
+  input.addEventListener("input", () => {
     const memberSearched = input.value.trim();
-    if (memberSearched === "") {
-      listedMember.innerHTML = "";
-      return;
-    }
-    try {
-      const existedMember = await genericFetch2("/api/private/friend/search", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ member: memberSearched })
-      });
-      listedMember.innerHTML = "";
-      if (existedMember.length === 0)
-        listedMember.innerHTML = "<li>No result</li>";
-      else {
-        existedMember.forEach((member) => {
-          const li = document.createElement("li");
-          li.textContent = member.pseudo;
-          listedMember.appendChild(li);
-        });
-      }
-    } catch (error) {
-      console.log(error);
-    }
+    debouncedSearch(memberSearched);
   });
+}
+async function search(memberSearched) {
+  console.log("search lanc\xE9 avec:", memberSearched);
+  const listedMember = document.getElementById("members");
+  if (!listedMember)
+    return;
+  if (memberSearched === "") {
+    listedMember.innerHTML = "";
+    return;
+  }
+  try {
+    const existedMember = await genericFetch2("/api/private/friend/search", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ member: memberSearched })
+    });
+    listedMember.innerHTML = "";
+    if (existedMember.length === 0)
+      listedMember.innerHTML = "<li>No result</li>";
+    else {
+      existedMember.forEach((member) => {
+        const li = document.createElement("li");
+        li.textContent = member.pseudo;
+        listedMember.appendChild(li);
+      });
+    }
+  } catch (error) {
+    console.log(error);
+  }
 }
 var init_p_friends = __esm({
   "front/src/views/p_friends.ts"() {
@@ -4520,7 +4538,6 @@ async function getPseudoHeader3() {
     document.getElementById("pseudo-header").textContent = result.pseudo;
     const avatar = document.getElementById("profile-avatar");
     avatar.src = result.avatar + "?ts" + Date.now();
-    console.log("avatar =", result.avatar);
   } catch (err) {
     console.error(err);
   }

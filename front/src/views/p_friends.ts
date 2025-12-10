@@ -39,43 +39,58 @@ export async function initFriends() {
 				ul?.appendChild(li)	
 			});
   		}
-  		search();
+  		doSearch()
 	}
 	catch (err) {
 		console.log(err);
 	}
 }
 
-async function search() {
+function debounce<T extends (...args: any[]) => void>(fn: T, delay: number) {
+	let timeout: ReturnType<typeof setTimeout>;
+	return (...args: Parameters<T>): void => {
+		clearTimeout(timeout);
+		timeout = setTimeout(() => { fn(...args) }, delay);
+	};
+}
+
+function doSearch() {
 	const input = (document.getElementById("searchInput") as HTMLInputElement | null);
-	const listedMember = (document.getElementById("members") as HTMLUListElement | null);
-	if (!input || ! listedMember)
+	if (!input)
 		return;
-	input.addEventListener("input", async() => {
+	const debouncedSearch = debounce(search, 300);
+	input.addEventListener("input", () => {
 		const memberSearched = input.value.trim();
-		if (memberSearched === "") {
-				listedMember.innerHTML = "";
-			return;
-		}
-		try {
-			const existedMember = await genericFetch("/api/private/friend/search", {
-				method: "POST",
-		  		headers: { 'Content-Type': 'application/json' },
-		  		body: JSON.stringify({ member: memberSearched })
-			});
-			listedMember.innerHTML = "";
-			if (existedMember.length === 0)	
-				listedMember.innerHTML = "<li>No result</li>";
-			else {
-				existedMember.forEach((member: IUsers) => {
-					const li = document.createElement("li");
-					li.textContent = member.pseudo;
-					listedMember.appendChild(li);
-				})
-			}
-		}
-		catch (error) {
-			console.log(error);
-		}
+		debouncedSearch(memberSearched);
 	});
+}
+
+async function search(memberSearched: string) {
+	const listedMember = (document.getElementById("members") as HTMLUListElement | null);
+	if (!listedMember)
+		return;
+	if (memberSearched === "") {
+		listedMember.innerHTML = "";
+		return;
+	}
+	try {
+		const existedMember = await genericFetch("/api/private/friend/search", {
+			method: "POST",
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ member: memberSearched })
+		});
+		listedMember.innerHTML = "";
+		if (existedMember.length === 0)	
+			listedMember.innerHTML = "<li>No result</li>";
+		else {
+			existedMember.forEach((member: IUsers) => {
+				const li = document.createElement("li");
+				li.textContent = member.pseudo;
+				listedMember.appendChild(li);
+			})
+		}
+	}
+	catch (error) {
+		console.log(error);
+	}
 }
