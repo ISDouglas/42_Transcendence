@@ -9,10 +9,9 @@ export async function initProfile() {
   const profile = await genericFetch("/api/private/profile", {
 	method: "POST",
 	});
-
+			
 	const avatar = document.getElementById("profile-avatar") as HTMLImageElement;
-	if (avatar) 
-		avatar.src = "/api/private/avatar?ts=" + Date.now();
+	avatar.src = profile.avatar + "?ts=" + Date.now();
 	(document.getElementById("profile-pseudo") as HTMLElement).textContent = profile.pseudo;
 	(document.getElementById("profile-email") as HTMLElement).textContent = profile.email;
 	const select = document.getElementById("profile-status") as HTMLSelectElement;
@@ -31,4 +30,3 @@ export async function initProfile() {
   (document.getElementById("profile-money") as HTMLElement).textContent = profile.money;
   (document.getElementById("profile-elo") as HTMLElement).textContent = profile.elo;
 }
-

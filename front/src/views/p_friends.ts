@@ -28,19 +28,16 @@ export async function initFriends() {
 			divFriend.classList.remove("hidden");
 			divNoFriend.classList.add("hidden");
 			const ul = divFriend.querySelector("ul");
-			const prepareInfo = myfriends.map(async (friend: IMyFriend) => {
-				const avatarBin = await loadAvatar(friend.id);
-      			const li = document.createElement("li");
+			myfriends.forEach(async (friend: IMyFriend) => {
+				const li = document.createElement("li");
       			li.textContent = "Pseudo: " + friend.pseudo + ", status: " + friend.webStatus + ", invitation: " + friend.friendship_status + ", friend since: " + friend.friendship_date;
 				const img = document.createElement("img");
-  				img.src =  URL.createObjectURL(avatarBin)
+  				img.src =  friend.avatar;
 				img.alt = `${friend.pseudo}'s avatar`;
   				img.width = 64;
   				li.appendChild(img)
-				return li;
-    		});
-			const allInfo = await Promise.all(prepareInfo);
-			allInfo.forEach(li => ul?.appendChild(li));
+				ul?.appendChild(li)	
+			});
   		}
   		search();
 	}
@@ -81,16 +78,4 @@ async function search() {
 			console.log(error);
 		}
 	});
-}
-
-export async function loadAvatar(id: number) {
-	const res = await fetch("api/private/member/avatar", {
-		method: "POST",
-		credentials: "include", 
-		headers: { "Content-Type": "application/json" },
-		body: JSON.stringify({ memberID: id })
-
-	})
-	const avatarBin = await res.blob();
-	return avatarBin;
 }

@@ -50,7 +50,7 @@ export class Users
 		pseudo,
 		email,
 		password,
-		"0.png",
+		"/files/0.png",
 		"online",
 		new Date().toISOString().replace("T", " ").split(".")[0],
 		new Date().toISOString().replace("T", " ").split(".")[0],
@@ -72,7 +72,7 @@ export class Users
 		"AI_Player",
 		"ia@ia.ia",
 		"iapassiapass",
-		"ai.png",
+		"/files/ai.png",
 		"online",
 		new Date().toISOString().replace("T", " ").split(".")[0],
 		new Date().toISOString().replace("T", " ").split(".")[0],
@@ -182,7 +182,6 @@ export class Users
 	async updateStatus(id: number, status: string): Promise < IUsers> {
 		await this._db.execute(`UPDATE Users SET status = ? WHERE user_id = ?`, [status, id]);
 		const updatedUser = await this.getIDUser(id);
-		// console.log("dans upadte", updatedUser.status);
 		return updatedUser;
 	}
 

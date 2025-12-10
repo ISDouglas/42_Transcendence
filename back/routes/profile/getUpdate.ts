@@ -140,7 +140,7 @@ export async function getUploadAvatar(request: FastifyRequest, reply: FastifyRep
 		await fs.promises.unlink(avatar_path);
 		return reply.status(413).send({ error: "File too large (max 2MB)" });
 	}
-	await users.updateAvatar(request.user!.user_id, avatar_name);
+	await users.updateAvatar(request.user!.user_id, "/files/" + avatar_name);
 	return reply.status(200).send({ message: "Upload succes", filename: avatar_name})
 }
 

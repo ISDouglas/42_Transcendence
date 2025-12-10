@@ -1,6 +1,7 @@
 import { db, friends, users } from '../../server';
 import { IFriends, IMyFriend } from '../../DB/friend';
 import { FastifyReply, FastifyRequest, FastifySerializerCompiler } from 'fastify';
+import { finished } from 'stream';
 
 export async function displayFriendPage(request: FastifyRequest, reply: FastifyReply): Promise< IMyFriend[] | undefined> 
 {
@@ -32,7 +33,7 @@ async function allMyFriendsInfo(allMyFrd: Partial<IMyFriend>[]): Promise<IMyFrie
 			const friend = await users.getIDUser(myfriend.id!);
 			return ({
 				id: myfriend.id!,
-				avatar: `/api/private/avatar/${myfriend.id!}`,
+				avatar: friend.avatar,
 				pseudo: friend.pseudo,
 				webStatus: friend.status,
 				friendship_date: myfriend.friendship_date!,
