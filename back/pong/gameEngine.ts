@@ -41,31 +41,46 @@ export function updateBall(game: GameState) {
 	if (game.ball.x <= paddleWidth &&
 		game.ball.y >= game.paddles.player1 &&
 		game.ball.y <= game.paddles.player1 + paddleHeight) {
-		game.ball.speedX *= -1;
+		increaseBallSpeed(game.ball);
 	}
 
 	if (game.ball.x >= game.width - paddleWidth &&
 		game.ball.y >= game.paddles.player2 &&
 		game.ball.y <= game.paddles.player2 + paddleHeight) {
-		game.ball.speedX *= -1;
+		increaseBallSpeed(game.ball);
 	}
 
 	// Score
 	if (game.ball.x <= 0) {
 		game.score.player2++;
 		resetBall(game);
+		game.ball.speedX = -2.5;
+		resetPaddles(game);
 	}
 	if (game.ball.x >= game.width) {
 		game.score.player1++;
 		resetBall(game);
+		game.ball.speedX = 2.5;
+		resetPaddles(game);
 	}
 }
 
 export function resetBall(game: GameState) {
 	game.ball.x = game.width / 2;
 	game.ball.y = game.height / 2;
-	game.ball.speedX = Math.random() < 0.5 ? 2 : -2;
 	game.ball.speedY = (Math.random() - 0.5) * 2;
+}
+
+export function resetPaddles(game: GameState) {
+	game.paddles.player1 = game.height / 2;
+	game.paddles.player2 = game.height / 2;
+}
+
+function increaseBallSpeed(ball: Ball)
+{
+	if (ball.speedX > -8 && ball.speedX < 8)
+		ball.speedX *= 1.15;
+	ball.speedX *= -1;
 }
 
 export function applyInput(
@@ -73,7 +88,7 @@ export function applyInput(
 	player: "player1" | "player2",
 	direction: "up" | "down" | "stop"
 ) {
-	const speed = 5;
+	const speed = 1.5;
 
 	if (direction === "up" && game.paddles[player] > 0)
 		game.paddles[player] -= speed;
