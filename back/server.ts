@@ -87,14 +87,6 @@ fastify.addHook("onRequest", async(request: FastifyRequest, reply: FastifyReply)
 	}
 })
 
-fastify.addHook("onRequest", async(request: FastifyRequest, reply: FastifyReply) => {
-	if (request.url.startsWith("/files")) {
-		const user = await tokenOK(request, reply);
-		if (user !== null)
-			request.user = user;
-	}
-})
-
 // fastify.get("/api/isLoggedIn", async (request: FastifyRequest, reply: FastifyReply) => {
 // 	const user = await tokenOK(request, reply);
 // 	if (user !== null)
