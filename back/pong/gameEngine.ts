@@ -73,7 +73,7 @@ export function applyInput(
 	player: "player1" | "player2",
 	direction: "up" | "down" | "stop"
 ) {
-	const speed = 5;
+	const speed = 2;
 
 	if (direction === "up" && game.paddles[player] > 0)
 		game.paddles[player] -= speed;

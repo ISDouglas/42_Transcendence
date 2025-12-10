@@ -24,6 +24,7 @@ export function setupGameServer(io: Server) {
 					game.sockets.player1 = socket.id;
 					game.sockets.player2 = socket.id;
 
+					game.idPlayer2 = 1;
 					game.status = "playing";
 					socket.emit("assignRole", "player1");
 					io.to(`game-${gameId}`).emit("startGame");
