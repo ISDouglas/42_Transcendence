@@ -1,4 +1,4 @@
-import { IMyFriend } from "../../../back/DB/friend";
+import { IMyFriends } from "../../../back/DB/friend";
 import { friends } from "../../../back/server";
 import { genericFetch, loadHeader } from "../router";
 import { IUsers } from "../../../back/DB/users";
@@ -9,56 +9,45 @@ export function FriendsView(): string {
 }
 
 export async function initFriends() {
-	doSearch();
-	myFriends();
-}
-
-async function myFriends() {
 	try {
-		const myfriends = await genericFetch("/api/private/friend", {
+		const myfriends: IMyFriends[] = await genericFetch("/api/private/friend", {
 			method: "POST",
 		});
 
-		const divNoFriend = document.getElementById("no-friend") as HTMLElement;
-		const divFriend = document.getElementById("friends") as HTMLElement;
-		const divPending = document.getElementById("pending") as HTMLElement;
+		const acceptedFriends = myfriends.filter( f => f.friendship_status === "accepting");
+		const pendingFriends = myfriends.filter( f => f.friendship_status === "pending");
 
-		if (myfriends.length === 0) {
-			divNoFriend.textContent = "No friends yet";
-			divFriend.classList.add("hidden");
-			divNoFriend.classList.remove("hidden");
-		}
-		else {
-			divFriend.classList.remove("hidden");
-			divNoFriend.classList.add("hidden");
-			const ul = divFriend.querySelector("ul");
-			myfriends.forEach(async (friend: IMyFriend) => {
-				const li = document.createElement("li");
-				li.textContent = "Pseudo: " + friend.pseudo + ", status: " + friend.webStatus + ", invitation: " + friend.friendship_status + ", friend since: " + friend.friendship_date;
-				const img = document.createElement("img");
-				img.src =  friend.avatar;
-				img.alt = `${friend.pseudo}'s avatar`;
-				img.width = 64;
-				li.appendChild(img);
-				ul?.appendChild(li);
-			});
-		}
-		const ul = divPending.querySelector("ul");
-		myfriends.forEach(async (friend: IMyFriend) => {
-				if (friend.friendship_status === "pending") {
-					const li = document.createElement("li");
-					li.textContent = "Pseudo: " + friend.pseudo + ", invitation: " + friend.friendship_status;
-					const img = document.createElement("img");
-					img.src =  friend.avatar;
-					img.alt = `${friend.pseudo}'s avatar`;
-					img.width = 64;
-					li.appendChild(img);
-					ul?.appendChild(li);
-				}
-			});
+		doSearch(acceptedFriends, pendingFriends, myfriends);
+		myFriends(acceptedFriends);
+		pendingFr(pendingFriends);
 	}
 	catch (err) {
 		console.log(err);
+	}
+}
+
+async function myFriends(acceptedFriends: IMyFriends[]) {
+	const divNoFriend = document.getElementById("no-friend") as HTMLElement;
+	const divFriend = document.getElementById("friends") as HTMLElement;
+	if (acceptedFriends.length === 0) {
+		divNoFriend.textContent = "No friends yet";
+		divFriend.classList.add("hidden");
+		divNoFriend.classList.remove("hidden");
+	}
+	else {
+		divFriend.classList.remove("hidden");
+		divNoFriend.classList.add("hidden");
+		const ul = divFriend.querySelector("ul");
+		acceptedFriends.forEach(async (friend: IMyFriends) => {
+			const li = document.createElement("li");
+			li.textContent = "Pseudo: " + friend.pseudo + ", status: " + friend.webStatus + ", invitation: " + friend.friendship_status + ", friend since: " + friend.friendship_date;
+			const img = document.createElement("img");
+			img.src =  friend.avatar;
+			img.alt = `${friend.pseudo}'s avatar`;
+			img.width = 64;
+			li.appendChild(img);
+			ul?.appendChild(li);
+		});
 	}
 }
 
@@ -70,18 +59,18 @@ function debounce<T extends (...args: any[]) => void>(fn: T, delay: number) {
 	};
 }
 
-function doSearch() {
+function doSearch(acceptedFriends: IMyFriends[], pendingFriends: IMyFriends[], myfriends: IMyFriends[]) {
 	const input = (document.getElementById("searchInput") as HTMLInputElement | null);
 	if (!input)
 		return;
 	const debouncedSearch = debounce(search, 300);
 	input.addEventListener("input", () => {
 		const memberSearched = input.value.trim();
-		debouncedSearch(memberSearched);
+		debouncedSearch(memberSearched, myfriends);
 	});
 }
 
-async function search(memberSearched: string) {
+async function search(memberSearched: string, myfriends: IMyFriends[]) {
 	const listedMember = (document.getElementById("members") as HTMLUListElement | null);
 	if (!listedMember)
 		return;
@@ -108,11 +97,15 @@ async function search(memberSearched: string) {
   				img.src =  member.avatar;
 				img.alt = `${member.pseudo}'s avatar`;
 				img.className = "w-8 h-8 rounded-full object-cover";
-				const button = toAddFriend(member.user_id);
+				const isFriend = myfriends.some(f => f.id === member.user_id);
 				li.appendChild(img);
 				li.appendChild(span);
-				li.appendChild(button);
+				if (!isFriend) {
+					const button = toAddFriend(member.user_id);
+					li.appendChild(button);
+				}
 				listedMember.appendChild(li);
+				
 			})
 		}
 	}
@@ -144,24 +137,18 @@ function toAddFriend(id: number): HTMLButtonElement {
 	return button;
 }
 
-async function pending() {
-	try {
-		const myfriends = await genericFetch("/api/private/friend/pending", {
-			method: "GET",
-		});
-
-		myfriends.forEach(async (friend: IMyFriend) => {
-			const li = document.createElement("li");
-      		li.textContent = "Pseudo: " + friend.pseudo + ", status: " + friend.webStatus + ", invitation: " + friend.friendship_status + ", friend since: " + friend.friendship_date;
-			const img = document.createElement("img");
-  			img.src =  friend.avatar;
-			img.alt = `${friend.pseudo}'s avatar`;
-  			img.width = 64;
-  			li.appendChild(img)
-		});
-	}
-	catch (err) {
-		console.log(err);
-	}
+function pendingFr(pendingFriends: IMyFriends[]) {
+	const divPending = document.getElementById("pending") as HTMLElement;
+	const ul = divPending.querySelector("ul");
+	pendingFriends.forEach(async (friend: IMyFriends) => {
+		const li = document.createElement("li");
+		li.textContent = "Pseudo: " + friend.pseudo + ", invitation: " + friend.friendship_status;
+		const img = document.createElement("img");
+		img.src =  friend.avatar;
+		img.alt = `${friend.pseudo}'s avatar`;
+		img.width = 64;
+		li.appendChild(img);
+		ul?.appendChild(li);
+	});
 }
 

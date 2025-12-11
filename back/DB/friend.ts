@@ -1,14 +1,14 @@
 import { ManageDB } from "./manageDB";
 
-export interface IFriends {
-	id: number;
-	user_id1: number;
-	user_id2: number;
-	friendship_date: Date;
-	status: string;
-}
+// export interface IFriends {
+// 	id: number;
+// 	user_id1: number;
+// 	user_id2: number;
+// 	friendship_date: Date;
+// 	status: string;
+// }
 
-export interface IMyFriend {
+export interface IMyFriends {	
 	id: number;
 	avatar: string;
 	pseudo: string;
@@ -54,9 +54,22 @@ export class Friends
 		await this._db.execute(query, parameters);
 	}
 
-	async getMyFriends(id: number): Promise<IFriends[]> {
-		const friendship: IFriends[] = await this._db.query(
-			`SELECT * FROM Friend WHERE user_id1 = ? OR user_id2 = ? ORDER BY friendship_date DESC`, [id, id]);
+	async getMyFriends(id: number): Promise<IMyFriends[]> {
+		const friendship: IMyFriends[] = await this._db.query(
+		`SELECT 
+			f.friendship_date, f.status AS friendship_status, u.pseudo, u.avatar, u.status AS web_status,
+				CASE
+					WHEN f.user_id1 = ? THEN f.user_id2
+					ELSE f.user_id1
+				END AS id
+			FROM Friend AS f
+			JOIN Users AS u ON u.user_id = 
+				CASE
+					WHEN f.user_id1 = ? THEN f.user_id2
+					ELSE f.user_id1
+				END
+			WHERE f.user_id1 = ? OR f.user_id2 = ?
+			ORDER BY f.friendship_date DESC;`, [id, id, id, id]);
 			return friendship;
 	}
 
@@ -66,13 +79,13 @@ export class Friends
 		await this._db.execute(query, []);
 	}
 
-	async getFriendshipStatus(id1: number, id2: number): Promise<string | null> {
-		const friend: IFriends[] = await this._db.query(
-			`SELECT * FROM Friend 
-			WHERE (user_id1 = ? AND user_id2 = ?) OR (user_id1 = ? AND user_id2 = ?)`, [id1, id2, id2, id1]);
-			if (friend.length === 0)
-				return null;
-			return friend[0].status;
-	}
+	// async getFriendshipStatus(id1: number, id2: number): Promise<string | null> {
+	// 	const friend: IFriends[] = await this._db.query(
+	// 		`SELECT * FROM Friend 
+	// 		WHERE (user_id1 = ? AND user_id2 = ?) OR (user_id1 = ? AND user_id2 = ?)`, [id1, id2, id2, id1]);
+	// 		if (friend.length === 0)
+	// 			return null;
+	// 		return friend[0].status;
+	// }
 }
 

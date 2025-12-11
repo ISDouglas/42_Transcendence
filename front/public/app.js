@@ -93,6 +93,9 @@ function DashboardView() {
   loadHeader();
   return document.getElementById("dashboardhtml").innerHTML;
 }
+function winrateCalcul(wins, losses) {
+  return Math.round(wins / (wins + losses) * 100).toString();
+}
 async function initDashboard() {
   const container = document.getElementById("game-list");
   if (!container)
@@ -102,31 +105,36 @@ async function initDashboard() {
       method: "GET"
     });
     const dashboards = await response.json();
-    container.innerHTML = "";
-    dashboards.forEach(async (game) => {
+    dashboards.GamesInfo.forEach(async (game) => {
       const template = document.getElementById("history-dashboard");
       const item = document.createElement("div");
       item.classList.add("dash");
       const clone = template.content.cloneNode(true);
+      const winnerpath = clone.getElementById("winnerpath");
+      const winnerscore = clone.getElementById("winnerscore");
+      const winnerpseudo = clone.getElementById("winnerpseudo");
+      const loserpath = clone.getElementById("loserpath");
+      const loserscore = clone.getElementById("loserscore");
+      const loserpseudo = clone.getElementById("loserpseudo");
+      const date = clone.getElementById("date");
+      const duration = clone.getElementById("duration");
+      winnerpath.src = game.winner_avatar;
+      winnerscore.textContent = game.winner_score.toString();
+      winnerpseudo.textContent = game.winner_pseudo;
+      loserpath.src = game.loser_avatar;
+      loserscore.textContent = game.loser_score.toString();
+      loserpseudo.textContent = game.loser_pseudo;
+      date.textContent = new Date(game.date_game).toLocaleDateString();
+      duration.textContent = "Dur\xE9e : " + game.duration_game;
       item.appendChild(clone);
       container.appendChild(item);
-      const winnerpath = document.getElementById("winnerpath");
-      const winnerscore = document.getElementById("winnerscore");
-      const winnerpseudo = document.getElementById("winnerpseudo");
-      const loserpath = document.getElementById("loserpath");
-      const loserscore = document.getElementById("loserscore");
-      const loserpseudo = document.getElementById("loserpseudo");
-      const date = document.getElementById("date");
-      const duration = document.getElementById("duration");
-      winnerpath.src = game.WinnerPath;
-      winnerscore.textContent = game.WinnerScore;
-      winnerpseudo.textContent = game.WinnerPseudo;
-      loserpath.src = game.LoserPath;
-      loserscore.textContent = game.LoserScore;
-      loserpseudo.textContent = game.LoserPseudo;
-      date.textContent = new Date(game.DateGame).toLocaleDateString();
-      duration.textContent = "Dur\xE9e : " + game.GameDuration;
     });
+    const winrate = document.getElementById("winrate");
+    const win = document.getElementById("win");
+    const loose = document.getElementById("loose");
+    winrate.textContent = winrateCalcul(dashboards.WinLoose.win, dashboards.WinLoose.loose);
+    win.textContent = dashboards.WinLoose.win.toString();
+    loose.textContent = dashboards.WinLoose.loose.toString();
   } catch (error) {
     console.error("Erreur lors du chargement :", error);
   }
@@ -4034,7 +4042,7 @@ function initPongMatch(params) {
   const gameID = params?.id;
   const url2 = new URL(window.location.href);
   const localMode = url2.searchParams.get("local") === "1";
-  const serverUrl = "https://127.0.0.1:3000";
+  const serverUrl = window.location.host;
   currentGame = new GameInstance();
   renderer = new GameRenderer();
   if (localMode)
@@ -4396,51 +4404,40 @@ function FriendsView() {
   return document.getElementById("friendshtml").innerHTML;
 }
 async function initFriends() {
-  doSearch();
-  myFriends();
-}
-async function myFriends() {
   try {
     const myfriends = await genericFetch2("/api/private/friend", {
       method: "POST"
     });
-    const divNoFriend = document.getElementById("no-friend");
-    const divFriend = document.getElementById("friends");
-    const divPending = document.getElementById("pending");
-    if (myfriends.length === 0) {
-      divNoFriend.textContent = "No friends yet";
-      divFriend.classList.add("hidden");
-      divNoFriend.classList.remove("hidden");
-    } else {
-      divFriend.classList.remove("hidden");
-      divNoFriend.classList.add("hidden");
-      const ul2 = divFriend.querySelector("ul");
-      myfriends.forEach(async (friend) => {
-        const li = document.createElement("li");
-        li.textContent = "Pseudo: " + friend.pseudo + ", status: " + friend.webStatus + ", invitation: " + friend.friendship_status + ", friend since: " + friend.friendship_date;
-        const img = document.createElement("img");
-        img.src = friend.avatar;
-        img.alt = `${friend.pseudo}'s avatar`;
-        img.width = 64;
-        li.appendChild(img);
-        ul2?.appendChild(li);
-      });
-    }
-    const ul = divPending.querySelector("ul");
-    myfriends.forEach(async (friend) => {
-      if (friend.friendship_status === "pending") {
-        const li = document.createElement("li");
-        li.textContent = "Pseudo: " + friend.pseudo + ", invitation: " + friend.friendship_status;
-        const img = document.createElement("img");
-        img.src = friend.avatar;
-        img.alt = `${friend.pseudo}'s avatar`;
-        img.width = 64;
-        li.appendChild(img);
-        ul?.appendChild(li);
-      }
-    });
+    const acceptedFriends = myfriends.filter((f) => f.friendship_status === "accepting");
+    const pendingFriends = myfriends.filter((f) => f.friendship_status === "pending");
+    doSearch(acceptedFriends, pendingFriends, myfriends);
+    myFriends(acceptedFriends);
+    pendingFr(pendingFriends);
   } catch (err) {
     console.log(err);
+  }
+}
+async function myFriends(acceptedFriends) {
+  const divNoFriend = document.getElementById("no-friend");
+  const divFriend = document.getElementById("friends");
+  if (acceptedFriends.length === 0) {
+    divNoFriend.textContent = "No friends yet";
+    divFriend.classList.add("hidden");
+    divNoFriend.classList.remove("hidden");
+  } else {
+    divFriend.classList.remove("hidden");
+    divNoFriend.classList.add("hidden");
+    const ul = divFriend.querySelector("ul");
+    acceptedFriends.forEach(async (friend) => {
+      const li = document.createElement("li");
+      li.textContent = "Pseudo: " + friend.pseudo + ", status: " + friend.webStatus + ", invitation: " + friend.friendship_status + ", friend since: " + friend.friendship_date;
+      const img = document.createElement("img");
+      img.src = friend.avatar;
+      img.alt = `${friend.pseudo}'s avatar`;
+      img.width = 64;
+      li.appendChild(img);
+      ul?.appendChild(li);
+    });
   }
 }
 function debounce(fn, delay) {
@@ -4452,17 +4449,17 @@ function debounce(fn, delay) {
     }, delay);
   };
 }
-function doSearch() {
+function doSearch(acceptedFriends, pendingFriends, myfriends) {
   const input = document.getElementById("searchInput");
   if (!input)
     return;
   const debouncedSearch = debounce(search, 300);
   input.addEventListener("input", () => {
     const memberSearched = input.value.trim();
-    debouncedSearch(memberSearched);
+    debouncedSearch(memberSearched, myfriends);
   });
 }
-async function search(memberSearched) {
+async function search(memberSearched, myfriends) {
   const listedMember = document.getElementById("members");
   if (!listedMember)
     return;
@@ -4489,10 +4486,13 @@ async function search(memberSearched) {
         img.src = member.avatar;
         img.alt = `${member.pseudo}'s avatar`;
         img.className = "w-8 h-8 rounded-full object-cover";
-        const button = toAddFriend(member.user_id);
+        const isFriend = myfriends.some((f) => f.id === member.user_id);
         li.appendChild(img);
         li.appendChild(span);
-        li.appendChild(button);
+        if (!isFriend) {
+          const button = toAddFriend(member.user_id);
+          li.appendChild(button);
+        }
         listedMember.appendChild(li);
       });
     }
@@ -4519,6 +4519,20 @@ function toAddFriend(id) {
     }
   });
   return button;
+}
+function pendingFr(pendingFriends) {
+  const divPending = document.getElementById("pending");
+  const ul = divPending.querySelector("ul");
+  pendingFriends.forEach(async (friend) => {
+    const li = document.createElement("li");
+    li.textContent = "Pseudo: " + friend.pseudo + ", invitation: " + friend.friendship_status;
+    const img = document.createElement("img");
+    img.src = friend.avatar;
+    img.alt = `${friend.pseudo}'s avatar`;
+    img.width = 64;
+    li.appendChild(img);
+    ul?.appendChild(li);
+  });
 }
 var init_p_friends = __esm({
   "front/src/views/p_friends.ts"() {
@@ -4592,7 +4606,7 @@ async function getPseudoHeader3() {
       credentials: "include"
     });
     document.getElementById("pseudo-header").textContent = result.pseudo;
-    const avatar = document.getElementById("profile-avatar");
+    const avatar = document.getElementById("header-avatar");
     avatar.src = result.avatar + "?ts" + Date.now();
   } catch (err) {
     console.error(err);

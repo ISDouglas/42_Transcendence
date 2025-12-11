@@ -24,7 +24,7 @@ import { getUpdateInfo, getUpdateUsername, getUpdateEmail, getUploadAvatar, getU
 import { logout } from "./routes/logout/logout";
 import { setupGameServer } from "./pong/pongServer";
 import { Friends } from "./DB/friend";
-import { displayFriendPage, searchUser, addFriend } from "./routes/friends/friends";
+import { allMyFriends, searchUser, addFriend } from "./routes/friends/friends";
 import { dashboardInfo } from "./routes/dashboard/dashboard";
 import { request } from "http";
 import { navigateTo } from "../front/src/router";
@@ -141,7 +141,7 @@ fastify.post("/api/private/updateinfo/uploads", async (request, reply) => {
 });
 
 fastify.post("/api/private/friend", async (request: FastifyRequest, reply: FastifyReply) => {
-	await displayFriendPage(request, reply);
+	await allMyFriends(request, reply);
 })
 
 fastify.post("/api/private/friend/add", async(request: FastifyRequest, reply: FastifyReply) => {
