@@ -14,6 +14,8 @@ import { fromTwos } from "ethers";
 import { Statement } from "sqlite3";
 import { FriendsView, initFriends } from "./views/p_friends";
 import { ErrorView, initError } from "./views/error";
+import { request } from "http";
+import { userInfo } from "os";
 
 const routes = [
   { path: "/", view: View, init: init},
@@ -42,9 +44,9 @@ export function navigateTo(url: string) {
 	history.pushState(state, "", url);
 	currentPath = url;
 	router();
-	const avatar = document.getElementById("profile-avatar") as HTMLImageElement;
-	if (avatar) 
-		avatar.src = "/api/private/avatar?ts=" + Date.now();
+	// const avatar = document.getElementById("profile-avatar") as HTMLImageElement;
+	// if (avatar) 
+	// 	avatar.src = "/api/private/avatar?ts=" + Date.now();
 }
 
 export async function genericFetch(url: string, options: RequestInit = {}) {
@@ -87,21 +89,20 @@ export async function loadHeader() {
 	const html = await response.text();
 	const container = document.getElementById('header-container');
 	if (container) container.innerHTML = html;
-	getPseudoHeader()
-	const avatar = document.getElementById("profile-avatar") as HTMLImageElement;
-	if (avatar) 
-		avatar.src = "/api/private/avatar?ts=" + Date.now();
+	getPseudoHeader();
 }
 
 export async function getPseudoHeader()
 {
   try {
-	const result = await genericFetch("/api/private/getpseudo", {
+	const result = await genericFetch("/api/private/getpseudoAv", {
 		method: "POST",
 		credentials: "include"
 	});
 	
 	document.getElementById("pseudo-header")!.textContent = result.pseudo;
+	const avatar = document.getElementById("header-avatar") as HTMLImageElement;
+	avatar.src = result.avatar + "?ts" + Date.now();
 	} catch (err) {
 		console.error(err);
 	}

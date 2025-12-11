@@ -8,8 +8,6 @@ export function FriendsView(): string {
 	return (document.getElementById("friendshtml") as HTMLTemplateElement).innerHTML;
 }
 
-
-
 export async function initFriends() {
 	try {
 		const myfriends = await genericFetch("/api/private/friend", {
@@ -28,69 +26,76 @@ export async function initFriends() {
 			divFriend.classList.remove("hidden");
 			divNoFriend.classList.add("hidden");
 			const ul = divFriend.querySelector("ul");
-			const prepareInfo = myfriends.map(async (friend: IMyFriend) => {
-				const avatarBin = await loadAvatar(friend.id);
-      			const li = document.createElement("li");
+			myfriends.forEach(async (friend: IMyFriend) => {
+				const li = document.createElement("li");
       			li.textContent = "Pseudo: " + friend.pseudo + ", status: " + friend.webStatus + ", invitation: " + friend.friendship_status + ", friend since: " + friend.friendship_date;
 				const img = document.createElement("img");
-  				img.src =  URL.createObjectURL(avatarBin)
+  				img.src =  friend.avatar;
 				img.alt = `${friend.pseudo}'s avatar`;
   				img.width = 64;
   				li.appendChild(img)
-				return li;
-    		});
-			const allInfo = await Promise.all(prepareInfo);
-			allInfo.forEach(li => ul?.appendChild(li));
+				ul?.appendChild(li)	
+			});
   		}
-  		search();
+  		doSearch()
 	}
 	catch (err) {
 		console.log(err);
 	}
 }
 
-async function search() {
+function debounce<T extends (...args: any[]) => void>(fn: T, delay: number) {
+	let timeout: ReturnType<typeof setTimeout>;
+	return (...args: Parameters<T>): void => {
+		clearTimeout(timeout);
+		timeout = setTimeout(() => { fn(...args) }, delay);
+	};
+}
+
+function doSearch() {
 	const input = (document.getElementById("searchInput") as HTMLInputElement | null);
-	const listedMember = (document.getElementById("members") as HTMLUListElement | null);
-	if (!input || ! listedMember)
+	if (!input)
 		return;
-	input.addEventListener("input", async() => {
+	const debouncedSearch = debounce(search, 300);
+	input.addEventListener("input", () => {
 		const memberSearched = input.value.trim();
-		if (memberSearched === "") {
-				listedMember.innerHTML = "";
-			return;
-		}
-		try {
-			const existedMember = await genericFetch("/api/private/friend/search", {
-				method: "POST",
-		  		headers: { 'Content-Type': 'application/json' },
-		  		body: JSON.stringify({ member: memberSearched })
-			});
-			listedMember.innerHTML = "";
-			if (existedMember.length === 0)	
-				listedMember.innerHTML = "<li>No result</li>";
-			else {
-				existedMember.forEach((member: IUsers) => {
-					const li = document.createElement("li");
-					li.textContent = member.pseudo;
-					listedMember.appendChild(li);
-				})
-			}
-		}
-		catch (error) {
-			console.log(error);
-		}
+		debouncedSearch(memberSearched);
 	});
 }
 
-export async function loadAvatar(id: number) {
-	const res = await fetch("api/private/member/avatar", {
-		method: "POST",
-		credentials: "include", 
-		headers: { "Content-Type": "application/json" },
-		body: JSON.stringify({ memberID: id })
-
-	})
-	const avatarBin = await res.blob();
-	return avatarBin;
+async function search(memberSearched: string) {
+	const listedMember = (document.getElementById("members") as HTMLUListElement | null);
+	if (!listedMember)
+		return;
+	if (memberSearched === "") {
+		listedMember.innerHTML = "";
+		return;
+	}
+	try {
+		const existedMember = await genericFetch("/api/private/friend/search", {
+			method: "POST",
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ member: memberSearched })
+		});
+		listedMember.innerHTML = "";
+		if (existedMember.length === 0)	
+			listedMember.innerHTML = "<li>No result</li>";
+		else {
+			existedMember.forEach((member: IUsers) => {
+				const li = document.createElement("li");
+				const img = document.createElement("img");
+			
+				// console.log("search av= ", member.avatar);
+  				img.src =  member.avatar;
+				img.alt = `${member.pseudo}'s avatar`;
+				img.className = "w-8 h-8 rounded-full object-cover";
+				li.textContent =" " + member.pseudo;
+				listedMember.appendChild(img);
+				listedMember.appendChild(li);
+			})
+		}
+	}
+	catch (error) {
+		console.log(error);
+	}
 }

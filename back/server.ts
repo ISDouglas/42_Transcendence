@@ -26,7 +26,6 @@ import { setupGameServer } from "./pong/pongServer";
 import { Friends } from "./DB/friend";
 import { displayFriendPage, searchUser } from "./routes/friends/friends";
 import { dashboardInfo } from "./routes/dashboard/dashboard";
-import { getAvatarFromID, displayAvatar} from "./routes/avatar/avatar";
 import { request } from "http";
 import { navigateTo } from "../front/src/router";
 
@@ -88,14 +87,6 @@ fastify.addHook("onRequest", async(request: FastifyRequest, reply: FastifyReply)
 	}
 })
 
-fastify.addHook("onRequest", async(request: FastifyRequest, reply: FastifyReply) => {
-	if (request.url.startsWith("/files")) {
-		const user = await tokenOK(request, reply);
-		if (user !== null)
-			request.user = user;
-	}
-})
-
 // fastify.get("/api/isLoggedIn", async (request: FastifyRequest, reply: FastifyReply) => {
 // 	const user = await tokenOK(request, reply);
 // 	if (user !== null)
@@ -117,8 +108,8 @@ fastify.post("/api/login", async (request: FastifyRequest, reply: FastifyReply) 
   await manageLogin(username, password, reply);
 });
 
-fastify.post("/api/private/getpseudo", async (request: FastifyRequest, reply: FastifyReply) => {
-	return { pseudo: request.user?.pseudo }
+fastify.post("/api/private/getpseudoAv", async (request: FastifyRequest, reply: FastifyReply) => {
+	return { pseudo: request.user?.pseudo, avatar: request.user?.avatar }
 });
 
 fastify.post("/api/private/profile", async (request: FastifyRequest, reply: FastifyReply) => {
@@ -149,10 +140,6 @@ fastify.post("/api/private/updateinfo/uploads", async (request, reply) => {
 	await getUploadAvatar(request, reply);
 });
 
-fastify.get("/api/private/avatar", async (request: FastifyRequest, reply: FastifyReply) => {
-	await displayAvatar(request, reply);
-});
-
 fastify.post("/api/private/friend", async (request: FastifyRequest, reply: FastifyReply) => {
 	await displayFriendPage(request, reply);
 })
@@ -160,10 +147,6 @@ fastify.post("/api/private/friend", async (request: FastifyRequest, reply: Fasti
 fastify.post("/api/private/friend/search", async( request: FastifyRequest, reply: FastifyReply) => {
 	await searchUser(request, reply);
 })
-
-fastify.post("/api/private/member/avatar", async (request: FastifyRequest, reply: FastifyReply) => {
-	await displayAvatar(request, reply);
-});
 
 fastify.post("/api/private/game/create", async (request, reply) => {
 	const { localMode } = request.body as { localMode: boolean };
@@ -233,8 +216,8 @@ const start = async () => {
 		// const hashedPassword = await bcrypt.hash("42", 12);
 		// users.addUser("42", "42", hashedPassword);
 		// friends.deleteFriendTable();
-		// friends.addFriendship(1, 3);
-		// friends.addFriendship(1, 2);
+		// friends.addFriendship(5, 6);
+		// friends.addFriendship(4, 5);
 	} catch (err) {
 		console.log(err);
 		fastify.log.error(err);

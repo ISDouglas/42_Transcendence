@@ -1,19 +1,13 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { gameInfo } from '../../server';
 import { IGameInfo } from '../../DB/gameinfo';
-import { getAvatarFromID } from '../avatar/avatar';
+// import { getAvatarFromID } from '../avatar/avatar';
 import { users } from '../../server';
 
 export interface IDashBoard
 {
-	WinnerPseudo: string,
-	WinnerPath: string,
-	WinnerScore: number,
-	LoserPseudo: string,
-	LoserPath: string,
-	LoserScore: number,
-	DateGame: string,
-	GameDuration: number
+	GamesInfo: IGameInfo[],
+	WinLoose: {win:number; loose:number}
 }
 
 export async function dashboardInfo(request: FastifyRequest, reply: FastifyReply)
@@ -25,33 +19,25 @@ export async function dashboardInfo(request: FastifyRequest, reply: FastifyReply
     try
     {
         const games = await gameInfo.getGamesByUser(user_id);
-		const dashboard: IDashBoard[] = await Promise.all(
+		const dashboard: IDashBoard = {} as IDashBoard;
+		dashboard.GamesInfo = await Promise.all(
    		games.map(async (game: any) => 
 		{
-			let winnerpseudo;
-			let loserpseudo;
-			if (game.winner_id === null)
-				winnerpseudo = await users.getIDUser(0);
-			else
-				winnerpseudo = await users.getIDUser(game.winner_id);
-			if (game.loser_id === null)
-				loserpseudo = await users.getIDUser(0);
-			else
-				loserpseudo = await users.getIDUser(game.loser_id);
-			const winnerPath = await getAvatarFromID(winnerpseudo.user_id);
-			const loserPath = await getAvatarFromID(loserpseudo.user_id);
 			return {
-				WinnerPseudo: winnerpseudo.pseudo,
-				WinnerPath: winnerPath,
-				WinnerScore: game.winner_score,
-				LoserPseudo: loserpseudo.pseudo,
-				LoserPath: loserPath,
-				LoserScore: game.loser_score,
-				DateGame: game.date_game,
-				GameDuration: game.duration_game
+				status: game.status,
+   				winner_id: game.winner_id,
+				winner_pseudo: game.winner_pseudo,
+				winner_avatar: game.winner_avatar,
+				loser_id: game.loser_id,
+				loser_pseudo: game.loser_pseudo,
+				loser_avatar: game.loser_avatar,
+				date_game: game.date_game,
+				duration_game: game.duration_game,
+				winner_score: game.winner_score,
+				loser_score: game.loser_score,
 				};
 		}));
-
+		dashboard.WinLoose = await gameInfo.getWinsLosses(user_id);
         reply.status(200).send(dashboard);
     }
     catch (err)

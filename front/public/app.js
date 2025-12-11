@@ -4034,7 +4034,7 @@ function initPongMatch(params) {
   const gameID = params?.id;
   const url2 = new URL(window.location.href);
   const localMode = url2.searchParams.get("local") === "1";
-  const serverUrl = "https://localhost:3000";
+  const serverUrl = "https://127.0.0.1:3002";
   currentGame = new GameInstance();
   renderer = new GameRenderer();
   if (localMode)
@@ -4149,8 +4149,7 @@ async function initProfile() {
     method: "POST"
   });
   const avatar = document.getElementById("profile-avatar");
-  if (avatar)
-    avatar.src = "/api/private/avatar?ts=" + Date.now();
+  avatar.src = profile.avatar + "?ts=" + Date.now();
   document.getElementById("profile-pseudo").textContent = profile.pseudo;
   document.getElementById("profile-email").textContent = profile.email;
   const select = document.getElementById("profile-status");
@@ -4411,66 +4410,73 @@ async function initFriends() {
       divFriend.classList.remove("hidden");
       divNoFriend.classList.add("hidden");
       const ul = divFriend.querySelector("ul");
-      const prepareInfo = myfriends.map(async (friend) => {
-        const avatarBin = await loadAvatar(friend.id);
+      myfriends.forEach(async (friend) => {
         const li = document.createElement("li");
         li.textContent = "Pseudo: " + friend.pseudo + ", status: " + friend.webStatus + ", invitation: " + friend.friendship_status + ", friend since: " + friend.friendship_date;
         const img = document.createElement("img");
-        img.src = URL.createObjectURL(avatarBin);
+        img.src = friend.avatar;
         img.alt = `${friend.pseudo}'s avatar`;
         img.width = 64;
         li.appendChild(img);
-        return li;
+        ul?.appendChild(li);
       });
-      const allInfo = await Promise.all(prepareInfo);
-      allInfo.forEach((li) => ul?.appendChild(li));
     }
-    search();
+    doSearch();
   } catch (err) {
     console.log(err);
   }
 }
-async function search() {
+function debounce(fn, delay) {
+  let timeout;
+  return (...args) => {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => {
+      fn(...args);
+    }, delay);
+  };
+}
+function doSearch() {
   const input = document.getElementById("searchInput");
-  const listedMember = document.getElementById("members");
-  if (!input || !listedMember)
+  if (!input)
     return;
-  input.addEventListener("input", async () => {
+  const debouncedSearch = debounce(search, 300);
+  input.addEventListener("input", () => {
     const memberSearched = input.value.trim();
-    if (memberSearched === "") {
-      listedMember.innerHTML = "";
-      return;
-    }
-    try {
-      const existedMember = await genericFetch2("/api/private/friend/search", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ member: memberSearched })
-      });
-      listedMember.innerHTML = "";
-      if (existedMember.length === 0)
-        listedMember.innerHTML = "<li>No result</li>";
-      else {
-        existedMember.forEach((member) => {
-          const li = document.createElement("li");
-          li.textContent = member.pseudo;
-          listedMember.appendChild(li);
-        });
-      }
-    } catch (error) {
-      console.log(error);
-    }
+    debouncedSearch(memberSearched);
   });
 }
-async function loadAvatar(id) {
-  const res = await fetch("api/private/member/avatar", {
-    method: "POST",
-    credentials: "include",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ memberID: id })
-  });
-  const avatarBin = await res.blob();
-  return avatarBin;
+async function search(memberSearched) {
+  const listedMember = document.getElementById("members");
+  if (!listedMember)
+    return;
+  if (memberSearched === "") {
+    listedMember.innerHTML = "";
+    return;
+  }
+  try {
+    const existedMember = await genericFetch2("/api/private/friend/search", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ member: memberSearched })
+    });
+    listedMember.innerHTML = "";
+    if (existedMember.length === 0)
+      listedMember.innerHTML = "<li>No result</li>";
+    else {
+      existedMember.forEach((member) => {
+        const li = document.createElement("li");
+        const img = document.createElement("img");
+        img.src = member.avatar;
+        img.alt = `${member.pseudo}'s avatar`;
+        img.className = "w-8 h-8 rounded-full object-cover";
+        li.textContent = " " + member.pseudo;
+        listedMember.appendChild(img);
+        listedMember.appendChild(li);
+      });
+    }
+  } catch (error) {
+    console.log(error);
+  }
 }
 var init_p_friends = __esm({
   "front/src/views/p_friends.ts"() {
@@ -4497,9 +4503,6 @@ function navigateTo(url2) {
   history.pushState(state, "", url2);
   currentPath = url2;
   router();
-  const avatar = document.getElementById("profile-avatar");
-  if (avatar)
-    avatar.src = "/api/private/avatar?ts=" + Date.now();
 }
 async function genericFetch2(url2, options = {}) {
   const res = await fetch(url2, {
@@ -4539,17 +4542,16 @@ async function loadHeader() {
   const container = document.getElementById("header-container");
   if (container) container.innerHTML = html;
   getPseudoHeader3();
-  const avatar = document.getElementById("profile-avatar");
-  if (avatar)
-    avatar.src = "/api/private/avatar?ts=" + Date.now();
 }
 async function getPseudoHeader3() {
   try {
-    const result = await genericFetch2("/api/private/getpseudo", {
+    const result = await genericFetch2("/api/private/getpseudoAv", {
       method: "POST",
       credentials: "include"
     });
     document.getElementById("pseudo-header").textContent = result.pseudo;
+    const avatar = document.getElementById("profile-avatar");
+    avatar.src = result.avatar + "?ts" + Date.now();
   } catch (err) {
     console.error(err);
   }
