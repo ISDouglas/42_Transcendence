@@ -101,7 +101,7 @@ export async function getPseudoHeader()
 	});
 	
 	document.getElementById("pseudo-header")!.textContent = result.pseudo;
-	const avatar = document.getElementById("profile-avatar") as HTMLImageElement;
+	const avatar = document.getElementById("header-avatar") as HTMLImageElement;
 	avatar.src = result.avatar + "?ts" + Date.now();
 	} catch (err) {
 		console.error(err);
