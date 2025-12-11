@@ -1,11 +1,10 @@
-// import { genericFetch } from "../router";
 import { GameNetwork, GameState } from "./gameNetwork";
 
 export class GameInstance {
 	private role: "player1" | "player2" | null = null;
 	private currentState: GameState = {
-		ball: { x: 0, y: 0 },
-		paddles: { player1: 0, player2: 0 },
+		ball: { x: 300, y: 240 },
+		paddles: { player1: 210, player2: 210 },
 		score: { player1: 0, player2: 0 }
 	};
 	private network: GameNetwork | null = null;

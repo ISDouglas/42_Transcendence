@@ -9,6 +9,7 @@ export class ServerGame {
 	idPlayer1: number;
 	idPlayer2: number;
 	status: "waiting" | "playing" | "finished";
+	type: "Local" | "IA" | "Online" | "Tournament";
 	gameDate: string;
 	duration: number;
 	isLocal: boolean;
@@ -22,6 +23,7 @@ export class ServerGame {
 		this.idPlayer1 = 0;
 		this.idPlayer2 = 0;
 		this.status = "waiting";
+		this.type = "Local";
 		this.gameDate = new Date().toISOString().replace("T", " ").split(".")[0];
 		this.duration = Date.now();
 		this.isLocal = isLocal;
@@ -52,7 +54,10 @@ export function createGame(PlayerId: number,  isLocal: boolean, options: { vsAI:
 	const game = new ServerGame(gameId, isLocal);
 	game.idPlayer1 = PlayerId;
 	if (options.vsAI)
+	{
 		game.idPlayer2 = -1;
+		game.type = "IA";
+	}
 	games_map.set(gameId, game);
 	return gameId;
 }
@@ -88,9 +93,9 @@ export function joinGame(playerId: number, gameId: number)
 }
 
 export async function endGame(winner_id: number, loser_id: number, winner_score: number,
-	loser_score: number, duration_game: number, gameid: number, gameInfo: GameInfo): Promise<void>
+	loser_score: number, duration_game: number, gameid: number, gameInfo: GameInfo, type: string): Promise<void>
 {
 	const gameDate: any = getDate(Number(gameid));
-	await gameInfo.finishGame(winner_id, loser_id, winner_score, loser_score, duration_game, gameDate);
+	await gameInfo.finishGame(winner_id, loser_id, winner_score, loser_score, duration_game, gameDate, type);
 	games_map.delete(gameid);
 }

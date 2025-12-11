@@ -67,20 +67,19 @@ export function updateBall(game: GameState) {
 	}
 }
 
+function modifyBallAngle(player: number, ball: Ball) {
+	const paddleCenter = player + 30;
+	let hitPos = ball.y - paddleCenter;
 
-	function modifyBallAngle(player: number, ball: Ball) {
-		const paddleCenter = player + 30;
-		let hitPos = ball.y - paddleCenter;
+	const normalized = hitPos / 30;
+	const bounceAngle = normalized * (Math.PI / 4);
 
-		const normalized = hitPos / 30;
-		const bounceAngle = normalized * (Math.PI / 4);
+	const speed = Math.sqrt(
+		ball.speedX ** 2 + ball.speedY ** 2
+	);
 
-		const speed = Math.sqrt(
-			ball.speedX ** 2 + ball.speedY ** 2
-		);
-
-		ball.speedY = speed * Math.sin(bounceAngle);
-	}
+	ball.speedY = speed * Math.sin(bounceAngle);
+}
 
 export function resetBall(game: GameState) {
 	game.ball.x = game.width / 2;

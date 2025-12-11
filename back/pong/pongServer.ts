@@ -1,5 +1,5 @@
 import { Server, Socket } from "socket.io";
-import { applyInput, GameState, updateBall } from "./gameEngine";
+import { applyInput, GameState, resetBall, updateBall } from "./gameEngine";
 import { ServerGame, games_map, endGame } from "../routes/game/serverGame";
 import { gameInfo } from "../server";
 import { simulateAI, AI_USER } from "./simulateAI";
@@ -26,6 +26,9 @@ export function setupGameServer(io: Server) {
 
 					game.idPlayer2 = 1;
 					game.status = "playing";
+					game.type = "Local";
+					game.state.ball.speedX = Math.random() < 0.5 ? -2.5 : 2.5;
+					resetBall(game.state);
 					socket.emit("assignRole", "player1");
 					io.to(`game-${gameId}`).emit("startGame");
 					socket.emit("state", game);
@@ -52,9 +55,12 @@ export function setupGameServer(io: Server) {
 					socket.emit("gameFull");
 					return;
 				}
-	
-				socket.emit("assignRole", role);
 
+				socket.emit("assignRole", role);
+				if (game.idPlayer2 != -1)
+					game.type = "Online";
+				game.state.ball.speedX = Math.random() < 0.5 ? -2.5 : 2.5;
+				resetBall(game.state);
 				// start game when 2 players are in the game
 				if ((game.sockets.player1 && game.idPlayer2 == -1) 
 					|| (game.sockets.player1 && game.sockets.player2 && game.status === "waiting")) {
@@ -118,11 +124,11 @@ function checkForWinner(game: ServerGame, io: Server)
 		game.duration = Math.round(duration * 10) / 10;
 		if (game.state.score.player1 > game.state.score.player2)
 		{
-			endGame(game.idPlayer1, game.idPlayer2, game.state.score.player1, game.state.score.player2, game.duration , game.id, gameInfo);
+			endGame(game.idPlayer1, game.idPlayer2, game.state.score.player1, game.state.score.player2, game.duration , game.id, gameInfo, game.type);
 		}
 		else
 		{
-			endGame(game.idPlayer2, game.idPlayer1, game.state.score.player2, game.state.score.player1, game.duration , game.id, gameInfo);
+			endGame(game.idPlayer2, game.idPlayer1, game.state.score.player2, game.state.score.player1, game.duration , game.id, gameInfo, game.type);
 		}
 		io.to(`game-${game.id}`).emit("gameOver");
 		io.in(`game-${game.id}`).socketsLeave(`game-${game.id}`);

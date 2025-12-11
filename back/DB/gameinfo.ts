@@ -28,6 +28,7 @@ export class GameInfo
 			CREATE TABLE IF NOT EXISTS game_info (
 				id INTEGER PRIMARY KEY AUTOINCREMENT,
 				status INTEGER NOT NULL,
+				type TEXT,
 				winner_id INTEGER,
 				loser_id INTEGER,
 				date_game TEXT,
@@ -39,12 +40,12 @@ export class GameInfo
 	};
 
 	async finishGame(winner_id: number, loser_id: number, winner_score: number,
-		loser_score: number, duration_game: number, gameDate: string): Promise<void>
+		loser_score: number, duration_game: number, gameDate: string, type: string): Promise<void>
 	{
 		const query = `
 			INSERT INTO game_info (status, winner_id, loser_id,
-			 date_game, duration_game, winner_score, loser_score)
-			VALUES (?,?,?,?,?,?,?)
+			 date_game, duration_game, winner_score, loser_score, type)
+			VALUES (?,?,?,?,?,?,?,?)
 			`;
 
 		const parameters = [
@@ -54,7 +55,8 @@ export class GameInfo
 			gameDate,
 			duration_game,
 			winner_score,
-			loser_score
+			loser_score,
+			type
 		];
 
 		await this._db.execute(query, parameters);

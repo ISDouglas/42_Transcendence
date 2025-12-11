@@ -93,6 +93,9 @@ function DashboardView() {
   loadHeader();
   return document.getElementById("dashboardhtml").innerHTML;
 }
+function winrateCalcul(wins, losses) {
+  return Math.round(wins / (wins + losses) * 100).toString();
+}
 async function initDashboard() {
   const container = document.getElementById("game-list");
   if (!container)
@@ -102,31 +105,36 @@ async function initDashboard() {
       method: "GET"
     });
     const dashboards = await response.json();
-    container.innerHTML = "";
-    dashboards.forEach(async (game) => {
+    dashboards.GamesInfo.forEach(async (game) => {
       const template = document.getElementById("history-dashboard");
       const item = document.createElement("div");
       item.classList.add("dash");
       const clone = template.content.cloneNode(true);
+      const winnerpath = clone.getElementById("winnerpath");
+      const winnerscore = clone.getElementById("winnerscore");
+      const winnerpseudo = clone.getElementById("winnerpseudo");
+      const loserpath = clone.getElementById("loserpath");
+      const loserscore = clone.getElementById("loserscore");
+      const loserpseudo = clone.getElementById("loserpseudo");
+      const date = clone.getElementById("date");
+      const duration = clone.getElementById("duration");
+      winnerpath.src = game.winner_avatar;
+      winnerscore.textContent = game.winner_score.toString();
+      winnerpseudo.textContent = game.winner_pseudo;
+      loserpath.src = game.loser_avatar;
+      loserscore.textContent = game.loser_score.toString();
+      loserpseudo.textContent = game.loser_pseudo;
+      date.textContent = new Date(game.date_game).toLocaleDateString();
+      duration.textContent = "Dur\xE9e : " + game.duration_game;
       item.appendChild(clone);
       container.appendChild(item);
-      const winnerpath = document.getElementById("winnerpath");
-      const winnerscore = document.getElementById("winnerscore");
-      const winnerpseudo = document.getElementById("winnerpseudo");
-      const loserpath = document.getElementById("loserpath");
-      const loserscore = document.getElementById("loserscore");
-      const loserpseudo = document.getElementById("loserpseudo");
-      const date = document.getElementById("date");
-      const duration = document.getElementById("duration");
-      winnerpath.src = game.WinnerPath;
-      winnerscore.textContent = game.WinnerScore;
-      winnerpseudo.textContent = game.WinnerPseudo;
-      loserpath.src = game.LoserPath;
-      loserscore.textContent = game.LoserScore;
-      loserpseudo.textContent = game.LoserPseudo;
-      date.textContent = new Date(game.DateGame).toLocaleDateString();
-      duration.textContent = "Dur\xE9e : " + game.GameDuration;
     });
+    const winrate = document.getElementById("winrate");
+    const win = document.getElementById("win");
+    const loose = document.getElementById("loose");
+    winrate.textContent = winrateCalcul(dashboards.WinLoose.win, dashboards.WinLoose.loose);
+    win.textContent = dashboards.WinLoose.win.toString();
+    loose.textContent = dashboards.WinLoose.loose.toString();
   } catch (error) {
     console.error("Erreur lors du chargement :", error);
   }
@@ -3985,8 +3993,8 @@ var init_gameInstance = __esm({
       constructor() {
         this.role = null;
         this.currentState = {
-          ball: { x: 0, y: 0 },
-          paddles: { player1: 0, player2: 0 },
+          ball: { x: 300, y: 240 },
+          paddles: { player1: 210, player2: 210 },
           score: { player1: 0, player2: 0 }
         };
         this.network = null;
@@ -4034,7 +4042,7 @@ function initPongMatch(params) {
   const gameID = params?.id;
   const url2 = new URL(window.location.href);
   const localMode = url2.searchParams.get("local") === "1";
-  const serverUrl = "https://127.0.0.1:3002";
+  const serverUrl = window.location.host;
   currentGame = new GameInstance();
   renderer = new GameRenderer();
   if (localMode)
@@ -4550,7 +4558,7 @@ async function getPseudoHeader3() {
       credentials: "include"
     });
     document.getElementById("pseudo-header").textContent = result.pseudo;
-    const avatar = document.getElementById("profile-avatar");
+    const avatar = document.getElementById("header-avatar");
     avatar.src = result.avatar + "?ts" + Date.now();
   } catch (err) {
     console.error(err);
