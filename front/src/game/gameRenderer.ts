@@ -14,7 +14,8 @@ export class GameRenderer {
 	}
 
 	public drawCountdown(state: GameState, countdown: number) {
-		this.draw(state);
+		this.draw(state, false);
+
 		if (countdown > 0)
 		{
 			this.ctx.font = "80px Arial";
@@ -40,7 +41,7 @@ export class GameRenderer {
 		}
 	}
 
-	public draw(state: GameState) {
+	public draw(state: GameState, drawScore: boolean) {
 		this.clear();
 
 		if (state.paddles)
@@ -49,8 +50,11 @@ export class GameRenderer {
 		if (state.ball)
 			this.drawBall(state.ball);
 
-		if (state.score)
-			this.drawScore(state.score);
+		if (drawScore)
+		{
+			if (state.score)
+				this.drawScore(state.score);
+		}
 	}
 
 	private clear() {

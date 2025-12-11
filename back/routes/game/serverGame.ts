@@ -1,8 +1,11 @@
 export const games_map = new Map<number, ServerGame>();
 import { GameInfo } from "../../DB/gameinfo";
-import { GameState } from "../../pong/gameEngine";
+import { GameState, updateBall } from "../../pong/gameEngine";
+import { simulateAI } from "../../pong/simulateAI";
+import { checkForWinner, serializeForClient } from "../../pong/pongServer";
+import { Server, Socket } from "socket.io";
 
-let maxGameId = 0;
+const TICK_RATE = 16;
 
 export class ServerGame {
 	id: number;
@@ -14,10 +17,13 @@ export class ServerGame {
 	duration: number;
 	isLocal: boolean;
 	sockets: { player1: string | null, player2: string | null };
+	intervalId: NodeJS.Timeout;
 
 	state: GameState & { aiLastUpdate?: number };
 
-	constructor(id: number, isLocal: boolean, width = 600, height = 480)
+	private io?: Server;
+
+	constructor(id: number, isLocal: boolean, io?: Server, width = 600, height = 480)
 	{
 		this.id = id;
 		this.idPlayer1 = 0;
@@ -27,8 +33,12 @@ export class ServerGame {
 		this.gameDate = new Date().toISOString().replace("T", " ").split(".")[0];
 		this.duration = Date.now();
 		this.isLocal = isLocal;
+		this.io = io;
 		this.sockets = { player1: null, player2: null };
-		
+		this.intervalId = setInterval(() => {
+			this.gameLoop();
+		}, TICK_RATE);
+
 		this.state = {
 			ball: { x: width / 2, y: height / 2, speedX: 2.5, speedY: 2 },
 			paddles: { player1: height / 2 - 30, player2: height / 2 - 30 },
@@ -37,6 +47,23 @@ export class ServerGame {
 			height,
 			aiLastUpdate: 0
 		};
+	}
+
+	gameLoop() {
+		if (this.status === "playing" && this.io) {
+			updateBall(this.state);
+			if (this.idPlayer2 === -1)
+				simulateAI(this.state as any, Date.now());
+
+			// broadcast
+			this.io.to(`game-${this.id}`).emit("state", serializeForClient(this.state));
+
+			checkForWinner(this, this.io);
+		}
+	}
+
+	setIo(io: Server) {
+		this.io = io;
 	}
 }
 

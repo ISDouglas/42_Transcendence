@@ -328,7 +328,7 @@ var init_gameRenderer = __esm({
         this.paddleHeight = 60;
       }
       drawCountdown(state, countdown) {
-        this.draw(state);
+        this.draw(state, false);
         if (countdown > 0) {
           this.ctx.font = "80px Arial";
           this.ctx.fillStyle = "white";
@@ -349,14 +349,16 @@ var init_gameRenderer = __esm({
           }
         }
       }
-      draw(state) {
+      draw(state, drawScore) {
         this.clear();
         if (state.paddles)
           this.drawPaddles(state.paddles);
         if (state.ball)
           this.drawBall(state.ball);
-        if (state.score)
-          this.drawScore(state.score);
+        if (drawScore) {
+          if (state.score)
+            this.drawScore(state.score);
+        }
       }
       clear() {
         this.drawCanvas();
@@ -3982,6 +3984,9 @@ var init_gameNetwork = __esm({
         this.socket.on("state", (state) => {
           this.onStateCallback?.(state);
         });
+        this.socket.on("predraw", (state) => {
+          this.onPredrawCallback?.(state);
+        });
         this.socket.on("startGame", () => {
           this.onCountdownCallback?.();
         });
@@ -3998,6 +4003,9 @@ var init_gameNetwork = __esm({
       }
       onState(cb) {
         this.onStateCallback = cb;
+      }
+      onPredraw(cb) {
+        this.onPredrawCallback = cb;
       }
       startMatch() {
         this.socket.emit("startMatch");
@@ -4100,11 +4108,17 @@ function initPongMatch(params) {
       }
     }, 1e3);
   });
+  net.onPredraw((state) => {
+    if (!currentGame || !renderer)
+      return;
+    currentGame.applyServerState(state);
+    renderer.draw(currentGame.getCurrentState(), false);
+  });
   net.onState((state) => {
     if (!currentGame || !renderer)
       return;
     currentGame.applyServerState(state);
-    renderer.draw(currentGame.getCurrentState());
+    renderer.draw(currentGame.getCurrentState(), true);
   });
   const keyState = {};
   window.addEventListener("keydown", (e) => {
@@ -4121,12 +4135,16 @@ function initPongMatch(params) {
         input1 = "up";
       else if (keyState["s"] || keyState["S"])
         input1 = "down";
+      else
+        input1 = "stop";
       currentGame.sendInput(input1, "player1");
       let input2 = "stop";
       if (keyState["ArrowUp"])
         input2 = "up";
       else if (keyState["ArrowDown"])
         input2 = "down";
+      else
+        input2 = "stop";
       currentGame.sendInput(input2, "player2");
     } else {
       let input = "stop";
@@ -4134,10 +4152,14 @@ function initPongMatch(params) {
         input = "up";
       else if (keyState["s"] || keyState["S"])
         input = "down";
+      else
+        input = "stop";
       currentGame.sendInput(input);
     }
   }
-  setInterval(updateInput, 16);
+  if (window.inputInterval)
+    clearInterval(window.inputInterval);
+  window.inputInterval = setInterval(updateInput, 16);
 }
 function stopGame() {
   net?.disconnect();

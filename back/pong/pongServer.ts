@@ -14,6 +14,8 @@ export function setupGameServer(io: Server) {
 
 			if (!game)
 				return;
+			game.setIo(io);
+			socket.data.gameId = gameId;
 
 			// join room
 			socket.join(`game-${gameId}`);
@@ -31,7 +33,7 @@ export function setupGameServer(io: Server) {
 					resetBall(game.state);
 					socket.emit("assignRole", "player1");
 					io.to(`game-${gameId}`).emit("startGame");
-					socket.emit("state", game);
+					socket.emit("predraw", serializeForClient(game.state));
 				} else {
 					// Already taken (another local session occupying it)
 					socket.emit("gameFull");
@@ -69,7 +71,7 @@ export function setupGameServer(io: Server) {
 				}
 	
 				// send initial state
-				socket.emit("state", game);
+				socket.emit("state", serializeForClient(game.state));
 	
 			}
 
@@ -77,9 +79,9 @@ export function setupGameServer(io: Server) {
 				const game = games_map.get(gameId);
 				if (!game) return;
 				game.status = "playing";
+				socket.emit("state", serializeForClient(game.state));
 			});
 
-			
 			// Paddle move
 			socket.on("input", ({ direction, player }: { direction: "up" | "down" | "stop", player?: "player1" | "player2" }) => {
 				const game = games_map.get(gameId);
@@ -95,12 +97,18 @@ export function setupGameServer(io: Server) {
 
 			// Disconnect
 			socket.on("disconnect", () => {
+				const game = games_map.get(gameId);
+				if (!game)
+					return;
+
 				if (game!.sockets.player1 === socket.id)
 					game!.sockets.player1 = null;
 
 				if (game!.sockets.player2 === socket.id)
 					game!.sockets.player2 = null;
+
 				console.log("Client disconnected:", socket.id);
+
 				if (game.status == "playing")
 					game.status = "waiting";
 			});
@@ -108,27 +116,30 @@ export function setupGameServer(io: Server) {
 		});
 	});
 
-	// Tick loop
-	setInterval(() => {
-		for (const game of games_map.values()) {
-			if (game.status === "playing") {
-				updateBall(game.state);
-				if (game.idPlayer2 === -1)
-					simulateAI(game.state as any, Date.now());
-				io.to(`game-${game.id}`).emit("state", serializeForClient(game.state));
-				checkForWinner(game, io);
-			}
-		}
-	}, TICK_RATE);
 }
+// // Tick loop
+// setInterval(() => {
+// 	for (const game of games_map.values()) {
+// 		if (game.status === "playing") {
+// 			updateBall(game.state);
+// 			if (game.idPlayer2 === -1)
+// 				simulateAI(game.state as any, Date.now());
+// 			io.to(`game-${game.id}`).emit("state", serializeForClient(game.state));
+// 			checkForWinner(game, io);
+// 		}
+// 	}
+// }, TICK_RATE);
 
-function checkForWinner(game: ServerGame, io: Server)
+export function checkForWinner(game: ServerGame, io: Server)
 {
 	if (game.state.score.player2 === game.state.score.max || game.state.score.player1 === game.state.score.max)
 		game.status = "finished";
 
 	if (game.status == "finished")
 	{
+		if (game.intervalId) {
+			clearInterval(game.intervalId);
+		}
 		const duration = (Date.now() - game.duration) / 1000;
 		game.duration = Math.round(duration * 10) / 10;
 		if (game.state.score.player1 > game.state.score.player2)
@@ -142,10 +153,9 @@ function checkForWinner(game: ServerGame, io: Server)
 		io.to(`game-${game.id}`).emit("gameOver");
 		io.in(`game-${game.id}`).socketsLeave(`game-${game.id}`);
 	}
-	//Math.floor((Date.now() - this.startTime) / 1000);
 }
 
-function serializeForClient(state: GameState) {
+export function serializeForClient(state: GameState) {
 	return {
 		ball: { x: state.ball.x, y: state.ball.y },
 		paddles: state.paddles,

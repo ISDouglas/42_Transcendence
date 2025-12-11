@@ -10,6 +10,8 @@ export class GameNetwork {
 	private socket: Socket;
 	private onStateCallback?: (state: GameState) => void;
 
+	private onPredrawCallback?: (state: GameState) => void;
+
 	private onCountdownCallback?: () => void;
 
 	private onRoleCallback?: (role: "player1" | "player2") => void;
@@ -27,6 +29,10 @@ export class GameNetwork {
 
 		this.socket.on("state", (state: GameState) => {
 			this.onStateCallback?.(state);
+		});
+
+		this.socket.on("predraw", (state: GameState) => {
+			this.onPredrawCallback?.(state);
 		});
 
 		this.socket.on("startGame", () => {
@@ -50,6 +56,10 @@ export class GameNetwork {
 
 	onState(cb: (state: GameState) => void) {
 		this.onStateCallback = cb;
+	}
+
+	onPredraw(cb: (state: GameState) => void) {
+		this.onPredrawCallback = cb;
 	}
 
 	startMatch() {

@@ -12,6 +12,10 @@ export function PongMatchView(params?: any): string {
 	return (document.getElementById("pongmatchhtml") as HTMLTemplateElement).innerHTML;
 }
 
+declare global {
+    interface Window { inputInterval?: NodeJS.Timeout; }
+}
+
 export function initPongMatch(params?: any) {
 	const gameID: string = params?.id;
 	const url = new URL(window.location.href);
@@ -57,6 +61,15 @@ export function initPongMatch(params?: any) {
 		}, 1000);
 	});
 
+	net.onPredraw((state) => {
+		if (!currentGame || !renderer)
+			return;
+
+		currentGame.applyServerState(state);
+
+		renderer.draw(currentGame.getCurrentState(), false);
+	})
+
 	// 6. Receive game state from server
 	net.onState((state) => {
 		if (!currentGame || !renderer)
@@ -66,7 +79,7 @@ export function initPongMatch(params?: any) {
 		currentGame.applyServerState(state);
 
 		//draw actual state
-		renderer.draw(currentGame.getCurrentState());
+		renderer.draw(currentGame.getCurrentState(), true);
 	});
 
 	// 7. Send inputs to server
@@ -90,6 +103,8 @@ export function initPongMatch(params?: any) {
 				input1 = "up";
 			else if (keyState["s"] || keyState["S"])
 				input1 = "down";
+			else
+				input1 = "stop";
 			currentGame.sendInput(input1, "player1");
 
 			let input2: "up" | "down" | "stop" = "stop";
@@ -97,6 +112,8 @@ export function initPongMatch(params?: any) {
 				input2 = "up";
 			else if (keyState["ArrowDown"])
 				input2 = "down";
+			else
+				input2 = "stop";
 			currentGame.sendInput(input2, "player2");
 		}
 		else {
@@ -105,12 +122,17 @@ export function initPongMatch(params?: any) {
 				input = "up";
 			else if (keyState["s"] || keyState["S"])
 				input = "down";
+			else
+				input = "stop";
 
 			currentGame.sendInput(input);
 		}
 	}
 
-	setInterval(updateInput, 16); // ~60 fps
+	if (window.inputInterval)
+		clearInterval(window.inputInterval);
+	window.inputInterval = setInterval(updateInput, 16);
+
 }
 
 export function stopGame() {
