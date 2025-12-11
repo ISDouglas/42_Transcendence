@@ -13,7 +13,7 @@ export function PongMatchView(params?: any): string {
 }
 
 declare global {
-    interface Window { inputInterval?: NodeJS.Timeout; }
+	interface Window { inputInterval?: NodeJS.Timeout; }
 }
 
 export function initPongMatch(params?: any) {
