@@ -4004,7 +4004,7 @@ var init_gameNetwork = __esm({
         this.socket.on("predraw", (state) => {
           this.onPredrawCallback?.(state);
         });
-        this.socket.on("startGame", () => {
+        this.socket.on("startCountdown", () => {
           this.onCountdownCallback?.();
         });
         this.socket.on("gameOver", () => {
@@ -4024,8 +4024,8 @@ var init_gameNetwork = __esm({
       onPredraw(cb) {
         this.onPredrawCallback = cb;
       }
-      startMatch() {
-        this.socket.emit("startMatch");
+      startGame() {
+        this.socket.emit("startGame");
       }
       sendInput(direction, player) {
         this.socket.emit("input", { direction, player });
@@ -4051,7 +4051,8 @@ var init_gameInstance = __esm({
         this.currentState = {
           ball: { x: 300, y: 240 },
           paddles: { player1: 210, player2: 210 },
-          score: { player1: 0, player2: 0 }
+          score: { player1: 0, player2: 0 },
+          status: "waiting"
         };
         this.network = null;
         this.localMode = false;
@@ -4099,6 +4100,9 @@ function initPongMatch(params) {
   const url2 = new URL(window.location.href);
   const localMode = url2.searchParams.get("local") === "1";
   const serverUrl = window.location.host;
+  let input1 = "stop";
+  let input2 = "stop";
+  let input = "stop";
   currentGame = new GameInstance();
   renderer = new GameRenderer();
   if (localMode)
@@ -4111,7 +4115,6 @@ function initPongMatch(params) {
   net.join(Number(gameID));
   net.onCountdown(() => {
     let countdown = 4;
-    let countdownActive = true;
     const interval = setInterval(() => {
       if (!currentGame || !renderer)
         return;
@@ -4119,9 +4122,8 @@ function initPongMatch(params) {
       countdown--;
       if (countdown < 0) {
         clearInterval(interval);
-        countdownActive = false;
         if (net)
-          net.startMatch();
+          net.startGame();
       }
     }, 1e3);
   });
@@ -4136,6 +4138,7 @@ function initPongMatch(params) {
       return;
     currentGame.applyServerState(state);
     renderer.draw(currentGame.getCurrentState(), true);
+    updateInput();
   });
   const keyState = {};
   window.addEventListener("keydown", (e) => {
@@ -4146,37 +4149,33 @@ function initPongMatch(params) {
   });
   function updateInput() {
     if (!currentGame) return;
-    if (currentGame.isLocalMode()) {
-      let input1 = "stop";
-      if (keyState["w"] || keyState["W"])
-        input1 = "up";
-      else if (keyState["s"] || keyState["S"])
-        input1 = "down";
-      else
-        input1 = "stop";
-      currentGame.sendInput(input1, "player1");
-      let input2 = "stop";
-      if (keyState["ArrowUp"])
-        input2 = "up";
-      else if (keyState["ArrowDown"])
-        input2 = "down";
-      else
-        input2 = "stop";
-      currentGame.sendInput(input2, "player2");
-    } else {
-      let input = "stop";
-      if (keyState["w"] || keyState["W"])
-        input = "up";
-      else if (keyState["s"] || keyState["S"])
-        input = "down";
-      else
-        input = "stop";
-      currentGame.sendInput(input);
+    if (currentGame.getCurrentState().status == "playing") {
+      if (currentGame.isLocalMode()) {
+        if (keyState["w"] || keyState["W"] && input1 != "up")
+          input1 = "up";
+        else if (keyState["s"] || keyState["S"] && input1 != "down")
+          input1 = "down";
+        else if (input1 != "stop")
+          input1 = "stop";
+        currentGame.sendInput(input1, "player1");
+        if (keyState["ArrowUp"] && input2 != "up")
+          input2 = "up";
+        else if (keyState["ArrowDown"] && input2 != "down")
+          input2 = "down";
+        else if (input2 != "stop")
+          input2 = "stop";
+        currentGame.sendInput(input2, "player2");
+      } else {
+        if (keyState["w"] || keyState["W"] && input != "up")
+          input = "up";
+        else if (keyState["s"] || keyState["S"] && input != "down")
+          input = "down";
+        else if (input != "stop")
+          input = "stop";
+        currentGame.sendInput(input);
+      }
     }
   }
-  if (window.inputInterval)
-    clearInterval(window.inputInterval);
-  window.inputInterval = setInterval(updateInput, 16);
 }
 function stopGame() {
   net?.disconnect();
@@ -4494,30 +4493,36 @@ async function initFriends() {
     const myfriends = await genericFetch2("/api/private/friend", {
       method: "POST"
     });
-    const divNoFriend = document.getElementById("no-friend");
-    const divFriend = document.getElementById("friends");
-    if (myfriends.length === 0) {
-      divNoFriend.textContent = "No friends yet";
-      divFriend.classList.add("hidden");
-      divNoFriend.classList.remove("hidden");
-    } else {
-      divFriend.classList.remove("hidden");
-      divNoFriend.classList.add("hidden");
-      const ul = divFriend.querySelector("ul");
-      myfriends.forEach(async (friend) => {
-        const li = document.createElement("li");
-        li.textContent = "Pseudo: " + friend.pseudo + ", status: " + friend.webStatus + ", invitation: " + friend.friendship_status + ", friend since: " + friend.friendship_date;
-        const img = document.createElement("img");
-        img.src = friend.avatar;
-        img.alt = `${friend.pseudo}'s avatar`;
-        img.width = 64;
-        li.appendChild(img);
-        ul?.appendChild(li);
-      });
-    }
-    doSearch();
+    const acceptedFriends = myfriends.filter((f) => f.friendship_status === "accepted");
+    const pendingFriends = myfriends.filter((f) => f.friendship_status === "pending");
+    doSearch(acceptedFriends, pendingFriends, myfriends);
+    myFriends(acceptedFriends);
+    pendingFr(pendingFriends);
   } catch (err) {
     console.log(err);
+  }
+}
+async function myFriends(acceptedFriends) {
+  const divNoFriend = document.getElementById("no-friend");
+  const divFriend = document.getElementById("friends");
+  if (acceptedFriends.length === 0) {
+    divNoFriend.textContent = "No friends yet";
+    divFriend.classList.add("hidden");
+    divNoFriend.classList.remove("hidden");
+  } else {
+    divFriend.classList.remove("hidden");
+    divNoFriend.classList.add("hidden");
+    const ul = divFriend.querySelector("ul");
+    acceptedFriends.forEach(async (friend) => {
+      const li = document.createElement("li");
+      li.textContent = "Pseudo: " + friend.pseudo + ", status: " + friend.webStatus + ", invitation: " + friend.friendship_status + ", friend since: " + friend.friendship_date;
+      const img = document.createElement("img");
+      img.src = friend.avatar;
+      img.alt = `${friend.pseudo}'s avatar`;
+      img.width = 64;
+      li.appendChild(img);
+      ul?.appendChild(li);
+    });
   }
 }
 function debounce(fn, delay) {
@@ -4529,17 +4534,17 @@ function debounce(fn, delay) {
     }, delay);
   };
 }
-function doSearch() {
+function doSearch(acceptedFriends, pendingFriends, myfriends) {
   const input = document.getElementById("searchInput");
   if (!input)
     return;
   const debouncedSearch = debounce(search, 300);
   input.addEventListener("input", () => {
     const memberSearched = input.value.trim();
-    debouncedSearch(memberSearched);
+    debouncedSearch(memberSearched, myfriends);
   });
 }
-async function search(memberSearched) {
+async function search(memberSearched, myfriends) {
   const listedMember = document.getElementById("members");
   if (!listedMember)
     return;
@@ -4559,18 +4564,89 @@ async function search(memberSearched) {
     else {
       existedMember.forEach((member) => {
         const li = document.createElement("li");
+        li.className = "flex items-center gap-3 p-2 justify-center";
         const img = document.createElement("img");
+        const span = document.createElement("span");
+        span.textContent = member.pseudo;
         img.src = member.avatar;
         img.alt = `${member.pseudo}'s avatar`;
         img.className = "w-8 h-8 rounded-full object-cover";
-        li.textContent = " " + member.pseudo;
-        listedMember.appendChild(img);
+        const isFriend = myfriends.some((f) => f.id === member.user_id);
+        li.appendChild(img);
+        li.appendChild(span);
+        if (!isFriend) {
+          const button = toAddFriend(member.user_id);
+          li.appendChild(button);
+        }
         listedMember.appendChild(li);
       });
     }
   } catch (error) {
     console.log(error);
   }
+}
+function toAddFriend(id) {
+  const button = document.createElement("button");
+  button.textContent = "Add friend";
+  button.className = "px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600";
+  button.addEventListener("click", async () => {
+    console.log("before add");
+    try {
+      await genericFetch2("/api/private/friend/add", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ friendID: id })
+      });
+      console.log("after add");
+      button.textContent = "pending";
+      button.disabled = true;
+    } catch (err) {
+      console.log(err);
+      button.disabled = false;
+    }
+  });
+  return button;
+}
+function toAcceptFriend(friend) {
+  const button = document.createElement("button");
+  if (friend.asked_by !== friend.id) {
+    button.textContent = "Pending invitation";
+    button.disabled = true;
+    return button;
+  }
+  button.textContent = "Accept invitation";
+  button.className = "px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600";
+  button.addEventListener("click", async () => {
+    try {
+      await genericFetch2("/api/private/friend/accept", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ friendID: friend.id })
+      });
+      button.textContent = "Accepted";
+      button.disabled = true;
+    } catch (err) {
+      console.log(err);
+      button.disabled = false;
+    }
+  });
+  return button;
+}
+function pendingFr(pendingFriends) {
+  const divPending = document.getElementById("pending");
+  const ul = divPending.querySelector("ul");
+  pendingFriends.forEach(async (friend) => {
+    const li = document.createElement("li");
+    li.textContent = "Pseudo: " + friend.pseudo + ", requested since: " + friend.friendship_date;
+    const img = document.createElement("img");
+    img.src = friend.avatar;
+    img.alt = `${friend.pseudo}'s avatar`;
+    img.width = 64;
+    const button = toAcceptFriend(friend);
+    li.appendChild(img);
+    li.appendChild(button);
+    ul?.appendChild(li);
+  });
 }
 var init_p_friends = __esm({
   "front/src/views/p_friends.ts"() {
