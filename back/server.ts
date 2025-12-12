@@ -24,7 +24,7 @@ import { getUpdateInfo, getUpdateUsername, getUpdateEmail, getUploadAvatar, getU
 import { logout } from "./routes/logout/logout";
 import { setupGameServer } from "./pong/pongServer";
 import { Friends } from "./DB/friend";
-import { displayFriendPage, searchUser } from "./routes/friends/friends";
+import { allMyFriends, searchUser, addFriend, acceptFriend } from "./routes/friends/friends";
 import { dashboardInfo } from "./routes/dashboard/dashboard";
 import { request } from "http";
 import { navigateTo } from "../front/src/router";
@@ -141,7 +141,15 @@ fastify.post("/api/private/updateinfo/uploads", async (request, reply) => {
 });
 
 fastify.post("/api/private/friend", async (request: FastifyRequest, reply: FastifyReply) => {
-	await displayFriendPage(request, reply);
+	await allMyFriends(request, reply);
+})
+
+fastify.post("/api/private/friend/add", async(request: FastifyRequest, reply: FastifyReply) => {
+	await addFriend(request, reply);
+})
+
+fastify.post("/api/private/friend/accept", async(request: FastifyRequest, reply: FastifyReply) => {
+	await acceptFriend(request, reply);
 })
 
 fastify.post("/api/private/friend/search", async( request: FastifyRequest, reply: FastifyReply) => {
@@ -208,14 +216,14 @@ const start = async () => {
 		await db.connect();
 		// await users.deleteUserTable();
 		// await gameInfo.deleteGameInfoTable();
+		friends.deleteFriendTable();
 		await users.createUserTable();
-		await friends.createFriendsTable();
+		await friends.createFriendTable();
 		await gameInfo.createGameInfoTable();
 		await tournament.createTournamentTable();
 		await users.CreateUserIA();
 		// const hashedPassword = await bcrypt.hash("42", 12);
 		// users.addUser("42", "42", hashedPassword);
-		// friends.deleteFriendTable();
 		// friends.addFriendship(5, 6);
 		// friends.addFriendship(4, 5);
 	} catch (err) {
