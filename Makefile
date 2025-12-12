@@ -19,16 +19,16 @@ up:		$(NAME)
 
 $(NAME):
 	@$(COMPOSE) up -d --build
-	@echo "$(GREEN)\n 🤖  Build up successfully ✴️  $(NAME) ✴️$(RESET)"
+	@echo "$(GREEN)\n 🤖  Build up successfully ✴️  $(NAME) ✴️$(RESET)\n"
 
 down:
 	@$(COMPOSE) down
-	@echo "$(RED)\n 🚽  Tear down successfully ❄️  $(NAME) ❄️$(RESET)"
+	@echo "$(RED)\n 🚽  Tear down successfully ❄️  $(NAME) ❄️$(RESET)\n"
 
 # Clean
 clean:
 	@$(COMPOSE) down --volumes
-	@echo "$(RED)\n 🗑️  Clean up successfully containers and volumes 🗑️ $(RESET)"
+	@echo "$(RED)\n 🗑️  Clean up successfully containers and volumes 🗑️ $(RESET)\n"
 
 fclean:
 	@$(COMPOSE) down --volumes --rmi all
