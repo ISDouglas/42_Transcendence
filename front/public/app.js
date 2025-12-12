@@ -3987,7 +3987,7 @@ var init_gameNetwork = __esm({
         this.socket.on("predraw", (state) => {
           this.onPredrawCallback?.(state);
         });
-        this.socket.on("startGame", () => {
+        this.socket.on("startCountdown", () => {
           this.onCountdownCallback?.();
         });
         this.socket.on("gameOver", () => {
@@ -4007,8 +4007,8 @@ var init_gameNetwork = __esm({
       onPredraw(cb) {
         this.onPredrawCallback = cb;
       }
-      startMatch() {
-        this.socket.emit("startMatch");
+      startGame() {
+        this.socket.emit("startGame");
       }
       sendInput(direction, player) {
         this.socket.emit("input", { direction, player });
@@ -4104,7 +4104,7 @@ function initPongMatch(params) {
         clearInterval(interval);
         countdownActive = false;
         if (net)
-          net.startMatch();
+          net.startGame();
       }
     }, 1e3);
   });

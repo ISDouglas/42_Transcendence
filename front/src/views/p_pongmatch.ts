@@ -56,7 +56,7 @@ export function initPongMatch(params?: any) {
 				clearInterval(interval);
 				countdownActive = false;
 				if (net)
-					net.startMatch();
+					net.startGame();
 			}
 		}, 1000);
 	});
