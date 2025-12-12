@@ -4592,7 +4592,6 @@ function toAddFriend(id) {
   return button;
 }
 function toAcceptFriend(friend) {
-  console.log("asked by : ", friend.asked_by, "friend ID:", friend.id);
   const button = document.createElement("button");
   if (friend.asked_by !== friend.id) {
     button.textContent = "Pending invitation";

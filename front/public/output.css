@@ -588,12 +588,9 @@
       background-color: color-mix(in oklab, var(--color-amber-600) 30%, transparent);
     }
   }
-<<<<<<< HEAD
-=======
   .bg-blue-500 {
     background-color: var(--color-blue-500);
   }
->>>>>>> elisa
   .bg-blue-600 {
     background-color: var(--color-blue-600);
   }
