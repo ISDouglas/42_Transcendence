@@ -29,7 +29,7 @@ export function setupGameServer(io: Server) {
 				const game = games_map.get(gameId);
 				if (!game) return;
 				game.status = "playing";
-				socket.emit("state", serializeForClient(game.state));
+				socket.emit("state", serializeForClient(game.state, game.status));
 			});
 
 			// Input
@@ -91,11 +91,12 @@ export function checkForWinner(game: ServerGame, io: Server)
 	}
 }
 
-export function serializeForClient(state: GameState) {
+export function serializeForClient(state: GameState, status: "waiting" | "playing" | "finished" | "countdown") {
 	return {
 		ball: { x: state.ball.x, y: state.ball.y },
 		paddles: state.paddles,
-		score: state.score
+		score: state.score,
+		status: status
 	};
 }
 
@@ -116,7 +117,7 @@ function initLocal(game: ServerGame, io: Server, socket: Socket, gameId: number)
 		//countdown starting
 		io.to(`game-${gameId}`).emit("startCountdown");
 		//predraw canvas without score to avoid empty screen before countdown
-		socket.emit("predraw", serializeForClient(game.state));
+		socket.emit("predraw", serializeForClient(game.state, game.status));
 	}
 	else
 	{
@@ -167,7 +168,7 @@ function initRemoteAndAi(game: ServerGame, io: Server, socket: Socket, gameId: n
 	}
 
 	//predraw canvas without score to avoid empty screen before countdown
-	socket.emit("predraw", serializeForClient(game.state));
+	socket.emit("predraw", serializeForClient(game.state, game.status));
 }
 
 function getPlayer(game: ServerGame, socket: Socket) {

@@ -4034,7 +4034,8 @@ var init_gameInstance = __esm({
         this.currentState = {
           ball: { x: 300, y: 240 },
           paddles: { player1: 210, player2: 210 },
-          score: { player1: 0, player2: 0 }
+          score: { player1: 0, player2: 0 },
+          status: "waiting"
         };
         this.network = null;
         this.localMode = false;
@@ -4129,32 +4130,34 @@ function initPongMatch(params) {
   });
   function updateInput() {
     if (!currentGame) return;
-    if (currentGame.isLocalMode()) {
-      let input1 = "stop";
-      if (keyState["w"] || keyState["W"])
-        input1 = "up";
-      else if (keyState["s"] || keyState["S"])
-        input1 = "down";
-      else
-        input1 = "stop";
-      currentGame.sendInput(input1, "player1");
-      let input2 = "stop";
-      if (keyState["ArrowUp"])
-        input2 = "up";
-      else if (keyState["ArrowDown"])
-        input2 = "down";
-      else
-        input2 = "stop";
-      currentGame.sendInput(input2, "player2");
-    } else {
-      let input = "stop";
-      if (keyState["w"] || keyState["W"])
-        input = "up";
-      else if (keyState["s"] || keyState["S"])
-        input = "down";
-      else
-        input = "stop";
-      currentGame.sendInput(input);
+    if (currentGame.getCurrentState().status == "playing") {
+      if (currentGame.isLocalMode()) {
+        let input1 = "stop";
+        if (keyState["w"] || keyState["W"])
+          input1 = "up";
+        else if (keyState["s"] || keyState["S"])
+          input1 = "down";
+        else
+          input1 = "stop";
+        currentGame.sendInput(input1, "player1");
+        let input2 = "stop";
+        if (keyState["ArrowUp"])
+          input2 = "up";
+        else if (keyState["ArrowDown"])
+          input2 = "down";
+        else
+          input2 = "stop";
+        currentGame.sendInput(input2, "player2");
+      } else {
+        let input = "stop";
+        if (keyState["w"] || keyState["W"])
+          input = "up";
+        else if (keyState["s"] || keyState["S"])
+          input = "down";
+        else
+          input = "stop";
+        currentGame.sendInput(input);
+      }
     }
   }
   if (window.inputInterval)

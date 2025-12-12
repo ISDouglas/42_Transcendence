@@ -4,6 +4,7 @@ export interface GameState {
 	ball: { x: number; y: number };
 	paddles: { player1: number; player2: number };
 	score: { player1: number; player2: number };
+	status: "waiting" | "playing" | "finished" | "countdown";
 }
 
 export class GameNetwork {

@@ -55,7 +55,7 @@ export class ServerGame {
 			if (this.idPlayer2 === -1)
 				simulateAI(this.state as any, Date.now());
 
-			this.io.to(`game-${this.id}`).emit("state", serializeForClient(this.state));
+			this.io.to(`game-${this.id}`).emit("state", serializeForClient(this.state, this.status));
 
 			checkForWinner(this, this.io);
 		}

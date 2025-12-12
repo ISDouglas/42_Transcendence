@@ -97,35 +97,42 @@ export function initPongMatch(params?: any) {
 	{
 		if (!currentGame) return;
 
-		if (currentGame.isLocalMode()) {
-			let input1: "up" | "down" | "stop" = "stop";
-			if (keyState["w"] || keyState["W"])
-				input1 = "up";
-			else if (keyState["s"] || keyState["S"])
-				input1 = "down";
-			else
-				input1 = "stop";
-			currentGame.sendInput(input1, "player1");
+		if (currentGame.getCurrentState().status == "playing")
+		{
+			if (currentGame.isLocalMode())
+			{
+				//player1
+				let input1: "up" | "down" | "stop" = "stop";
+				if (keyState["w"] || keyState["W"])
+					input1 = "up";
+				else if (keyState["s"] || keyState["S"])
+					input1 = "down";
+				else
+					input1 = "stop";
+				currentGame.sendInput(input1, "player1");
 
-			let input2: "up" | "down" | "stop" = "stop";
-			if (keyState["ArrowUp"])
-				input2 = "up";
-			else if (keyState["ArrowDown"])
-				input2 = "down";
+				//player2
+				let input2: "up" | "down" | "stop" = "stop";
+				if (keyState["ArrowUp"])
+					input2 = "up";
+				else if (keyState["ArrowDown"])
+					input2 = "down";
+				else
+					input2 = "stop";
+				currentGame.sendInput(input2, "player2");
+			}
 			else
-				input2 = "stop";
-			currentGame.sendInput(input2, "player2");
-		}
-		else {
-			let input: "up" | "down" | "stop" = "stop";
-			if (keyState["w"] || keyState["W"])
-				input = "up";
-			else if (keyState["s"] || keyState["S"])
-				input = "down";
-			else
-				input = "stop";
+			{
+				let input: "up" | "down" | "stop" = "stop";
+				if (keyState["w"] || keyState["W"])
+					input = "up";
+				else if (keyState["s"] || keyState["S"])
+					input = "down";
+				else
+					input = "stop";
 
-			currentGame.sendInput(input);
+				currentGame.sendInput(input);
+			}
 		}
 	}
 
