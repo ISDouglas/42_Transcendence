@@ -57,7 +57,7 @@ export class Users
 		new Date().toISOString().replace("T", " ").split(".")[0],
 		new Date().toISOString().replace("T", " ").split(".")[0],
 		0,
-		0
+		1000
 		];
 		await this._db.execute(query, parameters);
 	}
@@ -79,7 +79,29 @@ export class Users
 		new Date().toISOString().replace("T", " ").split(".")[0],
 		new Date().toISOString().replace("T", " ").split(".")[0],
 		0,
-		0
+		1000
+		];
+		await this._db.execute(query, parameters);
+	}
+
+	async CreateUserGuest()
+	{
+		const query = `
+			INSERT INTO Users (user_id, pseudo, email, password, avatar, status, creation_date, modification_date, money, elo)
+			VALUES (?,?,?,?,?,?,?,?,?,?)
+			ON CONFLICT(user_id) DO NOTHING
+		`;
+		const parameters = [
+		0,
+		"Guest",
+		"guest@g.g",
+		"guestpass",
+		"/files/0.png",
+		"online",
+		new Date().toISOString().replace("T", " ").split(".")[0],
+		new Date().toISOString().replace("T", " ").split(".")[0],
+		0,
+		1000
 		];
 		await this._db.execute(query, parameters);
 	}
@@ -198,7 +220,7 @@ export class Users
 	}
 
 	async searchMember(pseudo: string, id: number): Promise<IUsers[]> {
-		const query = ` SELECT * FROM Users WHERE user_id != ? AND LOWER(pseudo) LIKE LOWER(?) LIMIT 10`;
+		const query = ` SELECT * FROM Users WHERE user_id != ? AND LOWER(pseudo) LIKE LOWER(?) LIMIT 10`; /*faire un join pour status != friend ou voir pour mettre bouton supprimer si friend*/
 		const members = await this._db.query(query, [id, `${pseudo}%`])
 		return members;
 	}
