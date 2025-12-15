@@ -96,6 +96,15 @@ function DashboardView() {
 function winrateCalcul(wins, losses) {
   return Math.round(wins / (wins + losses) * 100).toString();
 }
+function formatDuration(seconds) {
+  seconds = Math.floor(seconds);
+  if (seconds < 60) {
+    return `${seconds}s`;
+  }
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = seconds % 60;
+  return `${minutes}m ${remainingSeconds}s`;
+}
 async function initDashboard() {
   const container = document.getElementById("game-list");
   if (!container)
@@ -118,6 +127,7 @@ async function initDashboard() {
       const loserpseudo = clone.getElementById("loserpseudo");
       const date = clone.getElementById("date");
       const duration = clone.getElementById("duration");
+      const type = clone.getElementById("type");
       winnerpath.src = game.winner_avatar;
       winnerscore.textContent = game.winner_score.toString();
       winnerpseudo.textContent = game.winner_pseudo;
@@ -125,16 +135,23 @@ async function initDashboard() {
       loserscore.textContent = game.loser_score.toString();
       loserpseudo.textContent = game.loser_pseudo;
       date.textContent = new Date(game.date_game).toLocaleDateString();
-      duration.textContent = "Dur\xE9e : " + game.duration_game;
+      duration.textContent = "Dur\xE9e : " + formatDuration(game.duration_game);
+      type.textContent = game.type;
       item.appendChild(clone);
       container.appendChild(item);
     });
     const winrate = document.getElementById("winrate");
     const win = document.getElementById("win");
     const loose = document.getElementById("loose");
-    winrate.textContent = winrateCalcul(dashboards.WinLoose.win, dashboards.WinLoose.loose);
+    winrate.textContent = winrateCalcul(dashboards.WinLoose.win, dashboards.WinLoose.loose) + "%";
     win.textContent = dashboards.WinLoose.win.toString();
     loose.textContent = dashboards.WinLoose.loose.toString();
+    const taken = document.getElementById("taken");
+    const scored = document.getElementById("scored");
+    const ratio = document.getElementById("ratio");
+    ratio.textContent = winrateCalcul(dashboards.TotalScore.scored, dashboards.TotalScore.taken) + "%";
+    taken.textContent = dashboards.TotalScore.taken.toString();
+    scored.textContent = dashboards.TotalScore.scored.toString();
   } catch (error) {
     console.error("Erreur lors du chargement :", error);
   }
@@ -4254,6 +4271,10 @@ function smoothScrollTo(targetY, duration) {
 async function initHomePage() {
   const btn = document.getElementById("scroll-button");
   const target = document.getElementById("gamepage");
+  const myfriends = await genericFetch2("/api/private/friend", {
+    method: "POST"
+  });
+  const pendingFriends = myfriends.filter((f) => f.friendship_status === "pending");
   btn.addEventListener("click", () => {
     const targetY = target.getBoundingClientRect().top + window.scrollY;
     smoothScrollTo(targetY, 1e3);
@@ -4529,7 +4550,7 @@ async function initFriends() {
     });
     const acceptedFriends = myfriends.filter((f) => f.friendship_status === "accepted");
     const pendingFriends = myfriends.filter((f) => f.friendship_status === "pending");
-    doSearch(acceptedFriends, pendingFriends, myfriends);
+    doSearch(myfriends);
     myFriends(acceptedFriends);
     pendingFr(pendingFriends);
   } catch (err) {
@@ -4554,6 +4575,8 @@ async function myFriends(acceptedFriends) {
       img.src = friend.avatar;
       img.alt = `${friend.pseudo}'s avatar`;
       img.width = 64;
+      const button = toDeleteFriend(friend.id);
+      li.appendChild(button);
       li.appendChild(img);
       ul?.appendChild(li);
     });
@@ -4568,7 +4591,7 @@ function debounce(fn, delay) {
     }, delay);
   };
 }
-function doSearch(acceptedFriends, pendingFriends, myfriends) {
+function doSearch(myfriends) {
   const input = document.getElementById("searchInput");
   if (!input)
     return;
@@ -4608,10 +4631,12 @@ async function search(memberSearched, myfriends) {
         const isFriend = myfriends.some((f) => f.id === member.user_id);
         li.appendChild(img);
         li.appendChild(span);
-        if (!isFriend) {
-          const button = toAddFriend(member.user_id);
-          li.appendChild(button);
-        }
+        let button;
+        if (!isFriend)
+          button = toAddFriend(member.user_id);
+        else
+          button = toDeleteFriend(member.user_id);
+        li.appendChild(button);
         listedMember.appendChild(li);
       });
     }
@@ -4624,14 +4649,12 @@ function toAddFriend(id) {
   button.textContent = "Add friend";
   button.className = "px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600";
   button.addEventListener("click", async () => {
-    console.log("before add");
     try {
       await genericFetch2("/api/private/friend/add", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ friendID: id })
       });
-      console.log("after add");
       button.textContent = "pending";
       button.disabled = true;
     } catch (err) {
@@ -4658,6 +4681,26 @@ function toAcceptFriend(friend) {
         body: JSON.stringify({ friendID: friend.id })
       });
       button.textContent = "Accepted";
+      button.disabled = true;
+    } catch (err) {
+      console.log(err);
+      button.disabled = false;
+    }
+  });
+  return button;
+}
+function toDeleteFriend(id) {
+  const button = document.createElement("button");
+  button.textContent = "Delete";
+  button.className = "px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600";
+  button.addEventListener("click", async () => {
+    try {
+      await genericFetch2("/api/private/friend/delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ friendID: id })
+      });
+      button.textContent = "deleted";
       button.disabled = true;
     } catch (err) {
       console.log(err);
@@ -4744,18 +4787,38 @@ async function loadHeader() {
   const response = await fetch("/header.html");
   const html = await response.text();
   const container = document.getElementById("header-container");
-  if (container) container.innerHTML = html;
-  getPseudoHeader3();
+  if (container) {
+    container.innerHTML = html;
+    getPseudoHeader3();
+  }
 }
 async function getPseudoHeader3() {
   try {
-    const result = await genericFetch2("/api/private/getpseudoAv", {
+    const result = await genericFetch2("/api/private/getpseudoAvStatus", {
       method: "POST",
       credentials: "include"
     });
     document.getElementById("pseudo-header").textContent = result.pseudo;
     const avatar = document.getElementById("header-avatar");
+    const status = document.getElementById("status");
     avatar.src = result.avatar + "?ts" + Date.now();
+    switch (result.status) {
+      case "online":
+        status.classList.add("bg-green-500");
+        break;
+      case "busy":
+        status.classList.add("bg-red-500");
+        break;
+      case "offline":
+        status.classList.add("bg-white");
+    }
+    console.log("notification =", document.getElementById("notification"));
+    const notification = document.getElementById("notification");
+    notification.classList.add("hidden");
+    console.log("notif = ", result.notif);
+    if (result.notif === true) {
+      notification.classList.remove("hidden");
+    }
   } catch (err) {
     console.error(err);
   }
