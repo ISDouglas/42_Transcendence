@@ -1,8 +1,10 @@
 import { IMyFriends } from "../../../back/DB/friend";
 import { friends } from "../../../back/server";
-import { genericFetch, loadHeader } from "../router";
+import { displayStatus, genericFetch, loadHeader, navigateTo } from "../router";
 import { IUsers } from "../../../back/DB/users";
 import { request } from "http";
+import { stat } from "fs";
+import { IFriendsAndNot } from "../../../back/routes/friends/friends";
 
 export function FriendsView(): string {
 	loadHeader();
@@ -11,16 +13,16 @@ export function FriendsView(): string {
 
 export async function initFriends() {
 	try {
-		const myfriends: IMyFriends[] = await genericFetch("/api/private/friend", {
+		const allInfo: IFriendsAndNot = await genericFetch("/api/private/friend", {
 			method: "POST",
 		});
-
-		const acceptedFriends = myfriends.filter(f => f.friendship_status === "accepted");
-		const pendingFriends = myfriends.filter(f => f.friendship_status === "pending");
-
-		doSearch(myfriends);
+		const acceptedFriends = allInfo.allMyFriends.filter(f => f.friendship_status === "accepted");
+		const pendingFriends = allInfo.allMyFriends.filter(f => f.friendship_status === "pending");
+		const playedWithNotF = allInfo.playedWith;
+		doSearch(allInfo.allMyFriends);
 		myFriends(acceptedFriends);
 		pendingFr(pendingFriends);
+		youMayKnow(playedWithNotF);
 	}
 	catch (err) {
 		console.log(err);
@@ -40,15 +42,23 @@ async function myFriends(acceptedFriends: IMyFriends[]) {
 		divNoFriend.classList.add("hidden");
 		const ul = divFriend.querySelector("ul");
 		acceptedFriends.forEach(async (friend: IMyFriends) => {
+
+			const status = document.createElement("span") as HTMLImageElement;
+			status.className ="absolute w-4 h-4 rounded-full border-2 border-white";
+			displayStatus(friend, status);
 			const li = document.createElement("li");
-			li.textContent = "Pseudo: " + friend.pseudo + ", status: " + friend.webStatus + ", invitation: " + friend.friendship_status + ", friend since: " + friend.friendship_date;
+			li.className = "flex items-center gap-3";
+			const span = document.createElement("span");
+			span.textContent = friend.pseudo + " friend since: " + friend.friendship_date;
 			const img = document.createElement("img");
 			img.src =  friend.avatar;
 			img.alt = `${friend.pseudo}'s avatar`;
 			img.width = 64;
 			const button: HTMLButtonElement = toDeleteFriend(friend.id);
-			li.appendChild(button);
 			li.appendChild(img);
+			li.appendChild(status);
+			li.appendChild(span);
+			li.appendChild(button);
 			ul?.appendChild(li);
 		});
 	}
@@ -133,6 +143,7 @@ function toAddFriend(id: number): HTMLButtonElement {
 			});
 			button.textContent = "pending";
 			button.disabled = true;
+			navigateTo("/friends");
 		}
 		catch (err) {
 			console.log(err);
@@ -160,6 +171,7 @@ function toAcceptFriend(friend: IMyFriends): HTMLButtonElement {
 			});
 			button.textContent = "Accepted";
 			button.disabled = true;
+			navigateTo("/friends");
 		}
 		catch (err) {
 			console.log(err);
@@ -183,6 +195,7 @@ function toDeleteFriend(id: number): HTMLButtonElement {
 			});
 			button.textContent = "deleted";
 			button.disabled = true;
+			navigateTo("/friends");
 		}
 		catch (err) {
 			console.log(err);
@@ -193,19 +206,33 @@ function toDeleteFriend(id: number): HTMLButtonElement {
 }
 
 function pendingFr(pendingFriends: IMyFriends[]) {
+	const divNoPending = document.getElementById("no-pending") as HTMLElement;
 	const divPending = document.getElementById("pending") as HTMLElement;
-	const ul = divPending.querySelector("ul");
-	pendingFriends.forEach(async (friend: IMyFriends) => {
-		const li = document.createElement("li");
-		li.textContent = "Pseudo: " + friend.pseudo + ", requested since: " + friend.friendship_date;
-		const img = document.createElement("img");
-		img.src =  friend.avatar;
-		img.alt = `${friend.pseudo}'s avatar`;
-		img.width = 64;
-		const button = toAcceptFriend(friend);
-		li.appendChild(img);
-		li.appendChild(button);
-		ul?.appendChild(li);
-	});
+	// console.log(pendingFriends);
+	if (pendingFriends.length === 0) {
+		divNoPending.textContent = "No pending friends";
+		divPending.classList.add("hidden");
+		divNoPending.classList.remove("hidden");
+	}
+	else {
+		divPending.classList.remove("hidden");
+		divNoPending.classList.add("hidden");
+		const ul = divPending.querySelector("ul");
+		pendingFriends.forEach(async (friend: IMyFriends) => {
+			const li = document.createElement("li");
+			li.textContent = friend.pseudo + ", requested since: " + friend.friendship_date;
+			const img = document.createElement("img");
+			img.src =  friend.avatar;
+			img.alt = `${friend.pseudo}'s avatar`;
+			img.width = 64;
+			const button = toAcceptFriend(friend);
+			li.appendChild(img);
+			li.appendChild(button);
+			ul?.appendChild(li);
+		});
+	}
 }
 
+function youMayKnow(adversary: {id: number, pseudo: string, avatar: string}[]) {
+	console.log("adversaire = ", adversary);
+}

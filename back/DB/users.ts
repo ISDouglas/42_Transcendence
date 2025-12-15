@@ -230,5 +230,5 @@ export class Users
 		  `UPDATE Users SET twofa_secret = ?, twofa_enabled = ? WHERE user_id = ?`,
 		  [secret, enabled ? 1 : 0, userId]
 		);
-	}
+	} 
 }
