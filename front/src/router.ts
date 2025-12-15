@@ -16,10 +16,12 @@ import { FriendsView, initFriends } from "./views/p_friends";
 import { ErrorView, initError } from "./views/error";
 import { request } from "http";
 import { userInfo } from "os";
+import { initTowfa, towfaView } from "./views/twofa";
 
 const routes = [
   { path: "/", view: View, init: init},
-  { path: "/login", view: LoginView, init:initLogin},
+  { path: "/login", view: LoginView, init: initLogin},
+  { path: "/twofa", view: towfaView, init: initTowfa},
   { path: "/logout", init: initLogout},
   { path: "/register", view: RegisterView, init: initRegister},
   { path: "/registerok", view: RegisterValidView},
@@ -44,12 +46,10 @@ export function navigateTo(url: string) {
 	history.pushState(state, "", url);
 	currentPath = url;
 	router();
-	// const avatar = document.getElementById("profile-avatar") as HTMLImageElement;
-	// if (avatar) 
-	// 	avatar.src = "/api/private/avatar?ts=" + Date.now();
 }
 
-export async function genericFetch(url: string, options: RequestInit = {}) {
+export async function genericFetch(url: string, options: RequestInit = {})
+{
 	const res = await fetch(url, {
 	...options,
 	credentials: "include"

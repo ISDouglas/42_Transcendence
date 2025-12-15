@@ -7,7 +7,7 @@ import { manageLogin } from './routes/login/login';
 import { manageRegister } from "./routes/register/register";
 import { GameInfo } from "./DB/gameinfo";
 import fastifyCookie from "@fastify/cookie";
-import { tokenOK } from "./middleware/jwt";
+import { checkAuth, tokenOK } from "./middleware/jwt";
 import { collapseTextChangeRangesAcrossMultipleVersions } from "typescript";
 import bcrypt from "bcryptjs";
 import { createGame, joinGame, displayGameList } from "./routes/game/serverGame";
@@ -29,7 +29,7 @@ import fastifyMetrics from "fastify-metrics";
 import { dashboardInfo } from "./routes/dashboard/dashboard";
 import { request } from "http";
 import { navigateTo } from "../front/src/router";
-import * as twofa from "./routes/twofa/twofa";
+import { checkTwoFA, disableTwoFA, enableTwoFA, setupTwoFA } from "./routes/twofa/twofa";
 
 
 export const db = new ManageDB("./back/DB/database.db");
@@ -113,20 +113,20 @@ fastify.post("/api/register", async (request, reply) => {
 });
 
 fastify.post("/api/login", async (request: FastifyRequest, reply: FastifyReply) => {
-  const { username, password, code } = request.body as { username: string, password: string, code?: string};
-  await manageLogin(username, password, code, reply);
+  const { username, password } = request.body as { username: string, password: string };
+  await manageLogin(username, password, reply);
 });
 
 fastify.post("/api/private/2fa/setup", async (request: FastifyRequest, reply: FastifyReply) => {
-    return await twofa.setupTwoFA(request, reply);
+    return await setupTwoFA(request, reply);
 });
 
 fastify.post("/api/private/2fa/enable", async (request: FastifyRequest, reply: FastifyReply) => {
-	return await twofa.enableTwoFA(request, reply);
+	return await enableTwoFA(request, reply);
 });
 
 fastify.post("/api/private/2fa/disable", async (request: FastifyRequest, reply: FastifyReply) => {
-	return await twofa.disableTwoFA(request, reply);
+	return await disableTwoFA(request, reply);
 });
 
 fastify.post("/api/private/getpseudoAvStatus", async (request: FastifyRequest, reply: FastifyReply) => {
@@ -230,7 +230,12 @@ fastify.setNotFoundHandler((request: FastifyRequest, reply: FastifyReply) => {
 })
 
 fastify.get("/api/private/dashboard", async (request, reply) => {
-	return dashboardInfo(request, reply);
+	await dashboardInfo(request, reply);
+});
+
+fastify.post("/api/twofa", async (request, reply) => {
+	const { code } = request.body as { code: number};
+	await checkTwoFA(request, reply, code);
 });
 
 const start = async () => {
@@ -245,7 +250,7 @@ const start = async () => {
 		// await gameInfo.deleteGameInfoTable();
 		// await friends.deleteFriendTable();
 		await users.createUserTable();
-		await users.migrateUsersTable();
+		// await users.migrateUsersTable();
 		await friends.createFriendTable();
 		await gameInfo.createGameInfoTable();
 		await tournament.createTournamentTable();
