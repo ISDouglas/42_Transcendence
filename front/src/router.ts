@@ -17,6 +17,7 @@ import { ErrorView, initError } from "./views/error";
 import { request } from "http";
 import { userInfo } from "os";
 import { initTowfa, towfaView } from "./views/twofa";
+import { UpdateEmailView, initUpdateEmail } from "./views/p_updateemail";
 
 const routes = [
   { path: "/", view: View, init: init},
@@ -30,6 +31,7 @@ const routes = [
   { path: "/friends", view: FriendsView, init: initFriends },
   { path: "/profile", view: ProfileView, init: initProfile},
   { path: "/updateinfo", view: UpdateInfoView, init: initUpdateInfo},
+  { path: "/updateemail", view: UpdateEmailView, init: initUpdateEmail },
   { path: "/gameonline", view: GameOnlineView, init: GameOnlineinit},
   { path: "/gamelocal", view: GameLocalView, init: GameLocalinit},
   { path: "/pongmatch/:id", view: PongMatchView, init: initPongMatch, cleanup: stopGame },

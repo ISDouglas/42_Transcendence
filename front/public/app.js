@@ -43,35 +43,73 @@ async function initLogin() {
     e.preventDefault();
     const username = document.getElementById("username").value;
     const password = document.getElementById("password").value;
+<<<<<<< HEAD
     const success = await login(username, password, form);
     if (success == 2)
       navigateTo("/twofa");
     if (success == 1)
+=======
+    const code = document.getElementById("twofa-code")?.value;
+    const success = await login(username, password, code, form);
+    if (success)
+>>>>>>> c7632bd29018b259e79a24110c4b38deda366efa
       navigateTo("/home");
   });
 }
-async function login(username, password, form) {
+async function login(username, password, code, form) {
   try {
     clearLoginErrors(form);
+<<<<<<< HEAD
+=======
+    const twofaBox = document.getElementById("twofa-box");
+    const twofaMsg = document.getElementById("twofa-msg");
+    twofaMsg.textContent = "";
+    if (require2FA && !code) {
+      twofaMsg.textContent = "No 2FA code submitted.";
+      return false;
+    }
+>>>>>>> c7632bd29018b259e79a24110c4b38deda366efa
     const res = await fetch("/api/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password }),
+      body: JSON.stringify({ username, password, code }),
       credentials: "include"
     });
     const result = await res.json();
+<<<<<<< HEAD
     if (!result.ok) {
+      if (result.field === "username") {
+        document.getElementById("username-loginmsg").textContent = result.error;
+=======
+    if (result.require2FA === true) {
+      require2FA = true;
+      twofaBox.classList.remove("hidden");
+      twofaMsg.textContent = "Please input 2FA code.";
+      return false;
+    }
+    if (!res.ok) {
       if (result.field === "username") {
         document.getElementById("username-loginmsg").textContent = result.error;
       }
       if (result.field === "password") {
         document.getElementById("password-loginmsg").textContent = result.error;
       }
+      if (result.field === "2fa") {
+        twofaMsg.textContent = result.error;
+>>>>>>> c7632bd29018b259e79a24110c4b38deda366efa
+      }
+      if (result.field === "password") {
+        document.getElementById("password-loginmsg").textContent = result.error;
+      }
       return 0;
     }
+<<<<<<< HEAD
     if (result.ok && result.twofa === true)
       return 2;
     return 1;
+=======
+    return true;
+>>>>>>> c7632bd29018b259e79a24110c4b38deda366efa
   } catch (err) {
     console.error(err);
     return 0;
@@ -85,10 +123,15 @@ function clearLoginErrors(form) {
   [usernameMsg, passwordMsg].forEach((p) => p.textContent = "");
   [usernameInput, passwordInput].forEach((p) => p.classList.remove("error"));
 }
+<<<<<<< HEAD
+=======
+var require2FA;
+>>>>>>> c7632bd29018b259e79a24110c4b38deda366efa
 var init_login = __esm({
   "front/src/views/login.ts"() {
     "use strict";
     init_router();
+    require2FA = false;
   }
 });
 
@@ -369,6 +412,31 @@ var init_gameRenderer = __esm({
             );
           }
         }
+      }
+      drawGameOver(state) {
+        this.ctx.fillStyle = "black";
+        this.canvas.height = this.canvas.height / 2;
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        if (state.score) {
+          this.drawScore(state.score);
+          this.ctx.font = "60px Arial";
+          this.ctx.fillStyle = "white";
+          this.ctx.textAlign = "center";
+          if (state.score.player1 > state.score.player2) {
+            this.ctx.fillText(
+              "Player1 wins!",
+              this.canvas.width / 2,
+              this.canvas.height * 0.75
+            );
+          } else {
+            this.ctx.fillText(
+              "Player2 wins!",
+              this.canvas.width / 2,
+              this.canvas.height * 0.75
+            );
+          }
+        }
+        document.getElementById("buttons")?.classList.remove("hidden");
       }
       draw(state, drawScore) {
         this.clear();
@@ -4012,6 +4080,7 @@ var init_gameNetwork = __esm({
           this.onCountdownCallback?.();
         });
         this.socket.on("gameOver", () => {
+          this.onGameOverCallback?.();
           console.log("Game over, closing socket...");
           this.socket.close();
         });
@@ -4036,6 +4105,9 @@ var init_gameNetwork = __esm({
       }
       join(gameId) {
         this.socket.emit("joinGame", gameId);
+      }
+      onGameOver(cb) {
+        this.onGameOverCallback = cb;
       }
       disconnect() {
         this.socket.disconnect();
@@ -4103,6 +4175,8 @@ function initPongMatch(params) {
   const gameID = params?.id;
   const url2 = new URL(window.location.href);
   const localMode = url2.searchParams.get("local") === "1";
+  const replayBtn = document.getElementById("replay-btn");
+  const dashboardBtn = document.getElementById("dashboard-btn");
   const serverUrl = window.location.host;
   let input1 = "stop";
   let input2 = "stop";
@@ -4145,34 +4219,37 @@ function initPongMatch(params) {
     updateInput();
   });
   const keyState = {};
+  const keyState2 = {};
   window.addEventListener("keydown", (e) => {
     keyState[e.key] = true;
+    keyState2[e.key] = true;
   });
   window.addEventListener("keyup", (e) => {
     keyState[e.key] = false;
+    keyState2[e.key] = false;
   });
   function updateInput() {
     if (!currentGame) return;
     if (currentGame.getCurrentState().status == "playing") {
       if (currentGame.isLocalMode()) {
-        if (keyState["w"] || keyState["W"] && input1 != "up")
+        if ((keyState["w"] || keyState["W"]) && input1 != "up")
           input1 = "up";
-        else if (keyState["s"] || keyState["S"] && input1 != "down")
+        else if ((keyState["s"] || keyState["S"]) && input1 != "down")
           input1 = "down";
         else if (input1 != "stop")
           input1 = "stop";
         currentGame.sendInput(input1, "player1");
-        if (keyState["ArrowUp"] && input2 != "up")
+        if (keyState2["ArrowUp"] && input2 != "up")
           input2 = "up";
-        else if (keyState["ArrowDown"] && input2 != "down")
+        else if (keyState2["ArrowDown"] && input2 != "down")
           input2 = "down";
         else if (input2 != "stop")
           input2 = "stop";
         currentGame.sendInput(input2, "player2");
       } else {
-        if (keyState["w"] || keyState["W"] && input != "up")
+        if ((keyState["w"] || keyState["W"]) && input != "up")
           input = "up";
-        else if (keyState["s"] || keyState["S"] && input != "down")
+        else if ((keyState["s"] || keyState["S"]) && input != "down")
           input = "down";
         else if (input != "stop")
           input = "stop";
@@ -4180,6 +4257,23 @@ function initPongMatch(params) {
       }
     }
   }
+  net.onGameOver(() => {
+    if (!currentGame || !renderer)
+      return;
+    renderer.drawGameOver(currentGame.getCurrentState());
+    if (currentGame.isLocalMode()) {
+      replayBtn?.addEventListener("click", async () => {
+        navigateTo(`/gamelocal`);
+      });
+    } else {
+      replayBtn?.addEventListener("click", async () => {
+        navigateTo(`/gameonline`);
+      });
+    }
+    dashboardBtn?.addEventListener("click", async () => {
+      navigateTo(`/dashboard`);
+    });
+  });
 }
 function stopGame() {
   net?.disconnect();
@@ -4350,14 +4444,17 @@ function UpdateInfoView() {
   return document.getElementById("updateinfohtml").innerHTML;
 }
 async function initUpdateInfo() {
+<<<<<<< HEAD
   const profil = await genericFetch("/api/private/updateinfo", {
+=======
+  const profile = await genericFetch("/api/private/profile", {
+>>>>>>> c7632bd29018b259e79a24110c4b38deda366efa
     method: "POST"
   });
-  document.getElementById("profile-username").textContent = profil.pseudo;
+  const avatar = document.getElementById("profile-avatar");
+  avatar.src = profile.avatar + "?ts=" + Date.now();
+  document.getElementById("profile-pseudo").textContent = profile.pseudo;
   await initUpdateUsername();
-  await initUpdateEmail();
-  await initUpdatePassword();
-  await initAvatar();
 }
 async function initUpdateUsername() {
   const formUsername = document.getElementById("change-username-form");
@@ -4378,6 +4475,7 @@ async function initUpdateUsername() {
     }
   });
 }
+<<<<<<< HEAD
 async function initUpdateEmail() {
   const formEmail = document.getElementById("change-email-form");
   formEmail.addEventListener("submit", async (e) => {
@@ -4448,6 +4546,8 @@ async function uploadAvatar(avatar) {
     console.error(err);
   }
 }
+=======
+>>>>>>> c7632bd29018b259e79a24110c4b38deda366efa
 var init_p_updateinfo = __esm({
   "front/src/views/p_updateinfo.ts"() {
     "use strict";
@@ -4765,6 +4865,7 @@ var init_error = __esm({
   }
 });
 
+<<<<<<< HEAD
 // front/src/views/twofa.ts
 function towfaView() {
   return document.getElementById("twofahtml").innerHTML;
@@ -4791,6 +4892,40 @@ async function initTowfa() {
 }
 var init_twofa = __esm({
   "front/src/views/twofa.ts"() {
+=======
+// front/src/views/p_updateemail.ts
+function UpdateEmailView() {
+  loadHeader();
+  return document.getElementById("update-email-html").innerHTML;
+}
+async function initUpdateEmail() {
+  const profile = await genericFetch("/api/private/profile", {
+    method: "POST"
+  });
+  const avatar = document.getElementById("profile-avatar");
+  avatar.src = profile.avatar + "?ts=" + Date.now();
+  document.getElementById("profile-pseudo").textContent = profile.pseudo;
+  const formEmail = document.getElementById("change-email-form");
+  formEmail.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const newEmail = formEmail["new-email"].value;
+    const password = formEmail["password"].value;
+    try {
+      const response = await genericFetch("/api/private/updateinfo/email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ newEmail, password })
+      });
+      alert("Username updated successfully to <<  " + response.email + "  >>");
+      navigateTo("/profile");
+    } catch (err) {
+      alert(err.message);
+    }
+  });
+}
+var init_p_updateemail = __esm({
+  "front/src/views/p_updateemail.ts"() {
+>>>>>>> c7632bd29018b259e79a24110c4b38deda366efa
     "use strict";
     init_router();
   }
@@ -4946,7 +5081,11 @@ var init_router = __esm({
     init_logout();
     init_p_friends();
     init_error();
+<<<<<<< HEAD
     init_twofa();
+=======
+    init_p_updateemail();
+>>>>>>> c7632bd29018b259e79a24110c4b38deda366efa
     routes = [
       { path: "/", view: View, init },
       { path: "/login", view: LoginView, init: initLogin },
@@ -4959,6 +5098,7 @@ var init_router = __esm({
       { path: "/friends", view: FriendsView, init: initFriends },
       { path: "/profile", view: ProfileView, init: initProfile },
       { path: "/updateinfo", view: UpdateInfoView, init: initUpdateInfo },
+      { path: "/updateemail", view: UpdateEmailView, init: initUpdateEmail },
       { path: "/gameonline", view: GameOnlineView, init: GameOnlineinit },
       { path: "/gamelocal", view: GameLocalView, init: GameLocalinit },
       { path: "/pongmatch/:id", view: PongMatchView, init: initPongMatch, cleanup: stopGame },
