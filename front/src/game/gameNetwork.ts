@@ -73,8 +73,8 @@ export class GameNetwork {
 		this.socket.emit("input", { direction, player });
 	}
 
-	join(gameId: number) {
-		this.socket.emit("joinGame", gameId);
+	join(gameId: number, playerId: number) {
+		this.socket.emit("joinGame", gameId, playerId);
 	}
 
 	onGameOver(cb: () => void) {

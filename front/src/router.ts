@@ -114,11 +114,11 @@ export async function getPseudoHeader()
 			break;
 		case "offline": status.classList.add("bg-white");
 	}
-	console.log("notification =", document.getElementById("notification"));
+	// console.log("notification =", document.getElementById("notification"));
 
 	const notification = document.getElementById("notification") as HTMLImageElement;
 	notification.classList.add("hidden");
-	console.log("notif = ", result.notif);
+	// console.log("notif = ", result.notif);
 	if (result.notif === true) {
 		notification.classList.remove("hidden");
 	}

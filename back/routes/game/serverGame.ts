@@ -120,13 +120,12 @@ export function joinGame(playerId: number, gameId: number)
 {
 	const game = games_map.get(gameId);
 	if (game)
-		{
-			if (!(game.idPlayer2))
+	{
+		if (game.idPlayer2 == 0)
 			game.idPlayer2 = playerId;
 		else
 			console.log("Game is already full.");
 	}
-	console.log(game);
 }
 
 export async function endGame(winner_id: number, loser_id: number, winner_score: number,

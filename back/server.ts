@@ -208,6 +208,11 @@ fastify.get("/api/private/game/list", async (request, reply) => {
 	return { games: list };
 });
 
+fastify.get("/api/private/game/playerid", async (request, reply) => {
+	const playerId = request.user?.user_id as any;
+	return Number(playerId);
+});
+
 fastify.post("/api/private/tournament/add", (req, reply) => {
 	return tournamentService.updateTournament(req, reply);
 });

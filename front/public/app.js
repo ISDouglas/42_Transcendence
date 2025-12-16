@@ -4075,8 +4075,8 @@ var init_gameNetwork = __esm({
       sendInput(direction, player) {
         this.socket.emit("input", { direction, player });
       }
-      join(gameId) {
-        this.socket.emit("joinGame", gameId);
+      join(gameId, playerId) {
+        this.socket.emit("joinGame", gameId, playerId);
       }
       onGameOver(cb) {
         this.onGameOverCallback = cb;
@@ -4143,12 +4143,13 @@ function PongMatchView(params) {
   loadHeader();
   return document.getElementById("pongmatchhtml").innerHTML;
 }
-function initPongMatch(params) {
+async function initPongMatch(params) {
   const gameID = params?.id;
   const url2 = new URL(window.location.href);
   const localMode = url2.searchParams.get("local") === "1";
   const replayBtn = document.getElementById("replay-btn");
   const dashboardBtn = document.getElementById("dashboard-btn");
+  const playerId = await genericFetch("/api/private/game/playerid");
   const serverUrl = window.location.host;
   let input1 = "stop";
   let input2 = "stop";
@@ -4162,7 +4163,7 @@ function initPongMatch(params) {
     if (net)
       currentGame?.setNetwork(net, role);
   });
-  net.join(Number(gameID));
+  net.join(Number(gameID), Number(playerId));
   net.onCountdown(() => {
     let countdown = 4;
     const interval = setInterval(() => {
@@ -4899,10 +4900,8 @@ async function getPseudoHeader3() {
       case "offline":
         status.classList.add("bg-white");
     }
-    console.log("notification =", document.getElementById("notification"));
     const notification = document.getElementById("notification");
     notification.classList.add("hidden");
-    console.log("notif = ", result.notif);
     if (result.notif === true) {
       notification.classList.remove("hidden");
     }

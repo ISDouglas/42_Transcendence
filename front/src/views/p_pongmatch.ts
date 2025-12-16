@@ -1,6 +1,6 @@
 import { GameRenderer } from "../game/gameRenderer";
 import { GameNetwork } from "../game/gameNetwork";
-import { loadHeader, navigateTo } from "../router";
+import { genericFetch, loadHeader, navigateTo } from "../router";
 import { GameInstance } from "../game/gameInstance";
 
 let renderer: GameRenderer | null = null;
@@ -12,13 +12,13 @@ export function PongMatchView(params?: any): string {
 	return (document.getElementById("pongmatchhtml") as HTMLTemplateElement).innerHTML;
 }
 
-
-export function initPongMatch(params?: any) {
+export async function initPongMatch(params?: any) {
 	const gameID: string = params?.id;
 	const url = new URL(window.location.href);
 	const localMode = url.searchParams.get("local") === "1";
 	const replayBtn = document.getElementById("replay-btn");
 	const dashboardBtn = document.getElementById("dashboard-btn");
+	const playerId = await genericFetch("/api/private/game/playerid");
 
 	const serverUrl = window.location.host;
 	let input1: "up" | "down" | "stop" = "stop";
@@ -44,7 +44,7 @@ export function initPongMatch(params?: any) {
 	});
 
 	// 5. Join game room
-	net.join(Number(gameID));
+	net.join(Number(gameID), Number(playerId));
 
 	net.onCountdown(() => {
 		let countdown = 4;

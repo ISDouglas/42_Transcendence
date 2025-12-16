@@ -2,14 +2,15 @@ import { Server, Socket } from "socket.io";
 import { applyInput, GameState, resetBall } from "./gameEngine";
 import { ServerGame, games_map, endGame } from "../routes/game/serverGame";
 import { gameInfo } from "../server";
+import { genericFetch } from "../../front/src/router";
 
 export function setupGameServer(io: Server) {
 	io.on("connection", (socket) => {
 		console.log("Client connected:", socket.id);
 
-		socket.on("joinGame", async (gameId: number) => {
+		socket.on("joinGame", async (gameId: number, playerId: number) => {
 			let game = games_map.get(gameId);
-
+			
 			if (!game)
 				return;
 
@@ -22,7 +23,7 @@ export function setupGameServer(io: Server) {
 			if (game.isLocal === true)
 				initLocal(game, io, socket, gameId);
 			else
-				initRemoteAndAi(game, io, socket, gameId);
+				initRemoteAndAi(game, io, socket, gameId, playerId);
 
 			//after countdown, match is starting
 			socket.on("startGame", () => {
@@ -89,7 +90,6 @@ export function checkForWinner(game: ServerGame, io: Server)
 		}
 		io.to(`game-${game.id}`).emit("gameOver");
 		io.in(`game-${game.id}`).socketsLeave(`game-${game.id}`);
-		console.log("function checkforwinner done");
 	}
 }
 
@@ -129,27 +129,44 @@ function initLocal(game: ServerGame, io: Server, socket: Socket, gameId: number)
 	}
 }
 
-function initRemoteAndAi(game: ServerGame, io: Server, socket: Socket, gameId: number) {
-	// automatic assignation
+async function initRemoteAndAi(game: ServerGame, io: Server, socket: Socket, gameId: number, playerId: number) {
+	
 	let role: "player1" | "player2";
-	if (!game.sockets.player1)
+
+	if (playerId === game.idPlayer1)
 	{
+		role = "player1";
 		game.sockets.player1 = socket.id;
-		role = "player1";
 	}
-	else if (!game.sockets.player2 && game.sockets.player1 !== socket.id)
+	else if (playerId === game.idPlayer2)
 	{
+		role = "player2";
 		game.sockets.player2 = socket.id;
-		role = "player2";
 	}
-	else if (game.sockets.player1 === socket.id)
-	{
-		role = "player1";
-	}
-	else if (game.sockets.player2 === socket.id)
-	{
-		role = "player2";
-	}
+	// else if (game.idPlayer1 == 0)
+	// {
+	// 	role = "player1";
+	// 	game.sockets.player1 = socket.id;
+	// }
+	// // automatic assignation
+	// if (!game.sockets.player1)
+	// {
+	// 	game.sockets.player1 = socket.id;
+	// 	role = "player1";
+	// }
+	// else if (!game.sockets.player2 && game.sockets.player1 !== socket.id)
+	// {
+	// 	game.sockets.player2 = socket.id;
+	// 	role = "player2";
+	// }
+	// else if (game.sockets.player1 === socket.id)
+	// {
+	// 	role = "player1";
+	// }
+	// else if (game.sockets.player2 === socket.id)
+	// {
+	// 	role = "player2";
+	// }
 	else
 	{
 		socket.emit("gameFull"); // => UNUSED SO FAR
