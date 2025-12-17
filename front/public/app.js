@@ -249,7 +249,7 @@ function GameOnlineinit() {
     const { gameId } = await genericFetch("/api/private/game/create", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ localMode: false })
+      body: JSON.stringify({ localMode: false, type: "Online" })
     });
     navigateTo(`/pongmatch/${gameId}`);
   });
@@ -314,9 +314,9 @@ function GameLocalinit() {
     const { gameId } = await genericFetch("/api/private/game/create", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ localMode: true })
+      body: JSON.stringify({ localMode: true, type: "Local" })
     });
-    navigateTo(`/pongmatch/${gameId}?local=1`);
+    navigateTo(`/pongmatch/${gameId}`);
   });
   const pvaiButton = document.getElementById("pvai");
   pvaiButton?.addEventListener("click", async () => {
@@ -4060,8 +4060,8 @@ var init_gameNetwork = __esm({
       sendInput(direction, player) {
         this.socket.emit("input", { direction, player });
       }
-      join(gameId) {
-        this.socket.emit("joinGame", gameId);
+      join(gameId, playerId) {
+        this.socket.emit("joinGame", gameId, playerId);
       }
       onGameOver(cb) {
         this.onGameOverCallback = cb;
@@ -4085,7 +4085,8 @@ var init_gameInstance = __esm({
           ball: { x: 300, y: 240 },
           paddles: { player1: 210, player2: 210 },
           score: { player1: 0, player2: 0 },
-          status: "waiting"
+          status: "waiting",
+          pseudo: { player1: "", player2: "" }
         };
         this.network = null;
         this.localMode = false;
@@ -4128,31 +4129,43 @@ function PongMatchView(params) {
   loadHeader();
   return document.getElementById("pongmatchhtml").innerHTML;
 }
-function initPongMatch(params) {
+async function initPongMatch(params) {
   const gameID = params?.id;
-  const url2 = new URL(window.location.href);
-  const localMode = url2.searchParams.get("local") === "1";
   const replayBtn = document.getElementById("replay-btn");
   const dashboardBtn = document.getElementById("dashboard-btn");
+  const pseudoP1 = document.getElementById("player1-name");
+  const pseudoP2 = document.getElementById("player2-name");
+  const res = await genericFetch("/api/private/game/playerinfo");
+  const resType = await genericFetch("/api/private/game/type", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      gameId: gameID
+    })
+  });
+  const { playerId } = res;
+  const type = resType.type;
   const serverUrl = window.location.host;
   let input1 = "stop";
   let input2 = "stop";
   let input = "stop";
   currentGame = new GameInstance();
   renderer = new GameRenderer();
-  if (localMode)
+  if (type == "Local") {
     currentGame.enableLocalMode();
+  }
   net = new GameNetwork(serverUrl, Number(gameID));
   net.onRole((role) => {
     if (net)
       currentGame?.setNetwork(net, role);
   });
-  net.join(Number(gameID));
+  net.join(Number(gameID), Number(playerId));
   net.onCountdown(() => {
     let countdown = 4;
     const interval = setInterval(() => {
       if (!currentGame || !renderer)
         return;
+      updatePseudo();
       renderer.drawCountdown(currentGame.getCurrentState(), countdown);
       countdown--;
       if (countdown < 0) {
@@ -4166,12 +4179,14 @@ function initPongMatch(params) {
     if (!currentGame || !renderer)
       return;
     currentGame.applyServerState(state);
+    updatePseudo();
     renderer.draw(currentGame.getCurrentState(), false);
   });
   net.onState((state) => {
     if (!currentGame || !renderer)
       return;
     currentGame.applyServerState(state);
+    updatePseudo();
     renderer.draw(currentGame.getCurrentState(), true);
     updateInput();
   });
@@ -4212,6 +4227,14 @@ function initPongMatch(params) {
           input = "stop";
         currentGame.sendInput(input);
       }
+    }
+  }
+  function updatePseudo() {
+    if (currentGame) {
+      if (pseudoP1)
+        pseudoP1.innerText = currentGame.getCurrentState().pseudo.player1;
+      if (pseudoP2)
+        pseudoP2.innerText = currentGame.getCurrentState().pseudo.player2;
     }
   }
   net.onGameOver(() => {
@@ -4904,7 +4927,20 @@ async function getPseudoHeader3() {
     const avatar = document.getElementById("header-avatar");
     const status = document.getElementById("status");
     avatar.src = result.avatar + "?ts" + Date.now();
+<<<<<<< HEAD
+    switch (result.status) {
+      case "online":
+        status.classList.add("bg-green-500");
+        break;
+      case "busy":
+        status.classList.add("bg-red-500");
+        break;
+      case "offline":
+        status.classList.add("bg-white");
+    }
+=======
     displayStatus(result, status);
+>>>>>>> main
     const notification = document.getElementById("notification");
     notification.classList.add("hidden");
     if (result.notif === true) {
