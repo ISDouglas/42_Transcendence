@@ -30,6 +30,7 @@ export async function initPongMatch(params?: any) {
 
 	const { playerId } = res;
 	const type = resType.type;
+	console.log("type :", type);
 
 	const serverUrl = window.location.host;
 	let input1: "up" | "down" | "stop" = "stop";
@@ -166,7 +167,8 @@ export async function initPongMatch(params?: any) {
 		if (!currentGame || !renderer)
 			return;
 		renderer.drawGameOver(currentGame.getCurrentState());
-		if (currentGame.isLocalMode())
+		console.log("type :", type);
+		if (currentGame.isLocalMode() || type == "AI")
 		{
 			replayBtn?.addEventListener("click", async () => {
 				navigateTo(`/gamelocal`);

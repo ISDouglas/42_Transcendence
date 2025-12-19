@@ -182,7 +182,7 @@ fastify.post("/api/private/friend/search", async( request: FastifyRequest, reply
 })
 
 fastify.post("/api/private/game/create", async (request, reply) => {
-	const { localMode, type } = request.body as { localMode: boolean, type: "Local" | "IA" | "Online" | "Tournament" };
+	const { localMode, type } = request.body as { localMode: boolean, type: "Local" | "AI" | "Online" | "Tournament" };
 	const playerId = request.user?.user_id as any;
 	const { vsAI } = request.body as { vsAI: boolean };
 	let gameId: number;

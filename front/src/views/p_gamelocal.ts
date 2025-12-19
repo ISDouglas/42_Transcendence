@@ -22,7 +22,7 @@ export function GameLocalinit() {
 		const { gameId } = await genericFetch("/api/private/game/create", {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({ vsAI }),
+			body: JSON.stringify({ vsAI ,type: "Local" }),
 		});
 		navigateTo(`/pongmatch/${gameId}`);
 	});

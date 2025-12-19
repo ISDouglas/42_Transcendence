@@ -324,7 +324,7 @@ function GameLocalinit() {
     const { gameId } = await genericFetch("/api/private/game/create", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ vsAI })
+      body: JSON.stringify({ vsAI, type: "Local" })
     });
     navigateTo(`/pongmatch/${gameId}`);
   });
@@ -380,14 +380,18 @@ var init_gameRenderer = __esm({
           this.ctx.fillStyle = "white";
           this.ctx.textAlign = "center";
           if (state.score.player1 > state.score.player2) {
+            const pseudo = state.pseudo.player1;
+            const str = pseudo + " wins!";
             this.ctx.fillText(
-              "Player1 wins!",
+              str,
               this.canvas.width / 2,
               this.canvas.height * 0.75
             );
           } else {
+            const pseudo = state.pseudo.player2;
+            const str = pseudo + " wins!";
             this.ctx.fillText(
-              "Player2 wins!",
+              str,
               this.canvas.width / 2,
               this.canvas.height * 0.75
             );
@@ -4145,6 +4149,7 @@ async function initPongMatch(params) {
   });
   const { playerId } = res;
   const type = resType.type;
+  console.log("type :", type);
   const serverUrl = window.location.host;
   let input1 = "stop";
   let input2 = "stop";
@@ -4241,7 +4246,8 @@ async function initPongMatch(params) {
     if (!currentGame || !renderer)
       return;
     renderer.drawGameOver(currentGame.getCurrentState());
-    if (currentGame.isLocalMode()) {
+    console.log("type :", type);
+    if (currentGame.isLocalMode() || type == "AI") {
       replayBtn?.addEventListener("click", async () => {
         navigateTo(`/gamelocal`);
       });

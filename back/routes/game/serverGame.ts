@@ -12,7 +12,7 @@ export class ServerGame {
 	idPlayer1: number;
 	idPlayer2: number;
 	status: "waiting" | "playing" | "finished" | "countdown" | "disconnected";
-	type: "Local" | "IA" | "Online" | "Tournament";
+	type: "Local" | "AI" | "Online" | "Tournament";
 	gameDate: string;
 	duration: number;
 	isLocal: boolean;
@@ -86,7 +86,7 @@ function getDate(id: number)
 	return games_map.get(id)?.gameDate;
 }
 
-export function createGame(PlayerId: number,  isLocal: boolean, type: "Local" | "IA" | "Online" | "Tournament", options: { vsAI: boolean }): number 
+export function createGame(PlayerId: number,  isLocal: boolean, type: "Local" | "AI" | "Online" | "Tournament", options: { vsAI: boolean }): number 
 {
 	let id: number = 1;
 	while (games_map.has(id))
@@ -98,7 +98,7 @@ export function createGame(PlayerId: number,  isLocal: boolean, type: "Local" | 
 	if (options.vsAI)
 	{
 		game.idPlayer2 = -1;
-		game.type = "IA";
+		game.type = "AI";
 	}
 	games_map.set(gameId, game);
 	return gameId;

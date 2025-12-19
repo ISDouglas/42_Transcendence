@@ -53,16 +53,20 @@ export class GameRenderer {
 			this.ctx.textAlign = "center";
 			if (state.score.player1 > state.score.player2)
 			{
+				const pseudo = state.pseudo.player1;
+				const str = pseudo + " wins!";
 				this.ctx.fillText(
-					"Player1 wins!",
+					str,
 					this.canvas.width / 2,
 					this.canvas.height * .75
 				);
 			}
 			else
 			{
+				const pseudo = state.pseudo.player2;
+				const str = pseudo + " wins!";
 				this.ctx.fillText(
-					"Player2 wins!",
+					str,
 					this.canvas.width / 2,
 					this.canvas.height * .75
 				);

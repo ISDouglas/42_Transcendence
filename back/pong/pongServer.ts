@@ -2,7 +2,6 @@ import { Server, Socket } from "socket.io";
 import { applyInput, GameState, resetBall } from "./gameEngine";
 import { ServerGame, games_map, endGame } from "../routes/game/serverGame";
 import { gameInfo } from "../server";
-import { genericFetch } from "../../front/src/router";
 import { Users } from "../DB/users";
 
 export function setupGameServer(io: Server, users: Users) {
