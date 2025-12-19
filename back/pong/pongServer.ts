@@ -20,6 +20,11 @@ export function setupGameServer(io: Server, users: Users) {
 			// join room
 			socket.join(`game-${gameId}`);
 
+			if (game.disconnectTimer) {
+				clearTimeout(game.disconnectTimer);
+				game.disconnectTimer = null;
+			}
+
 			if (game.isLocal === true)
 				initLocal(game, io, socket, gameId, pseudo.pseudo);
 			else
@@ -63,6 +68,13 @@ export function setupGameServer(io: Server, users: Users) {
 
 				if (game.status == "playing")
 					game.status = "disconnected";
+
+				if (!game.disconnectTimer) {
+					game.disconnectTimer = setTimeout(() => {
+						console.log("Timeout disconnected game : ", gameId);
+						games_map.delete(gameId);
+					}, 5 * 60 * 1000);
+				}
 			});
 		});
 	});

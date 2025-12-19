@@ -19,6 +19,7 @@ export class ServerGame {
 	lastTick: number;
 	sockets: { player1: string | null, player2: string | null };
 	intervalId: NodeJS.Timeout;
+	disconnectTimer: NodeJS.Timeout | null;
 
 	state: GameState & { aiLastUpdate?: number };
 
@@ -40,6 +41,7 @@ export class ServerGame {
 		this.intervalId = setInterval(() => {
 			this.gameLoop();
 		}, TICK_RATE);
+		this.disconnectTimer = null;
 
 		this.state = {
 			ball: { x: width / 2, y: height / 2, speedX: 2.5, speedY: 2 },
