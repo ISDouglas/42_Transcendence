@@ -271,7 +271,7 @@ const start = async () => {
 		await fastify.listen({ port: PORT, host: "0.0.0.0" });
 		console.log(`Server running on port ${PORT}`);
 		await db.connect();
-		// await users.deleteUserTable();
+		await users.deleteUserTable();
 		// await gameInfo.deleteGameInfoTable();
 		// await friends.deleteFriendTable();
 		await users.createUserTable();
@@ -281,8 +281,8 @@ const start = async () => {
 		await tournament.createTournamentTable();
 		await users.CreateUserIA();
 		await users.CreateUserGuest();
-		// const hashedPassword = await bcrypt.hash("42", 12);
-		// users.addUser("42", "42", hashedPassword);
+		const hashedPassword = await bcrypt.hash("42", 12);
+		users.addUser("42", "42", hashedPassword);
 		// friends.addFriendship(5, 6);
 		// friends.addFriendship(4, 5);
 	} catch (err) {

@@ -4,6 +4,7 @@ import { GameState, updateBall, updatePaddles } from "../../pong/gameEngine";
 import { simulateAI } from "../../pong/simulateAI";
 import { checkForWinner, serializeForClient } from "../../pong/pongServer";
 import { Server } from "socket.io";
+import { users } from "../../server";
 
 const TICK_RATE = 16;
 
@@ -150,5 +151,7 @@ export async function endGame(winner_id: number, loser_id: number, winner_score:
 {
 	const gameDate: any = getDate(Number(gameid));
 	await gameInfo.finishGame(winner_id, loser_id, winner_score, loser_score, duration_game, gameDate, type);
+	if (type === "Online")
+		users.updateElo(winner_id, loser_id, winner_score, loser_score);
 	games_map.delete(gameid);
 }
