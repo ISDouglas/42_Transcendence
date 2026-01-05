@@ -85,16 +85,46 @@ export function setupGameServer(io: Server, users: Users) {
 		socket.on("joinTournament", async (tournamentId: number, playerId: number) => {
 			let tournament = tournaments_map.get(tournamentId);
 			
-			if (!tournament)
+			if (!tournament || playerId === undefined)
 				return;
+
+			tournament.setIo(io);
+			const pseudo = await users.getPseudoFromId(playerId);
 
 			// join room
 			socket.join(`tournament-${tournamentId}`);
 
-			io.to(`tournament-${tournamentId}`).emit(
-				"tournamentPlayersUpdate",
-				tournament.idPlayers
-			);
+			console.log("id : ", playerId);
+			console.log("id players : ", tournament.idPlayers);
+			console.log("pseudo : ", pseudo.pseudo);
+
+			if (playerId === tournament.idPlayers[0])
+			{
+				tournament.sockets.player1 = socket.id;
+				tournament.pseudoPlayers[0] = pseudo.pseudo;
+			}
+			else if (playerId === tournament.idPlayers[1])
+			{
+				tournament.sockets.player2 = socket.id;
+				tournament.pseudoPlayers[1] = pseudo.pseudo;
+			}
+			else if (playerId === tournament.idPlayers[2])
+			{
+				tournament.sockets.player3 = socket.id;
+				tournament.pseudoPlayers[2] = pseudo.pseudo;
+			}
+			else if (playerId === tournament.idPlayers[3])
+			{
+				tournament.sockets.player4 = socket.id;
+				tournament.pseudoPlayers[3] = pseudo.pseudo;
+			}
+			else
+			{
+				console.log("oupsi");
+				return;
+			}
+
+			io.to(`tournament-${tournamentId}`).emit("tournamentPlayersUpdate", tournament.idPlayers, tournament.pseudoPlayers);
 		});
 	});
 }

@@ -2,7 +2,7 @@ import { io, Socket } from "socket.io-client";
 
 export class TournamentNetwork {
 	private socket: Socket;
-	private onStateCallback?: (idPlayers: number[]) => void;
+	private onStateCallback?: (idPlayers: number[], pseudoPlayers: string[]) => void;
 
 	private onDisconnectionCallback?: () => void;
 
@@ -13,8 +13,8 @@ export class TournamentNetwork {
 			this.socket.emit("joinTournament", tournamentId);
 		});
 
-		this.socket.on("tournamentPlayersUpdate", (idPlayers: number[]) => {
-			this.onStateCallback?.(idPlayers);
+		this.socket.on("tournamentPlayersUpdate", (idPlayers: number[], pseudoPlayers: string[]) => {
+			this.onStateCallback?.(idPlayers, pseudoPlayers);
 		});
 
 
@@ -23,7 +23,7 @@ export class TournamentNetwork {
 		});
 	}
 
-	onState(cb: (idPlayers: number[]) => void) {
+	onState(cb: (idPlayers: number[], pseudoPlayers: string[]) => void) {
 		this.onStateCallback = cb;
 	}
 
@@ -36,6 +36,7 @@ export class TournamentNetwork {
 	}
 
 	join(gameId: number, playerId: number) {
+		console.log("playerId front : ", playerId);
 		this.socket.emit("joinTournament", gameId, playerId);
 	}
 

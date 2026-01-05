@@ -14,15 +14,9 @@ export async function initBrackets(params?: any) {
 	const pseudoP2 = document.getElementById("player2-name");
 	const pseudoP3 = document.getElementById("player3-name");
 	const pseudoP4 = document.getElementById("player4-name");
-	const pseudoP5 = document.getElementById("player5-name");
-	const pseudoP6 = document.getElementById("player6-name");
-	const pseudoP7 = document.getElementById("player7-name");
-	const pseudoP8 = document.getElementById("player8-name");
 	const pseudos = [
-		pseudoP1, pseudoP2, pseudoP3, pseudoP4,
-		pseudoP5, pseudoP6, pseudoP7, pseudoP8
+		pseudoP1, pseudoP2, pseudoP3, pseudoP4
 	];
-
 
 	const id = await genericFetch("/api/private/game/playerinfo");
 
@@ -30,23 +24,24 @@ export async function initBrackets(params?: any) {
 
 	net = new TournamentNetwork(serverUrl, Number(tournamentID));
 
-	net.join(Number(tournamentID), Number(id));
+	net.join(Number(tournamentID), Number(id.playerId));
 
-	net.onState((idPlayers: number[]) => {
-		updateBrackets(idPlayers);
+	net.onState((idPlayers: number[], pseudoPlayers: string[]) => {
+		updateBrackets(idPlayers, pseudoPlayers);
 	});
 
-	async function updateBrackets(idPlayers: number[]) {
-		for (let i = 0; i < 8; i++) {
-			const el = pseudos[i];
+	async function updateBrackets(idPlayers: number[], pseudoPlayers: string[]) {
+		for (let i = 0; i < 4; i++) {
+			const pseudo = pseudos[i];
+			console.log("pseudo front : ", pseudoPlayers[i]);
 			const playerId = Number(idPlayers[i]);
 
-			if (!el) continue;
+			if (!pseudo) continue;
 
 			if (playerId === 1) {
-				el.innerText = "En attente...";
+				pseudo.innerText = "En attente...";
 			} else {
-				el.innerText = `Player ${playerId}`;
+				pseudo.innerText = pseudoPlayers[i];
 			}
 		}
 	}

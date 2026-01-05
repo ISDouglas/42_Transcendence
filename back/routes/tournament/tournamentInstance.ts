@@ -1,15 +1,26 @@
 export const tournaments_map = new Map<number, TournamentInstance>();
+import { Server } from "socket.io";
 import { ServerGame } from "../game/serverGame";
 
 export class TournamentInstance {
 	id: number;
 	games = new Map<number, ServerGame>();
 	idPlayers: number[];
+	sockets: { player1: string | null, player2: string | null, player3: string | null, player4: string | null };
+	pseudoPlayers: string[];
+	private io?: Server;
 
-	constructor(id: number)
+	constructor(id: number, io?: Server)
 	{
 		this.id = id;
-		this.idPlayers = Array(8).fill(1);
+		this.idPlayers = Array(4).fill(1);
+		this.sockets = { player1: null, player2: null, player3: null, player4: null };
+		this.pseudoPlayers = Array(4);
+		this.io = io;
+	}
+
+	setIo(io: Server) {
+		this.io = io;
 	}
 }
 
@@ -44,7 +55,7 @@ export function joinTournament(playerId: number, gameId: number)
 	{
 		if (tournament.idPlayers.includes(playerId))
 			return;
-		for (let i = 0; i < 9; i++)
+		for (let i = 0; i < 4; i++)
 		{
 			if (tournament.idPlayers[i] == 1)
 			{
