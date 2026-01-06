@@ -4476,7 +4476,6 @@ var init_tournamentNetwork = __esm({
         this.socket.emit("startGame");
       }
       join(gameId, playerId) {
-        console.log("playerId front : ", playerId);
         this.socket.emit("joinTournament", gameId, playerId);
       }
       disconnect() {
@@ -4518,12 +4517,16 @@ async function initBrackets(params) {
       const playerId = Number(idPlayers[i]);
       if (!pseudo) continue;
       if (playerId === 1) {
-        pseudo.innerText = "En attente...";
+        pseudo.innerText = "Waiting for player...";
       } else {
         pseudo.innerText = pseudoPlayers[i];
       }
     }
   }
+}
+function stopTournament() {
+  net2?.disconnect();
+  net2 = null;
 }
 var net2;
 var init_p_brackets = __esm({
@@ -5297,7 +5300,7 @@ var init_router = __esm({
       { path: "/gamelocal", view: GameLocalView, init: GameLocalinit },
       { path: "/pongmatch/:id", view: PongMatchView, init: initPongMatch, cleanup: stopGame },
       { path: "/tournament", view: TournamentView },
-      { path: "/brackets/:id", view: BracketsView, init: initBrackets },
+      { path: "/brackets/:id", view: BracketsView, init: initBrackets, cleanup: stopTournament },
       { path: "/error", view: ErrorView, init: initError }
     ];
     currentRoute = null;

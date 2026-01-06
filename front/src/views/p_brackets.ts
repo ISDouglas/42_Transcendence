@@ -39,10 +39,16 @@ export async function initBrackets(params?: any) {
 			if (!pseudo) continue;
 
 			if (playerId === 1) {
-				pseudo.innerText = "En attente...";
+				pseudo.innerText = "Waiting for player...";
 			} else {
 				pseudo.innerText = pseudoPlayers[i];
 			}
 		}
 	}
+}
+
+export function stopTournament()
+{
+	net?.disconnect();
+	net = null;
 }

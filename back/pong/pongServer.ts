@@ -58,7 +58,7 @@ export function setupGameServer(io: Server, users: Users) {
 				const game = games_map.get(gameId);
 				if (!game)
 					return;
-				
+
 				console.log("Client disconnected:", socket.id);
 
 				if (game!.sockets.player1 === socket.id)
@@ -125,6 +125,27 @@ export function setupGameServer(io: Server, users: Users) {
 			}
 
 			io.to(`tournament-${tournamentId}`).emit("tournamentPlayersUpdate", tournament.idPlayers, tournament.pseudoPlayers);
+
+			socket.on("disconnect", () => {
+				let tournament = tournaments_map.get(tournamentId);
+				if (!tournament)
+					return;
+
+				console.log("Client disconnected:", socket.id);
+
+				if (tournament.sockets.player1 === socket.id)
+					tournament.sockets.player1 = null;
+
+				if (tournament.sockets.player2 === socket.id)
+					tournament.sockets.player2 = null;
+
+				if (tournament.sockets.player3 === socket.id)
+					tournament.sockets.player3 = null;
+
+				if (tournament.sockets.player4 === socket.id)
+					tournament.sockets.player4 = null;
+
+			});
 		});
 	});
 }

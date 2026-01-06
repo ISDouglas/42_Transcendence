@@ -2,12 +2,15 @@ export const tournaments_map = new Map<number, TournamentInstance>();
 import { Server } from "socket.io";
 import { ServerGame } from "../game/serverGame";
 
+
 export class TournamentInstance {
 	id: number;
 	games = new Map<number, ServerGame>();
 	idPlayers: number[];
 	sockets: { player1: string | null, player2: string | null, player3: string | null, player4: string | null };
 	pseudoPlayers: string[];
+	arr_index: number[];
+	index: number;
 	private io?: Server;
 
 	constructor(id: number, io?: Server)
@@ -17,6 +20,8 @@ export class TournamentInstance {
 		this.sockets = { player1: null, player2: null, player3: null, player4: null };
 		this.pseudoPlayers = Array(4);
 		this.io = io;
+		this.arr_index = [0, 2, 1, 3];
+		this.index = 0;
 	}
 
 	setIo(io: Server) {
@@ -55,11 +60,13 @@ export function joinTournament(playerId: number, gameId: number)
 	{
 		if (tournament.idPlayers.includes(playerId))
 			return;
-		for (let i = 0; i < 4; i++)
+
+		let i = tournament.index;
+		for (i; i < 4; i++)
 		{
-			if (tournament.idPlayers[i] == 1)
+			if (tournament.idPlayers[tournament.arr_index[i]] == 1)
 			{
-				tournament.idPlayers[i] = playerId;
+				tournament.idPlayers[tournament.arr_index[i]] = playerId;
 				return;
 			}
 		}

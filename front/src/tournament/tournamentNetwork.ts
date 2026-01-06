@@ -36,7 +36,6 @@ export class TournamentNetwork {
 	}
 
 	join(gameId: number, playerId: number) {
-		console.log("playerId front : ", playerId);
 		this.socket.emit("joinTournament", gameId, playerId);
 	}
 
