@@ -35,7 +35,7 @@ async function myFriends(acceptedFriends: IMyFriends[]) {
 	if (!container)
 		return;
 	if (acceptedFriends.length === 0) {
-		container.innerHTML = `<p class="text-xl italic text-center text-amber-800">No friend yet</p>`;
+		container.innerHTML = `<p class="text-l italic text-center text-amber-800">No friend yet</p>`;
 		return;
 	}
 	acceptedFriends.forEach(async (friend: IMyFriends) => {
@@ -196,7 +196,7 @@ function pendingFr(pendingFriends: IMyFriends[]) {
 	if (!container)
 		return;
 	if (pendingFriends.length === 0) {
-		container.innerHTML = `<p class="text-xl italic text-center text-amber-800">No pending invitation</p>`;
+		container.innerHTML = `<p class="text-l italic text-center text-amber-800">No pending invitation</p>`;
 		return;
 	}
 	pendingFriends.forEach(async (friend: IMyFriends) => {
@@ -218,6 +218,8 @@ function pendingFr(pendingFriends: IMyFriends[]) {
 }
 
 function youMayKnow(opponent: {id: number, pseudo: string, avatar: string}[]) {
+
+	console.log(opponent, opponent.length);
 	const divNoOpponent = document.getElementById("no-opponent") as HTMLElement;
 	const divOpponent = document.getElementById("opponent") as HTMLElement;
 	if (opponent.length === 0) {
