@@ -4684,7 +4684,7 @@ function toAcceptFriend(friend, li) {
     toDeleteFriend(friend.id, li);
     return button;
   }
-  button.textContent = "Accept invitation";
+  button.textContent = "Accept";
   button.classList.add("hover:bg-amber-800");
   button.addEventListener("click", async () => {
     try {
@@ -4741,7 +4741,7 @@ function pendingFr(pendingFriends) {
     pseudo.textContent = friend.pseudo;
     avatar.src = friend.avatar;
     avatar.alt = `${friend.pseudo}'s avatar`;
-    date.textContent = "Pending since " + new Date(friend.friendship_date).toLocaleDateString();
+    date.textContent = "pending since " + new Date(friend.friendship_date).toLocaleDateString();
     toAcceptFriend(friend, clone);
     item.appendChild(clone);
     container.appendChild(item);

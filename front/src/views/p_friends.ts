@@ -147,7 +147,7 @@ function toAcceptFriend(friend: IMyFriends,li: DocumentFragment ) {
 		toDeleteFriend(friend.id, li);
 		return button;
 	}
-	button.textContent = "Accept invitation";
+	button.textContent = "Accept";
 	button.classList.add("hover:bg-amber-800");
 	// button.className = "px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600";
 	button.addEventListener("click", async () => {
@@ -210,7 +210,7 @@ function pendingFr(pendingFriends: IMyFriends[]) {
 		pseudo.textContent = friend.pseudo;
   		avatar.src =  friend.avatar;
 		avatar.alt = `${friend.pseudo}'s avatar`;
-		date.textContent = "Pending since " + new Date(friend.friendship_date).toLocaleDateString();		
+		date.textContent = "pending since " + new Date(friend.friendship_date).toLocaleDateString();		
 		toAcceptFriend(friend, clone);
 		item.appendChild(clone);
 		container.appendChild(item);
@@ -234,13 +234,9 @@ function youMayKnow(opponent: {id: number, pseudo: string, avatar: string}[]) {
 		const clone = template.content.cloneNode(true) as DocumentFragment;
 		const avatar = clone.getElementById("avatar") as HTMLImageElement;
 		const pseudo = clone.getElementById("pseudo") as HTMLParagraphElement;
-		// const date = clone.getElementById("date-friendship") as HTMLParagraphElement;
-		// const status = clone.getElementById("f_status") as HTMLImageElement;
 		pseudo.textContent = user.pseudo;
   		avatar.src =  user.avatar;
 		avatar.alt = `${user.pseudo}'s avatar`;
-		// date.textContent = "friend since " + new Date(friend.friendship_date).toLocaleDateString();		
-		// displayStatus(friend, status);
 		toAddFriend(user.id, clone);
 		item.appendChild(clone);
 		container.appendChild(item);
