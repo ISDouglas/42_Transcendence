@@ -8,10 +8,10 @@
 	<body>
 	<img src="/src/image/bg-croissant-white.jpg" 
 		alt="bgcroissant"
-		class="absolute block dark:hidden -z-10 object-cover w-full h-screen">
+		class="fixed inset-0 block dark:hidden -z-10 object-cover w-full h-screen">
 	<img src="/src/image/bg-croissant-black.jpg" 
 		alt="bgcroissant"
-		class="absolute -z-10 hidden dark:block object-cover w-full h-screen">
+		class="fixed inset-0 -z-10 hidden dark:block object-cover w-full h-screen">
 	<header id="header-container" ></header>
 	<main id="app"></main>
 
@@ -758,6 +758,9 @@
 	</template>
 
 	<template id="profilehtml">
+		<div>
+			<br>
+		</div>
 		<main class="flex">
 			<div class="bg-[linear-gradient(180deg,var(--color-amber-400)_20%,var(--color-amber-50)_20%)] 
 						ring-4 ring-amber-900 flex flex-col w-100 h-full rounded-lg mt-2 
@@ -779,7 +782,7 @@
 					<option value="busy">🔴 busy </option>
 					<option value="offline">⚫ offline </option>
 				</select>
-				<div class="flex flex-col">
+				<div class="flex flex-col mt-6">
 					<div class="flex items-start shadow-sm text-amber-900 bg-amber-300/20 w-80 ring-1 h-16 pt-1 ring-amber-900 rounded-lg mt-6">
 						<img class="bg-blue-700 shadow-sm my-1 px-1 rounded-lg size-12 invert ml-2 items-start" src="/src/image/email.png" alt="">
 						<div>
@@ -791,7 +794,7 @@
 						</a>
 					</div>
 					<div class="flex items-start shadow-sm text-amber-900 bg-amber-300/20 w-80 ring-1 h-16 pt-1 ring-amber-900 rounded-lg mt-6">
-						<img class="bg-blue-700 shadow-sm my-1 px-1 rounded-lg size-12 invert ml-2 items-start" src="/src/image/cadenas.png" alt="">
+						<img class="bg-blue-700 shadow-sm my-1 px-1 rounded-lg size-12 invert ml-2 items-start" src="/src/image/password.png" alt="">
 						<div>
 							<h1 class="ml-2 font-bold">Password</h1>
 							<p class="ml-2">••••••••••••</p>
@@ -820,18 +823,27 @@
 							<h1 class="ml-2 font-bold">Two-Factor Authentication</h1>
 							<p id="twofa-status" class="ml-2"></p>
 						</div>
-						<a class="size-6 mt-4 ml-auto justify-end mr-5 object-contain" href="/updatepassword">
+						<a class="size-6 mt-4 ml-auto justify-end mr-5 object-contain" href="/update2fa">
 							<img class="invert p-0.5 bg-blue-600 rounded-md" src="src/image/crayon.png" alt="crayon">
 						</a>
 					</div>
 				</div>
+				<div>
+					<br>
+				</div>
 			</div>
 		</main>
+		<div>
+			<br>
+		</div>
 	</template>
 
 	<template id="update-email-html">
+		<div>
+			<br>
+		</div>
 		<main class="flex">
-			<div class="bg-[linear-linear(180deg,var(--color-amber-400)_20%,var(--color-amber-50)_20%)] 
+			<div class="bg-[linear-gradient(180deg,var(--color-amber-400)_20%,var(--color-amber-50)_20%)]
 						ring-4 ring-amber-900 flex flex-col w-100 h-full rounded-lg mt-2 
 						mx-auto shadow-2xl items-center">
 				<div class="flex flex-row w-100 mt-3 justify-between">
@@ -850,7 +862,7 @@
 					<!-- Change Email -->
 					<div class="flex flex-col shadow-sm text-amber-900 bg-amber-300/20
 								w-80 ring-1 ring-amber-900 rounded-lg mt-6 p-3">
-						<h2 class="font-bold mb-2">Change Email</h2>
+						<h2 class="font-bold mb-2 text-center">Change Email</h2>
 						<form id="change-email-form" class="flex flex-col gap-2">
 							<h2 class="text-sm text-amber-900 dark:text-white mt-3 mb-0.5">New Email</h2>
 							<input
@@ -879,11 +891,17 @@
 				</div>
 			</div>
 		</main>
+		<div>
+			<br>
+		</div>
 	</template>
 
 	<template id="update-username-html">
+		<div>
+			<br>
+		</div>
 		<main class="flex">
-			<div class="bg-[linear-linear(180deg,var(--color-amber-400)_20%,var(--color-amber-50)_20%)] 
+			<div class="bg-[linear-gradient(180deg,var(--color-amber-400)_20%,var(--color-amber-50)_20%)]
 						ring-4 ring-amber-900 flex flex-col w-100 h-full rounded-lg mt-2 
 						mx-auto shadow-2xl items-center">
 				<div class="flex flex-row w-100 mt-3 justify-between">
@@ -902,7 +920,7 @@
 					<!-- Change Username -->
 					<div class="flex flex-col shadow-sm text-amber-900 bg-amber-300/20
 								w-80 ring-1 ring-amber-900 rounded-lg mt-6 p-3">
-						<h2 class="font-bold mb-2">Change Username</h2>
+						<h2 class="font-bold mb-2 text-center">Change Username</h2>
 						<form id="change-username-form" class="flex flex-col gap-2">
 							<h2 class="text-sm text-amber-900 dark:text-white mt-3 mb-0.5">New Username</h2>
 							<input
@@ -931,11 +949,17 @@
 				</div>
 			</div>
 		</main>
+		<div>
+			<br>
+		</div>
 	</template>
 
 	<template id="update-password-html">
+		<div>
+			<br>
+		</div>
 		<main class="flex">
-			<div class="bg-[linear-linear(180deg,var(--color-amber-400)_20%,var(--color-amber-50)_20%)] 
+			<div class="bg-[linear-gradient(180deg,var(--color-amber-400)_20%,var(--color-amber-50)_20%)] 
 						ring-4 ring-amber-900 flex flex-col w-100 h-full rounded-lg mt-2 
 						mx-auto shadow-2xl items-center">
 				<div class="flex flex-row w-100 mt-3 justify-between">
@@ -954,7 +978,7 @@
 					<!-- Change Password -->
 					<div class="flex flex-col shadow-sm text-amber-900 bg-amber-300/20
 								w-80 ring-1 ring-amber-900 rounded-lg mt-6 p-3">
-						<h2 class="font-bold mb-2">Change Password</h2>
+						<h2 class="font-bold mb-2 text-center">Change Password</h2>
 						<form id="change-password-form" class="flex flex-col gap-2">
 							<h2 class="text-sm text-amber-900 dark:text-white mt-3 mb-0.5">Old Password</h2>
 							<input
@@ -990,11 +1014,17 @@
 				</div>
 			</div>
 		</main>
+		<div>
+			<br>
+		</div>
 	</template>
 
 	<template id="update-avatar-html">
+		<div>
+			<br>
+		</div>
 		<main class="flex">
-			<div class="bg-[linear-linear(180deg,var(--color-amber-400)_20%,var(--color-amber-50)_20%)] 
+			<div class="bg-[linear-gradient(180deg,var(--color-amber-400)_20%,var(--color-amber-50)_20%)] 
 						ring-4 ring-amber-900 flex flex-col w-100 h-full rounded-lg mt-2 
 						mx-auto shadow-2xl items-center">
 				<div class="flex flex-row w-100 mt-3 justify-between">
@@ -1013,7 +1043,7 @@
 					<!-- Change Avatar -->
 					<div class="flex flex-col shadow-sm text-amber-900 bg-amber-300/20
 								w-80 ring-1 ring-amber-900 rounded-lg mt-6 p-3">
-						<h2 class="font-bold mb-2">Change Avatar</h2>
+						<h2 class="font-bold mb-2 text-center">Change Avatar</h2>
 						<form id="upload_avatar" method="POST" enctype="multipart/form-data" class="flex flex-col gap-2">
 							<h2 class="text-sm text-amber-900 dark:text-white mt-3 mb-0.5">New Avatar</h2>
 							<input
@@ -1035,6 +1065,72 @@
 				</div>
 			</div>
 		</main>
+		<div>
+			<br>
+		</div>
+	</template>
+
+	<template id="update-2fa-html">
+		<div>
+			<br>
+		</div>
+		<main class="flex">
+			<div class="bg-[linear-gradient(180deg,var(--color-amber-400)_20%,var(--color-amber-50)_20%)] 
+						ring-4 ring-amber-900 flex flex-col w-100 h-full rounded-lg mt-2 
+						mx-auto shadow-2xl items-center">
+				<div class="flex flex-row w-100 mt-3 justify-between">
+					<div class="w-5"></div>
+					<h1 class="text-3xl mx-auto font-bold text-amber-900
+						drop-shadow-lg" id="profile-pseudo">
+					</h1>
+					<a class="size-6 mt-2 justify-end mr-5 object-contain" href="/profile">
+						<img class="invert ring-1 p-0.5 ring-blue-950 rounded-md" src="src/image/back.png" alt="back">
+					</a>
+				</div>
+				<a class="mt-2 object-contain">
+					<img class="ring-4 ring-amber-900 rounded-full shadow-xl" id="profile-avatar" src="" alt="Your avatar" width="150">
+				</a>
+				<div class="flex flex-col mt-6">
+					<!-- Update 2FA -->
+					<div class="flex flex-col shadow-sm text-amber-900 bg-amber-300/20
+								w-80 ring-1 ring-amber-900 rounded-lg mt-6 p-3">
+						<h2 class="font-bold mb-2 text-center">Two-Factor Authentication</h2>
+						<!-- Two-Factor Management Section -->
+						<div id="twofa-container" class="flex flex-col items-center mt-6">
+							<p id="twofa-status" class="font-bold text-amber-900 mb-2">2FA Status</p>
+							<img id="twofa-qr" class="hidden w-40 h-40 mb-2 border-2 border-amber-900 rounded-lg" alt="2FA QR Code">
+							<div class="flex gap-4">
+								<button id="twofa-enable-btn" class="btn bg-green-500 text-white px-4 py-2 rounded hidden">
+									Enable 2FA
+								</button>
+								<button id="twofa-disable-btn" class="btn bg-red-500 text-white px-4 py-2 rounded hidden">
+									Disable 2FA
+								</button>
+							</div>
+						</div>
+						<div id="twofa-verify-container" class="flex flex-col items-center mt-4 hidden">
+							<input
+								id="twofa-code-input"
+								maxlength="6"
+								placeholder="Enter 6-digit code"
+								class="border px-2 py-1 rounded w-32 text-center"
+							/>
+							<button id="twofa-verify-btn"
+								class="mt-2 bg-blue-500 text-white px-3 py-1 rounded">
+								Verify Code
+							</button>
+						</div>
+
+					</div>
+				</div>
+				<div>
+					<br>
+				</div>
+			</div>
+		</main>
+		<div>
+			<br>
+		</div>
 	</template>
 
 	<template id="gamelocalhtml">
