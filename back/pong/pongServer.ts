@@ -102,7 +102,7 @@ export function setupGameServer(io: Server, users: Users) {
 
 			fillSocketTournament(playerId, tournament, socket, pseudo.pseudo);
 
-			io.to(`tournament-${tournamentId}`).emit("tournamentPlayersUpdate", updateStateTournament(tournament.state));
+			io.to(`tournament-${tournamentId}`).emit("state", updateStateTournament(tournament.state));
 			if (playerId == tournament.idPlayers[0])
 			{
 				io.to(`tournament-${tournamentId}`).emit("isCreator", playerId);
@@ -117,7 +117,7 @@ export function setupGameServer(io: Server, users: Users) {
 
 				removeSocketTournament(tournament, socket);
 
-				io.to(`tournament-${tournamentId}`).emit("tournamentPlayersUpdate", updateStateTournament(tournament.state));
+				io.to(`tournament-${tournamentId}`).emit("state", updateStateTournament(tournament.state));
 
 				//disconnect player from tournament after 5 minutes
 				if (!tournament.disconnectTimer) {
@@ -135,7 +135,16 @@ export function setupGameServer(io: Server, users: Users) {
 				if (!tournament)
 					return;
 				tournament.state.status = "playing";
-				socket.emit("state", updateStateTournament(tournament.state));
+				if (tournament.idPlayers[0] === 1)
+					tournament.state.pseudo.player1 = "IA";
+				if (tournament.idPlayers[1] === 1)
+					tournament.state.pseudo.player2 = "IA";
+				if (tournament.idPlayers[2] === 1)
+					tournament.state.pseudo.player3 = "IA";
+				if (tournament.idPlayers[3] === 1)
+					tournament.state.pseudo.player4 = "IA";
+				io.to(`tournament-${tournamentId}`).emit("state", updateStateTournament(tournament.state));
+				io.to(`tournament-${tournamentId}`).emit("displayStartButton");
 			});
 		});
 	});
@@ -145,7 +154,9 @@ function updateStateTournament(state: TournamentState)
 {
 	return {
 		status: state.status,
-		pseudo: { player1: state.pseudo.player1, player2: state.pseudo.player2, player3: state.pseudo.player3, player4: state.pseudo.player4 }
+		pseudo: { player1: state.pseudo.player1, player2: state.pseudo.player2, player3: state.pseudo.player3, player4: state.pseudo.player4 },
+		finalists: { player1: state.finalists.player1, player2: state.finalists.player2 },
+		champion: { player: state.champion.player }
 	};
 }
 

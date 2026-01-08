@@ -3,6 +3,8 @@ import { io, Socket } from "socket.io-client";
 export interface TournamentState {
 	status: "waiting" | "playing" | "finished";
 	pseudo: { player1: string; player2: string; player3: string; player4: string };
+	finalists: { player1: string; player2: string };
+	champion: { player: string };
 }
 
 export class TournamentNetwork {
@@ -10,6 +12,7 @@ export class TournamentNetwork {
 	private onStateCallback?: (state: TournamentState) => void;
 	private onCreatorCallback?: (playerId: number) => void;
 	private onDisconnectionCallback?: () => void;
+	private onDisplayStartButtonCallback?: () => void;
 
 	constructor(serverUrl: string, tournamentId: number) {
 		this.socket = io(serverUrl, { transports: ["websocket"] });
@@ -18,12 +21,16 @@ export class TournamentNetwork {
 			this.socket.emit("joinTournament", tournamentId);
 		});
 
-		this.socket.on("tournamentPlayersUpdate", (state: TournamentState) => {
+		this.socket.on("state", (state: TournamentState) => {
 			this.onStateCallback?.(state);
 		});
 
 		this.socket.on("isCreator", (playerId: number) => {
 			this.onCreatorCallback?.(playerId);
+		});
+
+		this.socket.on("displayStartButton", () => {
+			this.onDisplayStartButtonCallback?.();
 		});
 
 		this.socket.on("disconnection", () => {
@@ -41,6 +48,10 @@ export class TournamentNetwork {
 
 	onDisconnection(cb: () => void) {
 		this.onDisconnectionCallback = cb;
+	}
+
+	onDisplayStartButton(cb: () => void) {
+		this.onDisplayStartButtonCallback = cb;
 	}
 
 	startTournament() {

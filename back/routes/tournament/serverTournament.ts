@@ -5,6 +5,8 @@ import { ServerGame } from "../game/serverGame";
 interface TournamentState {
 	status: "waiting" | "playing" | "finished";
 	pseudo: { player1: string; player2: string; player3: string; player4: string };
+	finalists: { player1: string; player2: string };
+	champion: { player: string };
 }
 
 export class serverTournament {
@@ -34,7 +36,12 @@ export class serverTournament {
 				player2: "Waiting for player...",
 				player3: "Waiting for player...",
 				player4: "Waiting for player...",
-			}
+			},
+			finalists: {
+				player1: "Winner 1",
+				player2: "Winner 2",
+			},
+			champion: { player: "Champion" }
 		};
 	}
 

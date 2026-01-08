@@ -4456,7 +4456,9 @@ var init_tournamentInstance = __esm({
       constructor() {
         this.currentState = {
           status: "waiting",
-          pseudo: { player1: "", player2: "", player3: "", player4: "" }
+          pseudo: { player1: "", player2: "", player3: "", player4: "" },
+          finalists: { player1: "", player2: "" },
+          champion: { player: "" }
         };
       }
       applyServerState(state) {
@@ -4481,11 +4483,14 @@ var init_tournamentNetwork = __esm({
         this.socket.on("connect", () => {
           this.socket.emit("joinTournament", tournamentId);
         });
-        this.socket.on("tournamentPlayersUpdate", (state) => {
+        this.socket.on("state", (state) => {
           this.onStateCallback?.(state);
         });
         this.socket.on("isCreator", (playerId) => {
           this.onCreatorCallback?.(playerId);
+        });
+        this.socket.on("displayStartButton", () => {
+          this.onDisplayStartButtonCallback?.();
         });
         this.socket.on("disconnection", () => {
           this.onDisconnectionCallback?.();
@@ -4499,6 +4504,9 @@ var init_tournamentNetwork = __esm({
       }
       onDisconnection(cb) {
         this.onDisconnectionCallback = cb;
+      }
+      onDisplayStartButton(cb) {
+        this.onDisplayStartButtonCallback = cb;
       }
       startTournament() {
         this.socket.emit("startTournament");
@@ -4522,16 +4530,14 @@ function BracketsView() {
 async function initBrackets(params) {
   const tournamentID = params?.id;
   const startTournamentButton = document.getElementById("start-button");
+  const playButton = document.getElementById("play-button");
   const pseudoP1 = document.getElementById("player1-name");
   const pseudoP2 = document.getElementById("player2-name");
   const pseudoP3 = document.getElementById("player3-name");
   const pseudoP4 = document.getElementById("player4-name");
-  const pseudos = [
-    pseudoP1,
-    pseudoP2,
-    pseudoP3,
-    pseudoP4
-  ];
+  const finalist1 = document.getElementById("finalist1");
+  const finalist2 = document.getElementById("finalist2");
+  const champion = document.getElementById("champion");
   const id = await genericFetch("/api/private/game/playerinfo");
   const serverUrl = window.location.host;
   currentTournament = new TournamentInstance();
@@ -4549,21 +4555,15 @@ async function initBrackets(params) {
       startTournamentButton?.addEventListener("click", async () => {
         console.log("Starting tournament!");
         net2?.startTournament();
+        startTournamentButton?.classList.add("hidden");
+        playButton?.classList.remove("hidden");
       });
     }
   });
-  async function updateBrackets(idPlayers, pseudoPlayers) {
-    for (let i = 0; i < 4; i++) {
-      const pseudo = pseudos[i];
-      const playerId = Number(idPlayers[i]);
-      if (!pseudo) continue;
-      if (playerId === 1) {
-        pseudo.innerText = "Waiting for player...";
-      } else {
-        pseudo.innerText = pseudoPlayers[i];
-      }
-    }
-  }
+  net2.onDisplayStartButton(() => {
+    startTournamentButton?.classList.add("hidden");
+    playButton?.classList.remove("hidden");
+  });
   function updatePseudo() {
     if (currentTournament) {
       if (pseudoP1)
@@ -4574,6 +4574,12 @@ async function initBrackets(params) {
         pseudoP3.innerText = currentTournament.getCurrentState().pseudo.player3;
       if (pseudoP4)
         pseudoP4.innerText = currentTournament.getCurrentState().pseudo.player4;
+      if (finalist1)
+        finalist1.innerText = currentTournament.getCurrentState().finalists.player1;
+      if (finalist2)
+        finalist2.innerText = currentTournament.getCurrentState().finalists.player2;
+      if (champion)
+        champion.innerText = currentTournament.getCurrentState().champion.player;
     }
   }
 }
