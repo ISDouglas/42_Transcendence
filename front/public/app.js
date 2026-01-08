@@ -4980,6 +4980,94 @@ var init_p_updateavatar = __esm({
   }
 });
 
+// front/src/views/p_update2fa.ts
+function Update2faView() {
+  loadHeader();
+  return document.getElementById("update-2fa-html").innerHTML;
+}
+async function initUpdate2fa() {
+  const profile = await genericFetch("/api/private/profile", {
+    method: "POST"
+  });
+  const avatar = document.getElementById("profile-avatar");
+  avatar.src = profile.avatar + "?ts=" + Date.now();
+  document.getElementById("profile-pseudo").textContent = profile.pseudo;
+  const twofaStatusText = document.getElementById("twofa-status");
+  const twofaEnableBtn = document.getElementById("twofa-enable-btn");
+  const twofaDisableBtn = document.getElementById("twofa-disable-btn");
+  const twofaQr = document.getElementById("twofa-qr");
+  const verifyContainer = document.getElementById("twofa-verify-container");
+  const verifyInput = document.getElementById("twofa-code-input");
+  const verifyBtn = document.getElementById("twofa-verify-btn");
+  twofaEnableBtn.classList.add("hidden");
+  twofaDisableBtn.classList.add("hidden");
+  twofaQr.classList.add("hidden");
+  verifyContainer.classList.add("hidden");
+  if (profile.twofa_enabled) {
+    twofaStatusText.textContent = "Enabled";
+    twofaDisableBtn.classList.remove("hidden");
+  } else {
+    twofaStatusText.textContent = "Disabled";
+    twofaEnableBtn.classList.remove("hidden");
+  }
+  twofaEnableBtn.addEventListener("click", async () => {
+    try {
+      const res = await genericFetch("/api/private/2fa/setup", { method: "POST" });
+      twofaQr.src = res.qr;
+      twofaQr.classList.remove("hidden");
+      verifyContainer.classList.remove("hidden");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to setup 2FA.");
+    }
+  });
+  verifyBtn.addEventListener("click", async () => {
+    const code = verifyInput.value.trim();
+    if (code.length !== 6) {
+      alert("Please enter a valid 6-digit code.");
+      return;
+    }
+    try {
+      await genericFetch("/api/private/2fa/enable", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code })
+      });
+      alert("2FA Enabled!");
+      twofaEnableBtn.classList.add("hidden");
+      twofaDisableBtn.classList.remove("hidden");
+      twofaStatusText.textContent = "2FA Enabled";
+      twofaQr.classList.add("hidden");
+      verifyContainer.classList.add("hidden");
+      verifyInput.value = "";
+    } catch (err) {
+      console.error(err);
+      alert("Invalid code, please try again.");
+    }
+  });
+  twofaDisableBtn.addEventListener("click", async () => {
+    try {
+      await genericFetch("/api/private/2fa/disable", { method: "POST" });
+      alert("2FA Disabled!");
+      twofaDisableBtn.classList.add("hidden");
+      twofaEnableBtn.classList.remove("hidden");
+      twofaStatusText.textContent = "2FA Disabled";
+      twofaQr.classList.add("hidden");
+      verifyContainer.classList.add("hidden");
+      verifyInput.value = "";
+    } catch (err) {
+      console.error(err);
+      alert("Failed to disable 2FA.");
+    }
+  });
+}
+var init_p_update2fa = __esm({
+  "front/src/views/p_update2fa.ts"() {
+    "use strict";
+    init_router();
+  }
+});
+
 // front/src/views/oauth_callback.ts
 async function initOAuthCallback() {
   const res = await fetch("/api/auth/status", {
@@ -5204,6 +5292,7 @@ var init_router = __esm({
     init_p_updateusername();
     init_p_updatepassword();
     init_p_updateavatar();
+    init_p_update2fa();
     init_oauth_callback();
     init_terms_of_service();
     init_privacypolicy();
@@ -5224,6 +5313,7 @@ var init_router = __esm({
       { path: "/updateusername", view: UpdateUsernameView, init: initUpdateUsername },
       { path: "/updatepassword", view: UpdatePasswordView, init: initUpdatePassword },
       { path: "/updateavatar", view: UpdateAvatarView, init: initUpdateAvatar },
+      { path: "/update2fa", view: Update2faView, init: initUpdate2fa },
       { path: "/gameonline", view: GameOnlineView, init: GameOnlineinit },
       { path: "/gamelocal", view: GameLocalView, init: GameLocalinit },
       { path: "/pongmatch/:id", view: PongMatchView, init: initPongMatch, cleanup: stopGame },

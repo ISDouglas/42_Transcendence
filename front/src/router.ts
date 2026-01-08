@@ -20,6 +20,7 @@ import { UpdateEmailView, initUpdateEmail } from "./views/p_updateemail";
 import { UpdateUsernameView, initUpdateUsername } from "./views/p_updateusername";
 import { UpdatePasswordView, initUpdatePassword } from "./views/p_updatepassword";
 import { UpdateAvatarView, initUpdateAvatar } from "./views/p_updateavatar";
+import { Update2faView, initUpdate2fa } from "./views/p_update2fa";
 import { initOAuthCallback } from "./views/oauth_callback";
 import { InitTermsOfService, TermsOfServiceView } from "./views/terms_of_service";
 import { InitPrivacyPolicy, PriavacyPolicyView } from "./views/privacypolicy";
@@ -42,6 +43,7 @@ const routes = [
   { path: "/updateusername", view: UpdateUsernameView, init: initUpdateUsername },
   { path: "/updatepassword", view: UpdatePasswordView, init: initUpdatePassword },
   { path: "/updateavatar", view: UpdateAvatarView, init: initUpdateAvatar },
+  { path: "/update2fa", view:Update2faView, init:initUpdate2fa },
   { path: "/gameonline", view: GameOnlineView, init: GameOnlineinit},
   { path: "/gamelocal", view: GameLocalView, init: GameLocalinit},
   { path: "/pongmatch/:id", view: PongMatchView, init: initPongMatch, cleanup: stopGame },
