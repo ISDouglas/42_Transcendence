@@ -250,8 +250,8 @@ fastify.get("/api/private/logout", async (request, reply) => {
 const io = new Server(fastify.server, {
 			cors: { origin: "*" }
 		});
-createWebSocket(io, users);
-// setupGameServer(io, users);
+createWebSocket(io);
+setupGameServer(io, users);
 
 fastify.setNotFoundHandler((request: FastifyRequest, reply: FastifyReply) => {
 	return reply.sendFile("index.html");

@@ -55,7 +55,6 @@ async function initLogin() {
     if (success == 2)
       navigateTo("/twofa");
     if (success == 1) {
-      console.log("dans init login");
       navigateTo("/home");
     }
   });
@@ -83,6 +82,7 @@ async function login(username, password, form) {
       }
       return 0;
     }
+    localStorage.setItem("token", result.token);
     if (result.ok && result.twofa === true)
       return 2;
     return 1;
@@ -4054,11 +4054,13 @@ __export(socket_exports, {
   initSocket: () => initSocket
 });
 function initSocket() {
-  const token = document.cookie.split("; ").find((row) => row.startsWith("token="))?.split("=")[1];
-  console.log((/* @__PURE__ */ new Date()).toISOString(), "dans init socket, token socket=", token);
-  globalSocket = lookup2(window.location.host, {
+  const token = localStorage.getItem("token");
+  if (!token)
+    return;
+  console.log((/* @__PURE__ */ new Date()).toISOString(), "dans init socket, token socket=", token, "URL socket =", window.location.origin);
+  globalSocket = lookup2(window.location.origin, {
     transports: ["websocket"],
-    auth: { token }
+    query: { token }
   });
   console.log((/* @__PURE__ */ new Date()).toISOString(), "globalsocket s ocket=", globalSocket);
 }
@@ -4068,7 +4070,6 @@ var init_socket3 = __esm({
     "use strict";
     init_esm5();
     globalSocket = null;
-    console.log((/* @__PURE__ */ new Date()).toISOString(), "socket.ts charg\xE9 (import\xE9)");
   }
 });
 
@@ -4369,8 +4370,6 @@ function smoothScrollTo(targetY, duration) {
   requestAnimationFrame(animation);
 }
 async function initHomePage() {
-  console.log("dans home");
-  await new Promise((resolve) => setTimeout(resolve, 50));
   const { initSocket: initSocket2 } = await Promise.resolve().then(() => (init_socket3(), socket_exports));
   initSocket2();
   const btn = document.getElementById("scroll-button");

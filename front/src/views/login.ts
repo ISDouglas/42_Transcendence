@@ -23,8 +23,6 @@ export async function initLogin()
    		if (success == 2)
 			navigateTo("/twofa");
 		if (success == 1) {
-			console.log("dans init login");
-
 			navigateTo("/home");
 		}
     });
@@ -56,6 +54,8 @@ export async function login(username: string, password: string, form: HTMLFormEl
 			}
 			return 0;
 		}
+		localStorage.setItem("token", result.token);
+		/*ajouter localstorage pour que cela fonctionne*/
 		if (result.ok && result.twofa === true)
 			return 2;
 		return 1;
