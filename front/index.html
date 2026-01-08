@@ -151,13 +151,13 @@
 						/>
 						<label for="accept-terms" class="text-xs text-gray-700">
 							I agree to the
-							<a href="/privacypolicy" target="_top" data-link class="text-amber-600 underline hover:text-amber-800">
-								Privacy Policy
-							</a>
-							and the
 							<a href="/termsofservice" target="_top" data-link class="text-amber-600 underline hover:text-amber-800">
 								Terms of Service
 							</a>.
+							and the
+							<a href="/privacypolicy" target="_top" data-link class="text-amber-600 underline hover:text-amber-800">
+								Privacy Policy
+							</a>
 						</label>
 					</div>
 				</div>
@@ -1124,18 +1124,38 @@
 					bg-amber-50 rounded-lg ring-amber-200 shadow-lg">
 				</div>
 			</section>
-			<section class="flex flex-row ml-2 w-[50%]">
-				<div class="flex flex-col w-[50%] h-[95%] mx-4 text-center mt-4">
-					<p class="stat">Games Wins <br><span class="text-6xl" id="win"></span></p>
-					<p class="stat">Games Losses <br><span class="text-6xl" id="loose"></span></p>
-					<p class="stat">Winrate <br><span class="text-6xl" id="winrate"></span></p>
-				</div>
-				<div class="flex flex-col w-[50%] h-[95%] mx-4 text-center mt-4">
-					<p class="stat">Points Scored <br><span class="text-6xl" id="scored"></span></p>
-					<p class="stat">Points Taken <br><span class="text-6xl" id="taken"></span></p>
-					<p class="stat">Ratio <br><span class="text-6xl" id="ratio"></span></p>
-				</div>
-			</section>
+			<div class="w-[50%] ml-2">
+				<section class="flex flex-row items-center ring-4 ring-amber-400 bg-amber-50 mt-5 mx-8 h-[30%] rounded-2xl">
+						<img id="rank-img" class="size-40 rounded-full mx-4 border-2 w-[23%]" src="" alt="icone-rank">
+						<div class="w-[37%] mx-2">
+							<p class="text-4xl text-amber-900 pb">My Rank: <br></p>
+							<p class="" id="rank-player"></p>
+						</div>
+						<div class="w-[40%] mx-2">
+							<p class="text-4xl text-center text-amber-900">My Elo: <span class="font-bold text-4xl" id="elo-player"></span> LP</p>
+							<div class="w-full h-3 mt-5 bg-gray-200 rounded-full overflow-hidden">
+								<div
+									id="progress-fill"
+									class="h-full w-0 rounded-full
+									transition-all duration-700 ease-out">
+								</div>
+							</div>
+							<p class="text-xl text-center text-amber-900">Next rank: <span class="font-bold text-xl" id="elo-next"></span> LP</p>
+						</div>
+				</section>
+				<section class="flex flex-row h-[70%]">
+					<div class="flex flex-col w-[50%] h-[95%] mx-4 text-center mt-4">
+						<p class="stat">Games Wins <br><span class="text-6xl" id="win"></span></p>
+						<p class="stat">Games Losses <br><span class="text-6xl" id="loose"></span></p>
+						<p class="stat">Winrate <br><span class="text-6xl" id="winrate"></span></p>
+					</div>
+					<div class="flex flex-col w-[50%] h-[95%] mx-4 text-center mt-4">
+						<p class="stat">Points Scored <br><span class="text-6xl" id="scored"></span></p>
+						<p class="stat">Points Taken <br><span class="text-6xl" id="taken"></span></p>
+						<p class="stat">Ratio <br><span class="text-6xl" id="ratio"></span></p>
+					</div>
+				</section>
+			</div>
 		</div>				
 	</template>
 

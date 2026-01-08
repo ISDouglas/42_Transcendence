@@ -113,6 +113,20 @@ function formatDuration(seconds) {
   const remainingSeconds = seconds % 60;
   return `${minutes}m ${remainingSeconds}s`;
 }
+function getRankInfo(elo) {
+  for (const rank of ranks) {
+    if (elo < rank.max) {
+      const progress = rank.max === Infinity ? 100 : Math.floor((elo - rank.min) / (rank.max - rank.min) * 100);
+      return {
+        src: rank.src,
+        next: rank.max === Infinity ? 0 : rank.max - elo,
+        progress,
+        type: rank.type
+      };
+    }
+  }
+  return { src: "/src/image/rank6.png", next: 0, progress: 100, type: "Champion" };
+}
 async function initDashboard() {
   const container = document.getElementById("game-list");
   if (!container)
@@ -122,32 +136,41 @@ async function initDashboard() {
       method: "GET"
     });
     const dashboards = await response.json();
-    dashboards.GamesInfo.forEach(async (game) => {
-      const template = document.getElementById("history-dashboard");
-      const item = document.createElement("div");
-      item.classList.add("dash");
-      const clone = template.content.cloneNode(true);
-      const winnerpath = clone.getElementById("winnerpath");
-      const winnerscore = clone.getElementById("winnerscore");
-      const winnerpseudo = clone.getElementById("winnerpseudo");
-      const loserpath = clone.getElementById("loserpath");
-      const loserscore = clone.getElementById("loserscore");
-      const loserpseudo = clone.getElementById("loserpseudo");
-      const date = clone.getElementById("date");
-      const duration = clone.getElementById("duration");
-      const type = clone.getElementById("type");
-      winnerpath.src = game.winner_avatar;
-      winnerscore.textContent = game.winner_score.toString();
-      winnerpseudo.textContent = game.winner_pseudo;
-      loserpath.src = game.loser_avatar;
-      loserscore.textContent = game.loser_score.toString();
-      loserpseudo.textContent = game.loser_pseudo;
-      date.textContent = new Date(game.date_game).toLocaleDateString();
-      duration.textContent = "Dur\xE9e : " + formatDuration(game.duration_game);
-      type.textContent = game.type;
-      item.appendChild(clone);
+    if (dashboards.GamesInfo.length > 0) {
+      dashboards.GamesInfo.forEach(async (game) => {
+        const template = document.getElementById("history-dashboard");
+        const item = document.createElement("div");
+        item.classList.add("dash");
+        const clone = template.content.cloneNode(true);
+        const winnerpath = clone.getElementById("winnerpath");
+        const winnerscore = clone.getElementById("winnerscore");
+        const winnerpseudo = clone.getElementById("winnerpseudo");
+        const loserpath = clone.getElementById("loserpath");
+        const loserscore = clone.getElementById("loserscore");
+        const loserpseudo = clone.getElementById("loserpseudo");
+        const date = clone.getElementById("date");
+        const duration = clone.getElementById("duration");
+        const type = clone.getElementById("type");
+        winnerpath.src = game.winner_avatar;
+        winnerscore.textContent = game.winner_score.toString();
+        winnerpseudo.textContent = game.winner_pseudo;
+        loserpath.src = game.loser_avatar;
+        loserscore.textContent = game.loser_score.toString();
+        loserpseudo.textContent = game.loser_pseudo;
+        date.textContent = new Date(game.date_game).toLocaleDateString();
+        duration.textContent = "Dur\xE9e : " + formatDuration(game.duration_game);
+        type.textContent = game.type;
+        item.appendChild(clone);
+        container.appendChild(item);
+      });
+    } else {
+      const item = document.createElement("p");
+      item.textContent = "Go play some game newbie !";
+      item.classList.add("text-center");
+      item.classList.add("text-3xl");
+      item.classList.add("mt-68");
       container.appendChild(item);
-    });
+    }
     const winrate = document.getElementById("winrate");
     const win = document.getElementById("win");
     const loose = document.getElementById("loose");
@@ -160,14 +183,51 @@ async function initDashboard() {
     ratio.textContent = winrateCalcul(dashboards.TotalScore.scored, dashboards.TotalScore.taken) + "%";
     taken.textContent = dashboards.TotalScore.taken.toString();
     scored.textContent = dashboards.TotalScore.scored.toString();
+    const rankinfo = getRankInfo(dashboards.Elo);
+    document.getElementById("rank-img").src = rankinfo.src;
+    document.getElementById("rank-img").classList.add(rankColors[rankinfo.type]);
+    document.getElementById("rank-player").classList.add(rankinfo.type);
+    document.getElementById("rank-player").textContent = rankinfo.type;
+    document.getElementById("elo-player").textContent = dashboards.Elo.toString();
+    document.getElementById("elo-next").textContent = rankinfo.next.toString();
+    setTimeout(() => {
+      const bar = document.getElementById("progress-fill");
+      bar.style.width = `${rankinfo.progress}%`;
+      bar.classList.add(...progressionColors[rankinfo.type].split(" "));
+    }, 50);
   } catch (error) {
     console.error("Erreur lors du chargement :", error);
   }
 }
+var ranks, rankColors, progressionColors;
 var init_p_dashboard = __esm({
   "front/src/views/p_dashboard.ts"() {
     "use strict";
     init_router();
+    ranks = [
+      { min: 0, max: 400, src: "/src/image/rank1.png", type: "Wood" },
+      { min: 400, max: 800, src: "/src/image/rank2.png", type: "Iron" },
+      { min: 800, max: 1200, src: "/src/image/rank3.png", type: "Bronze" },
+      { min: 1200, max: 1600, src: "/src/image/rank4.png", type: "Silver" },
+      { min: 1600, max: 2e3, src: "/src/image/rank5.png", type: "Gold" },
+      { min: 2e3, max: Infinity, src: "/src/image/rank6.png", type: "Champion" }
+    ];
+    rankColors = {
+      Wood: "border-stone-400",
+      Iron: "border-orange-500",
+      Bronze: "border-amber-600",
+      Silver: "border-gray-400",
+      Gold: "border-yellow-400",
+      Champion: "border-purple-500"
+    };
+    progressionColors = {
+      Wood: "bg-linear-to-br from-orange-800 via-amber-700 to-yellow-800",
+      Iron: "bg-linear-to-br from-neutral-700 via-neutral-500",
+      Bronze: "bg-linear-to-br from-yellow-700 via-amber-600 to-orange-700",
+      Silver: "bg-linear-to-br from-gray-200 via-white to-gray-300",
+      Gold: "bg-linear-to-br from-amber-400 via-yellow-500 to-amber-600",
+      Champion: "bg-linear-to-br from-purple-600 via-violet-500 to-fuchsia-600"
+    };
   }
 });
 
@@ -4948,10 +5008,32 @@ function TermsOfServiceView() {
   return document.getElementById("terms-of-service").innerHTML;
 }
 function InitTermsOfService() {
+  const btn = document.getElementById("go-back");
+  btn.addEventListener("click", () => {
+    navigateTo("/register");
+  });
 }
 var init_terms_of_service = __esm({
   "front/src/views/terms_of_service.ts"() {
     "use strict";
+    init_router();
+  }
+});
+
+// front/src/views/privacypolicy.ts
+function PriavacyPolicyView() {
+  return document.getElementById("privacy-policy").innerHTML;
+}
+function InitPrivacyPolicy() {
+  const btn = document.getElementById("go-back");
+  btn.addEventListener("click", () => {
+    navigateTo("/register");
+  });
+}
+var init_privacypolicy = __esm({
+  "front/src/views/privacypolicy.ts"() {
+    "use strict";
+    init_router();
   }
 });
 
@@ -4960,6 +5042,7 @@ function navigateTo(url2) {
   const state = { from: window.location.pathname };
   history.pushState(state, "", url2);
   currentPath = url2;
+  window.scrollTo(0, 0);
   router();
 }
 async function genericFetch(url2, options = {}) {
@@ -5066,11 +5149,11 @@ function initRouter() {
   });
   currentPath = window.location.pathname;
   window.addEventListener("popstate", (event) => {
-    popState();
+    popState3();
   });
   router();
 }
-function popState() {
+function popState3() {
   const path = window.location.pathname;
   const publicPath = ["/", "/login", "/register", "/logout"];
   const toIsPrivate = !publicPath.includes(path);
@@ -5113,6 +5196,7 @@ var init_router = __esm({
     init_p_updateavatar();
     init_oauth_callback();
     init_terms_of_service();
+    init_privacypolicy();
     routes = [
       { path: "/", view: View, init },
       { path: "/login", view: LoginView, init: initLogin },
@@ -5121,6 +5205,7 @@ var init_router = __esm({
       { path: "/register", view: RegisterView, init: initRegister },
       { path: "/registerok", view: RegisterValidView },
       { path: "/termsofservice", view: TermsOfServiceView, init: InitTermsOfService },
+      { path: "/privacypolicy", view: PriavacyPolicyView, init: InitPrivacyPolicy },
       { path: "/home", view: homeView, init: initHomePage },
       { path: "/dashboard", view: DashboardView, init: initDashboard },
       { path: "/friends", view: FriendsView, init: initFriends },

@@ -32,6 +32,7 @@ import { navigateTo } from "../front/src/router";
 import { checkTwoFA, disableTwoFA, enableTwoFA, setupTwoFA } from "./routes/twofa/twofa";
 import { oauthStatus } from "./routes/login/oauth.status";
 import { registerGoogle, callbackGoogle } from "./routes/login/oauth.google";
+import { UpdatePasswordView } from "../front/src/views/p_updatepassword";
 
 export const db = new ManageDB("./back/DB/database.db");
 export const users = new Users(db);
@@ -271,7 +272,7 @@ const start = async () => {
 		await fastify.listen({ port: PORT, host: "0.0.0.0" });
 		console.log(`Server running on port ${PORT}`);
 		await db.connect();
-		await users.deleteUserTable();
+		// await users.deleteUserTable();
 		// await gameInfo.deleteGameInfoTable();
 		// await friends.deleteFriendTable();
 		await users.createUserTable();
@@ -282,7 +283,8 @@ const start = async () => {
 		await users.CreateUserIA();
 		await users.CreateUserGuest();
 		const hashedPassword = await bcrypt.hash("42", 12);
-		users.addUser("42", "42", hashedPassword);
+		users.addElo(1);
+		// users.addUser("42", "42", hashedPassword);
 		// friends.addFriendship(5, 6);
 		// friends.addFriendship(4, 5);
 	} catch (err) {
