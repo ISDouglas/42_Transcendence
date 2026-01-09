@@ -66,7 +66,7 @@ export async function callbackGoogle(request: FastifyRequest, reply: FastifyRepl
       }
 
       // 7. JWT
-      const jwtoken = createJWT(user.user_id);
+      const jwtoken = createJWT(user.user_id, user.pseudo, user.avatar);
       reply.setCookie("token", jwtoken, { httpOnly: true, secure: true, sameSite: "strict", path: "/" });
       return reply.redirect(`${process.env.PUBLIC_BASE_URL}/oauth/callback`);
     } catch (err) {
