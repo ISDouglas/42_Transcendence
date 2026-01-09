@@ -1,7 +1,8 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { google } from "googleapis";
-import { users } from "../../server";
+import { friends, users } from '../../server';
 import { createJWT, createTemp2FAToken } from "../../middleware/jwt";
+import { notification } from "../friends/friends";
 
 // Google account password placeholder
 export const GOOGLE_PASSWORD_PLACEHOLDER = "__OAUTH_GOOGLE__";
@@ -67,6 +68,9 @@ export async function callbackGoogle(request: FastifyRequest, reply: FastifyRepl
 
       // 7. JWT
       const jwtoken = createJWT(user.user_id);
+      users.updateStatus(user.user_id, "online");
+      const allFriends = await friends.getMyFriends(user.user_id);
+      notification(allFriends, user.user_id);
       reply.setCookie("token", jwtoken, { httpOnly: true, secure: true, sameSite: "strict", path: "/" });
       return reply.redirect(`${process.env.PUBLIC_BASE_URL}/oauth/callback`);
     } catch (err) {

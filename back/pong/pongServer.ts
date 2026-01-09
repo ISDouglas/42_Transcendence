@@ -205,6 +205,7 @@ export function setupGameServer(io: Server, users: Users) {
 					gameId = 1;
 				if (tournament.final_arr[0] == 0 && tournament.final_arr[1] == 0)
 				{
+					console.log("EnnemyId: ", ennemyId);
 					if (ennemyId == 1 || i % 2 == 0)
 					{
 						io.to(socket.id).emit("startTournamentGame", ennemyId, gameId);
@@ -218,18 +219,41 @@ export function setupGameServer(io: Server, users: Users) {
 				let ennemyId;
 				let gameId = 2;
 				if (playerId == tournament.final_arr[0])
+				{
+					if (tournament.final_arr[1] == 0)
+					{
+						if (!tournament.disconnectTimer) {
+							tournament.disconnectTimer = setTimeout(() => {
+								if (tournament.final_arr[1] != 0)
+								{
+									return;
+								}
+							}, 5 * 60 * 1000);
+						}
+					}
+					ennemyId = tournament.final_arr[1];
+					if (ennemyId == -1)
+						ennemyId = 1;
+					console.log("ennemyId create : ", ennemyId);
 					io.to(socket.id).emit("startTournamentGame", ennemyId, gameId);
-				else
+				}
+				else if (playerId == tournament.final_arr[1])
 				{
 					if (tournament.final_arr[0] == 0)
 					{
 						if (!tournament.disconnectTimer) {
 							tournament.disconnectTimer = setTimeout(() => {
 								if (tournament.final_arr[0] != 0)
+								{
 									return;
+								}
 							}, 5 * 60 * 1000);
 						}
 					}
+					ennemyId = tournament.final_arr[0];
+					if (ennemyId == -1)
+						ennemyId = 1;
+					console.log("ennemyId join : ", ennemyId);
 					io.to(socket.id).emit("joinTournamentGame", ennemyId, gameId);
 				}
 			});
@@ -250,8 +274,7 @@ function updateBrackets(tournament: serverTournament)
 			return;
 		}
 		tournament.state.finalists.player1 = game1.winner;
-		if (tournament.state.finalists.player1 != "")
-			tournament.final_arr[0] = game1.idwinner;
+		tournament.final_arr[0] = game1.idwinner;
 
 		const game2 = tournament.games.get(gameId + 1);
 		if (!game2)
@@ -260,8 +283,7 @@ function updateBrackets(tournament: serverTournament)
 			return;
 		}
 		tournament.state.finalists.player2 = game2.winner;
-		if (tournament.state.finalists.player2 != "")
-			tournament.final_arr[1] = game2.idwinner;
+		tournament.final_arr[1] = game2.idwinner;
 
 		if (tournament.final_arr[0] != 0 && tournament.final_arr[1] != 0)
 			tournament.state.status = "final";

@@ -81,7 +81,7 @@ export async function initBrackets(params?: any) {
 		navigateTo(`/pongmatch/${idGame}?tournamentId=${tournamentID}`);
 	});
 
-	net.onJoinTournamentGame(async (gameId: number) => {
+	net.onJoinTournamentGame(async (ennemyId: number, gameId: number) => {
 		console.log("join game : ");
 		const id = await genericFetch("/api/private/tournament/game/join", {
 			method: "POST",
@@ -93,6 +93,7 @@ export async function initBrackets(params?: any) {
 		});
 		const idGame = Number(id.id);
 		console.log("id final : ", idGame);
+		console.log("id final : ", id);
 		navigateTo(`/pongmatch/${idGame}?tournamentId=${tournamentID}`);
 	});
 

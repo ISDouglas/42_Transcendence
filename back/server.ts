@@ -300,9 +300,10 @@ fastify.post("/api/private/tournament/game/create", async (request, reply) => {
 fastify.post("/api/private/tournament/game/join", async (request, reply) => {
 	const { gameId, tournamentID } = request.body as { gameId: number, tournamentID: number };
 	const playerId = request.user?.user_id as any;
-	const gameid = joinTournamentGame(playerId, Number(gameId), Number(tournamentID));
-	console.log("gameid join : ", gameid);
-	return { gameid };
+	console.log("gameId join before: ", gameId);
+	const id = joinTournamentGame(playerId, Number(gameId), Number(tournamentID));
+	console.log("gameid join : ", id);
+	return { id };
 });
 
 fastify.post("/api/private/tournament/add", (req, reply) => {

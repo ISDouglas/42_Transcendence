@@ -13,7 +13,7 @@ export class TournamentNetwork {
 	private onTournamentHostCallback?: (playerId: number) => void;
 	private onDisconnectionCallback?: () => void;
 	private onStartTournamentGameCallback?: (ennemyId: number, gameId: number) => void;
-	private onjoinTournamentGameCallback?: (gameId: number) => void;
+	private onjoinTournamentGameCallback?: (ennemyId: number, gameId: number) => void;
 
 	constructor(serverUrl: string) {
 		this.socket = io(serverUrl, { transports: ["websocket"] });
@@ -30,8 +30,8 @@ export class TournamentNetwork {
 			this.onStartTournamentGameCallback?.(ennemyId, gameId);
 		});
 
-		this.socket.on("joinTournamentGame", (gameId: number) => {
-			this.onjoinTournamentGameCallback?.(gameId);
+		this.socket.on("joinTournamentGame", (ennemyId: number, gameId: number) => {
+			this.onjoinTournamentGameCallback?.(ennemyId, gameId);
 		});
 
 		this.socket.on("disconnection", () => {
@@ -63,7 +63,7 @@ export class TournamentNetwork {
 		this.onStartTournamentGameCallback = cb;
 	}
 
-	onJoinTournamentGame(cb: (gameId: number) => void) {
+	onJoinTournamentGame(cb: (ennemyId: number, gameId: number) => void) {
 		this.onjoinTournamentGameCallback = cb;
 	}
 
