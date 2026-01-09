@@ -21,5 +21,4 @@ export function initSocket() {
     setTimeout(() => {
     console.log("Final socket state:", globalSocket);
 }, 500);
-
 }

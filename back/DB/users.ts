@@ -29,7 +29,7 @@ export class Users
 		await this._db.execute(`
 			CREATE TABLE IF NOT EXISTS Users (
 				user_id INTEGER PRIMARY KEY AUTOINCREMENT,
-                pseudo TEXT UNIQUE NOT NULL,
+                pseudo TEXT NOT NULL,
                 email TEXT NOT NULL,
                 password TEXT NOT NULL,
 				avatar TEXT NOT NULL,

@@ -324,7 +324,7 @@ const io = new Server(fastify.server, {
 			cors: { origin: "*", credentials: true}
 		});
 createWebSocket(io);
-setupGameServer(io, users);
+
 
 fastify.setNotFoundHandler((request: FastifyRequest, reply: FastifyReply) => {
 	return reply.sendFile("index.html");

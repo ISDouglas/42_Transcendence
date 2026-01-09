@@ -3,6 +3,7 @@ import { socketTokenOk, secretkey } from "./jwt";
 import { IUsers } from "../DB/users";
 import jwt from "jsonwebtoken";
 import  * as cookie from "cookie";
+import { setupGameServer } from "../pong/pongServer";
 
 export async function createWebSocket(io: Server) {
 	io.use((socket, next) => {
@@ -35,6 +36,7 @@ export async function createWebSocket(io: Server) {
 });
 
 	io.on("connection", async (socket) => {
+    setupGameServer(io, socket);
 		// const raw = socket.handshake.query.token;
 		// const token: string = Array.isArray(raw) ? raw[0] : raw ?? "";
 		// const user: IUsers | null = await socketTokenOk(token);
