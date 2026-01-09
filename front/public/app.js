@@ -4495,8 +4495,11 @@ var init_tournamentNetwork = __esm({
         this.socket.on("hostTournament", (playerId) => {
           this.onTournamentHostCallback?.(playerId);
         });
-        this.socket.on("startTournamentGame", () => {
-          this.onStartTournamentGameCallback?.();
+        this.socket.on("startTournamentGame", (ennemyId, gameId) => {
+          this.onStartTournamentGameCallback?.(ennemyId, gameId);
+        });
+        this.socket.on("joinTournamentGame", (gameId) => {
+          this.onjoinTournamentGameCallback?.(gameId);
         });
         this.socket.on("disconnection", () => {
           this.onDisconnectionCallback?.();
@@ -4511,8 +4514,17 @@ var init_tournamentNetwork = __esm({
       onDisconnection(cb) {
         this.onDisconnectionCallback = cb;
       }
+      SetupSemiFinal() {
+        this.socket.emit("setupSemiFinal");
+      }
+      SetupFinal() {
+        this.socket.emit("setupFinal");
+      }
       onStartTournamentGame(cb) {
         this.onStartTournamentGameCallback = cb;
+      }
+      onJoinTournamentGame(cb) {
+        this.onjoinTournamentGameCallback = cb;
       }
       startTournament() {
         this.socket.emit("startTournament");
@@ -4536,7 +4548,6 @@ function BracketsView() {
 async function initBrackets(params) {
   const tournamentID = params?.id;
   const startTournamentButton = document.getElementById("start-button");
-  const playButton = document.getElementById("play-button");
   const pseudoP1 = document.getElementById("player1-name");
   const pseudoP2 = document.getElementById("player2-name");
   const pseudoP3 = document.getElementById("player3-name");
@@ -4554,6 +4565,11 @@ async function initBrackets(params) {
       return;
     currentTournament.applyServerState(state);
     updatePseudo();
+    console.log("currentTournament.getCurrentState().status : ", currentTournament.getCurrentState().status);
+    if (currentTournament.getCurrentState().status == "semifinal")
+      net2?.SetupSemiFinal();
+    else if (currentTournament.getCurrentState().status == "final" && currentTournament.getCurrentState().finalists.player1 != "Winner 1" && currentTournament.getCurrentState().finalists.player2 != "Winner 2")
+      net2?.SetupFinal();
   });
   net2.onTournamentHost((playerId) => {
     if (playerId == id.playerId) {
@@ -4561,22 +4577,45 @@ async function initBrackets(params) {
       startTournamentButton?.addEventListener("click", async () => {
         net2?.startTournament();
         startTournamentButton?.classList.add("hidden");
-        playButton?.classList.remove("hidden");
       });
     }
   });
-  net2.onStartTournamentGame(() => {
+  net2.onStartTournamentGame(async (ennemyId, gameId) => {
     startTournamentButton?.classList.add("hidden");
-    playButton?.classList.remove("hidden");
-    playButton?.addEventListener("click", async () => {
+    let idGame;
+    console.log("start game : ");
+    if (Number(ennemyId) == 1) {
       const vsAI = true;
-      const { gameId } = await genericFetch("/api/private/tournament/game/create", {
+      const id2 = await genericFetch("/api/private/tournament/game/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ vsAI, type: "Tournament", tournamentID })
+        body: JSON.stringify({ vsAI, type: "Tournament", tournamentID, gameId })
       });
-      navigateTo(`/pongmatch/${gameId}?tournamentId=${tournamentID}`);
+      idGame = Number(id2.id);
+    } else {
+      const id2 = await genericFetch("/api/private/tournament/game/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ localMode: false, type: "Tournament", tournamentID, gameId })
+      });
+      idGame = Number(id2.id);
+      console.log("id final : ", idGame);
+    }
+    navigateTo(`/pongmatch/${idGame}?tournamentId=${tournamentID}`);
+  });
+  net2.onJoinTournamentGame(async (gameId) => {
+    console.log("join game : ");
+    const id2 = await genericFetch("/api/private/tournament/game/join", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        gameId,
+        tournamentID
+      })
     });
+    const idGame = Number(id2.id);
+    console.log("id final : ", idGame);
+    navigateTo(`/pongmatch/${idGame}?tournamentId=${tournamentID}`);
   });
   function updatePseudo() {
     if (currentTournament) {

@@ -12,7 +12,8 @@ export class TournamentNetwork {
 	private onStateCallback?: (state: TournamentState) => void;
 	private onTournamentHostCallback?: (playerId: number) => void;
 	private onDisconnectionCallback?: () => void;
-	private onStartTournamentGameCallback?: () => void;
+	private onStartTournamentGameCallback?: (ennemyId: number, gameId: number) => void;
+	private onjoinTournamentGameCallback?: (gameId: number) => void;
 
 	constructor(serverUrl: string) {
 		this.socket = io(serverUrl, { transports: ["websocket"] });
@@ -25,8 +26,12 @@ export class TournamentNetwork {
 			this.onTournamentHostCallback?.(playerId);
 		});
 
-		this.socket.on("startTournamentGame", () => {
-			this.onStartTournamentGameCallback?.();
+		this.socket.on("startTournamentGame", (ennemyId: number, gameId: number) => {
+			this.onStartTournamentGameCallback?.(ennemyId, gameId);
+		});
+
+		this.socket.on("joinTournamentGame", (gameId: number) => {
+			this.onjoinTournamentGameCallback?.(gameId);
 		});
 
 		this.socket.on("disconnection", () => {
@@ -46,8 +51,20 @@ export class TournamentNetwork {
 		this.onDisconnectionCallback = cb;
 	}
 
-	onStartTournamentGame(cb: () => void) {
+	SetupSemiFinal() {
+		this.socket.emit("setupSemiFinal");
+	}
+
+	SetupFinal() {
+		this.socket.emit("setupFinal");
+	}
+
+	onStartTournamentGame(cb: (ennemyId: number, gameId: number) => void) {
 		this.onStartTournamentGameCallback = cb;
+	}
+
+	onJoinTournamentGame(cb: (gameId: number) => void) {
+		this.onjoinTournamentGameCallback = cb;
 	}
 
 	startTournament() {

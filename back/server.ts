@@ -30,7 +30,7 @@ import { dashboardInfo } from "./routes/dashboard/dashboard";
 import { request } from "http";
 import { navigateTo } from "../front/src/router";
 import { checkTwoFA, disableTwoFA, enableTwoFA, setupTwoFA } from "./routes/twofa/twofa";
-import { createTournament, createTournamentGame, displayTournamentList, getIdPlayers, getTournamentGameType, joinTournament } from "./routes/tournament/serverTournament";
+import { createTournament, createTournamentGame, displayTournamentList, getIdPlayers, getTournamentGameType, joinTournament, joinTournamentGame } from "./routes/tournament/serverTournament";
 
 
 export const db = new ManageDB("./back/DB/database.db");
@@ -259,17 +259,25 @@ fastify.post("/api/private/tournament/players", async (request, reply) => {
 });
 
 fastify.post("/api/private/tournament/game/create", async (request, reply) => {
-	const { localMode, type, tournamentID } = request.body as { localMode: boolean, type: "Local" | "AI" | "Online" | "Tournament", tournamentID: number };
+	const { localMode, type, tournamentID, gameId } = request.body as { localMode: boolean, type: "Local" | "AI" | "Online" | "Tournament", tournamentID: number, gameId: number };
 	const playerId = request.user?.user_id as any;
 	const { vsAI } = request.body as { vsAI: boolean };
-	let gameId: number;
 	console.log(`vsAI is: ${vsAI}`);
+	let id;
 	if (vsAI) {
-		gameId = createTournamentGame(Number(playerId), localMode, type, { vsAI: true }, Number(tournamentID));
+		id = createTournamentGame(Number(playerId), localMode, type, { vsAI: true }, Number(tournamentID), Number(gameId));
 	} else {
-		gameId = createTournamentGame(Number(playerId), localMode, type, { vsAI: false }, Number(tournamentID));
+		id = createTournamentGame(Number(playerId), localMode, type, { vsAI: false }, Number(tournamentID), Number(gameId));
 	}
-	reply.send({ gameId });
+	return { id };
+});
+
+fastify.post("/api/private/tournament/game/join", async (request, reply) => {
+	const { gameId, tournamentID } = request.body as { gameId: number, tournamentID: number };
+	const playerId = request.user?.user_id as any;
+	const gameid = joinTournamentGame(playerId, Number(gameId), Number(tournamentID));
+	console.log("gameid join : ", gameid);
+	return { gameid };
 });
 
 fastify.post("/api/private/tournament/add", (req, reply) => {

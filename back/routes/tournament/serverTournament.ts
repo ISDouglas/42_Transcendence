@@ -14,7 +14,8 @@ export class serverTournament {
 	games = new Map<number, ServerGame>();
 	idPlayers: number[];
 	sockets: { player1: string | null, player2: string | null, player3: string | null, player4: string | null };
-	arr_index: number[];
+	semi_index: number[];
+	final_arr: number[];
 	index: number;
 	private io?: Server;
 	disconnectTimer: NodeJS.Timeout | null;
@@ -26,7 +27,8 @@ export class serverTournament {
 		this.idPlayers = Array(4).fill(1);
 		this.sockets = { player1: null, player2: null, player3: null, player4: null };
 		this.io = io;
-		this.arr_index = [0, 2, 1, 3];
+		this.semi_index = [0, 2, 1, 3];
+		this.final_arr = [0, 0];
 		this.index = 0;
 		this.disconnectTimer = null;
 		this.state = {
@@ -101,9 +103,9 @@ export function joinTournament(playerId: number, tournamentId: number)
 		let i = tournament.index;
 		for (i; i < 4; i++)
 		{
-			if (tournament.idPlayers[tournament.arr_index[i]] == 1)
+			if (tournament.idPlayers[tournament.semi_index[i]] == 1)
 			{
-				tournament.idPlayers[tournament.arr_index[i]] = playerId;
+				tournament.idPlayers[tournament.semi_index[i]] = playerId;
 				return;
 			}
 		}
@@ -111,16 +113,15 @@ export function joinTournament(playerId: number, tournamentId: number)
 	}
 }
 
-export function createTournamentGame(PlayerId: number,  isLocal: boolean, type: "Local" | "AI" | "Online" | "Tournament", options: { vsAI: boolean }, tournamentID: number): number 
+export function createTournamentGame(PlayerId: number,  isLocal: boolean, type: "Local" | "AI" | "Online" | "Tournament", options: { vsAI: boolean }, tournamentID: number, gameId: number): number 
 {
 	const tournament = tournaments_map.get(tournamentID);
 	if (tournament)
 	{
 		let id: number = tournamentID * 1000;
-		while (tournament.games.has(id))
-			id++;
-		const gameId = id;
-		const game = new ServerGame(gameId, isLocal);
+		id += gameId;
+		console.log("gameid back creation : ", id);
+		const game = new ServerGame(id, isLocal);
 		game.idPlayer1 = PlayerId;
 		game.type = type;
 		if (options.vsAI)
@@ -129,11 +130,32 @@ export function createTournamentGame(PlayerId: number,  isLocal: boolean, type: 
 			if (game.type != "Tournament")
 				game.type = "AI";
 		}
-		tournament.games.set(gameId, game);
-		return gameId;
+		tournament.games.set(id, game);
+		return id;
 	}
 	else
 		return -1;
+}
+
+export function joinTournamentGame(playerId: number, gameId: number, tournamentID: number) : number
+{
+	const tournament = tournaments_map.get(tournamentID);
+	if (tournament)
+	{
+		let id: number = tournamentID * 1000;
+		id += gameId;
+		console.log("gameid back join : ", id);
+		const game = tournament.games.get(id);
+		if (game)
+		{
+			if (game.idPlayer2 == 0)
+				game.idPlayer2 = playerId;
+			else
+				console.log("Game is already full.");
+		}
+		return id;
+	}
+	return -1;
 }
 
 export function getIdPlayers(tournamentId: number) {

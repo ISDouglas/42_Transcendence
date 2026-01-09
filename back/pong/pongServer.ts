@@ -160,7 +160,7 @@ export function setupGameServer(io: Server, users: Users) {
 				if (!tournament.disconnectTimer) {
 					tournament.disconnectTimer = setTimeout(() => {
 						console.log("Timeout disconnected game : ", tournamentId);
-						io.to(`tournament-${tournament.id}`).emit("noReconnection");
+						io.to(`tournament-${tournamentId}`).emit("state", updateStateTournament(tournament.state));
 						tournaments_map.delete(tournamentId);
 					}, 5 * 60 * 1000);
 				}
@@ -181,7 +181,57 @@ export function setupGameServer(io: Server, users: Users) {
 				if (tournament.idPlayers[3] === 1)
 					tournament.state.pseudo.player4 = "AI";
 				io.to(`tournament-${tournamentId}`).emit("state", updateStateTournament(tournament.state));
-				io.to(`tournament-${tournamentId}`).emit("startTournamentGame");
+				
+			});
+
+			socket.on("setupSemiFinal", () => {
+				let ennemyId;
+				let i = 0;
+				for (; i < 4; i++)
+				{
+					if (playerId == tournament.idPlayers[i])
+					{
+						if (i % 2 == 0)
+							ennemyId = tournament.idPlayers[i + 1];
+						else
+							ennemyId = tournament.idPlayers[i - 1];
+						break;
+					}
+				}
+				let gameId;
+				if (i < 2)
+					gameId = 0;
+				else
+					gameId = 1;
+				if (tournament.final_arr[0] == 0 && tournament.final_arr[1] == 0)
+				{
+					if (ennemyId == 1 || i % 2 == 0)
+					{
+						io.to(socket.id).emit("startTournamentGame", ennemyId, gameId);
+					}
+					else
+						io.to(socket.id).emit("joinTournamentGame", ennemyId, gameId);
+				}
+			});
+
+			socket.on("setupFinal", () => {
+				let ennemyId;
+				let gameId = 2;
+				if (playerId == tournament.final_arr[0])
+					io.to(socket.id).emit("startTournamentGame", ennemyId, gameId);
+				else
+				{
+					if (tournament.final_arr[0] == 0)
+					{
+						if (!tournament.disconnectTimer) {
+							tournament.disconnectTimer = setTimeout(() => {
+								if (tournament.final_arr[0] != 0)
+									return;
+							}, 5 * 60 * 1000);
+						}
+					}
+					io.to(socket.id).emit("joinTournamentGame", ennemyId, gameId);
+				}
 			});
 		});
 	});
@@ -200,6 +250,8 @@ function updateBrackets(tournament: serverTournament)
 			return;
 		}
 		tournament.state.finalists.player1 = game1.winner;
+		if (tournament.state.finalists.player1 != "")
+			tournament.final_arr[0] = game1.idwinner;
 
 		const game2 = tournament.games.get(gameId + 1);
 		if (!game2)
@@ -208,8 +260,11 @@ function updateBrackets(tournament: serverTournament)
 			return;
 		}
 		tournament.state.finalists.player2 = game2.winner;
+		if (tournament.state.finalists.player2 != "")
+			tournament.final_arr[1] = game2.idwinner;
 
-		tournament.state.status = "final";
+		if (tournament.final_arr[0] != 0 && tournament.final_arr[1] != 0)
+			tournament.state.status = "final";
 	}
 	if (tournament.state.status == "final")
 	{
@@ -250,11 +305,13 @@ export function checkForWinner(game: ServerGame, io: Server)
 		if (game.state.score.player1 > game.state.score.player2)
 		{
 			game.winner = game.state.pseudo.player1;
+			game.idwinner = game.idPlayer1;
 			endGame(game.idPlayer1, game.idPlayer2, game.state.score.player1, game.state.score.player2, game.duration , game.id, gameInfo, game.type);
 		}
 		else
 		{
 			game.winner = game.state.pseudo.player2;
+			game.idwinner = game.idPlayer2;
 			endGame(game.idPlayer2, game.idPlayer1, game.state.score.player2, game.state.score.player1, game.duration , game.id, gameInfo, game.type);
 		}
 		io.to(`game-${game.id}`).emit("gameOver");

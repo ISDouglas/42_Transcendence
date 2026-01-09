@@ -13,7 +13,6 @@ export function BracketsView(): string {
 export async function initBrackets(params?: any) {
 	const tournamentID: string = params?.id;
 	const startTournamentButton = document.getElementById("start-button");
-	const playButton = document.getElementById("play-button");
 	const pseudoP1 = document.getElementById("player1-name");
 	const pseudoP2 = document.getElementById("player2-name");
 	const pseudoP3 = document.getElementById("player3-name");
@@ -37,6 +36,11 @@ export async function initBrackets(params?: any) {
 			return;
 		currentTournament.applyServerState(state);
 		updatePseudo();
+		console.log("currentTournament.getCurrentState().status : ", currentTournament.getCurrentState().status);
+		if (currentTournament.getCurrentState().status == "semifinal")
+			net?.SetupSemiFinal();
+		else if (currentTournament.getCurrentState().status == "final" && currentTournament.getCurrentState().finalists.player1 != "Winner 1" && currentTournament.getCurrentState().finalists.player2 != "Winner 2")
+			net?.SetupFinal();
 	});
 
 	net.onTournamentHost((playerId: number) => {
@@ -46,23 +50,50 @@ export async function initBrackets(params?: any) {
 			startTournamentButton?.addEventListener("click", async () => {
 				net?.startTournament();
 				startTournamentButton?.classList.add("hidden");
-				playButton?.classList.remove("hidden");
 			});
 		}
 	});
 
-	net.onStartTournamentGame(() => {
+	net.onStartTournamentGame(async (ennemyId: number, gameId: number) => {
 		startTournamentButton?.classList.add("hidden");
-		playButton?.classList.remove("hidden");
-		playButton?.addEventListener("click", async () => {
-				const vsAI = true;
-				const { gameId } = await genericFetch("/api/private/tournament/game/create", {
-					method: "POST",
-					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({ vsAI, type: "Tournament", tournamentID })
-				});
-				navigateTo(`/pongmatch/${gameId}?tournamentId=${tournamentID}`);
+		let idGame;
+		console.log("start game : ");
+		if (Number(ennemyId) == 1)
+		{
+			const vsAI = true;
+			const id = await genericFetch("/api/private/tournament/game/create", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ vsAI, type: "Tournament", tournamentID, gameId: gameId })
 			});
+			idGame = Number(id.id);
+		}
+		else
+		{
+			const id = await genericFetch("/api/private/tournament/game/create", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ localMode: false, type: "Tournament", tournamentID, gameId: gameId })
+			});
+			idGame = Number(id.id);
+			console.log("id final : ", idGame);
+		}
+		navigateTo(`/pongmatch/${idGame}?tournamentId=${tournamentID}`);
+	});
+
+	net.onJoinTournamentGame(async (gameId: number) => {
+		console.log("join game : ");
+		const id = await genericFetch("/api/private/tournament/game/join", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({
+				gameId: gameId,
+				tournamentID: tournamentID
+			})
+		});
+		const idGame = Number(id.id);
+		console.log("id final : ", idGame);
+		navigateTo(`/pongmatch/${idGame}?tournamentId=${tournamentID}`);
 	});
 
 	function updatePseudo() {
