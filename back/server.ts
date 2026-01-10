@@ -246,13 +246,9 @@ fastify.post("/api/private/game/type", async (request, reply) => {
 	const { gameId, tournamentId } = request.body as { gameId: number, tournamentId: number };
 	let type;
 	if (tournamentId)
-	{
 		type = getTournamentGameType(Number(tournamentId), Number(gameId));
-	}
 	else
-	{
 		type = getGameType(Number(gameId));
-	}
 	reply.send({ type });
 });
 
@@ -275,13 +271,6 @@ fastify.post("/api/private/tournament/join", async (request, reply) => {
 	const id = Number(tournamentId);
 	joinTournament(playerId, id);
 	reply.send({ message: "Player joined tournament" });
-});
-
-fastify.post("/api/private/tournament/players", async (request, reply) => {
-	const { tournamentID } = request.body as any;
-	const id = Number(tournamentID);
-	const idPlayers = getIdPlayers(id);
-	return { idPlayers };
 });
 
 fastify.post("/api/private/tournament/add", (req, reply) => {
