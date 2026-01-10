@@ -3,40 +3,50 @@ import { socketTokenOk, secretkey } from "./jwt";
 import { IUsers } from "../DB/users";
 import jwt from "jsonwebtoken";
 import  * as cookie from "cookie";
-import { setupGameServer } from "../pong/pongServer";
+import { handleGameSocket } from "../pong/pongServer";
+import { handleTournamentSocket } from "../pong/tournamentServer";
+import { tournaments_map } from "../routes/tournament/serverTournament";
 
 export async function createWebSocket(io: Server) {
 	io.use((socket, next) => {
   try {
-    // 1. Récupérer le header cookie
-    const cookieHeader = socket.request.headers.cookie;
-    if (!cookieHeader) {
-      return next(new Error("No cookie"));
-    }
+	// 1. Récupérer le header cookie
+	const cookieHeader = socket.request.headers.cookie;
+	if (!cookieHeader) {
+	  return next(new Error("No cookie"));
+	}
 
-    // 2. Parser les cookies
-    const cookies = cookie.parse(cookieHeader);
-    const token = cookies.token; // nom de ton cookie
+	// 2. Parser les cookies
+	const cookies = cookie.parse(cookieHeader);
+	const token = cookies.token; // nom de ton cookie
 
-    if (!token) {
-      return next(new Error("No token"));
-    }
+	if (!token) {
+	  return next(new Error("No token"));
+	}
 
-    // 3. Vérifier le JWT
-    const user = jwt.verify(token, secretkey);
+	// 3. Vérifier le JWT
+	const user = jwt.verify(token, secretkey);
 
-    // 4. Attacher le user au socket
-    socket.data.user = user;
+	// 4. Attacher le user au socket
+	socket.data.user = user;
 	console.log("id =", socket.data.user.id, " pseudo =", socket.data.user.pseudo, "avatar =", socket.data.user.avatar);
 
-    next();
+	next();
   } catch (err) {
-    next(new Error("Unauthorized"));
+	next(new Error("Unauthorized"));
   }
 });
 
 	io.on("connection", async (socket) => {
-    setupGameServer(io, socket);
+		socket.on("joinGame", async (gameId: number, playerId: number, tournamentId: number) => {
+			handleGameSocket(io, socket, gameId, playerId, tournamentId);
+		});
+
+		socket.on("joinTournament", async (tournamentId: number, playerId: number) => {
+			handleTournamentSocket(io, socket, tournaments_map, tournamentId, playerId);
+		});
+
+
 		// const raw = socket.handshake.query.token;
 		// const token: string = Array.isArray(raw) ? raw[0] : raw ?? "";
 		// const user: IUsers | null = await socketTokenOk(token);

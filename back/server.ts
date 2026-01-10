@@ -22,7 +22,6 @@ import * as tournamentService from "./routes/tournament/tournament.service";
 import { getProfile } from "./routes/profile/profile";
 import { getUpdateInfo, getUpdateUsername, getUpdateEmail, getUploadAvatar, getUpdatePassword, getUpdateStatus, deleteUser } from "./routes/profile/getUpdate";
 import { logout } from "./routes/logout/logout";
-import { setupGameServer } from "./pong/pongServer";
 import { Friends } from "./DB/friend";
 import { allMyFriendsAndOpponent, searchUser, addFriend, acceptFriend, deleteFriend } from "./routes/friends/friends";
 import fastifyMetrics from "fastify-metrics";
