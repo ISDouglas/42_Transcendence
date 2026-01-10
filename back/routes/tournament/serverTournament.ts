@@ -123,12 +123,11 @@ export function createTournamentGame(PlayerId: number,  isLocal: boolean, type: 
 		console.log("gameid back creation : ", id);
 		const game = new ServerGame(id, isLocal);
 		game.idPlayer1 = PlayerId;
+		console.log("game.idPlayer1 : ", game.idPlayer1);
 		game.type = type;
 		if (options.vsAI)
 		{
 			game.idPlayer2 = -1;
-			if (game.type != "Tournament")
-				game.type = "AI";
 		}
 		tournament.games.set(id, game);
 		return id;

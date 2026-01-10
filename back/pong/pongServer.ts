@@ -7,9 +7,62 @@ import { serverTournament, tournaments_map } from "../routes/tournament/serverTo
 import { TournamentState } from "../../front/src/tournament/tournamentNetwork";
 
 export function setupGameServer(io: Server, socket: Socket) {
+	socket.on("joinGame", async (gameId: number, playerId: number, tournamentId: number) => {
+		let tournament = tournaments_map.get(tournamentId);
+		let game;
+		if (tournament)
+		{
+			game = tournament.games.get(gameId);
+		}
+		else
+		{
+			game = games_map.get(gameId);
+		}
+		if (!game)
+			return;
 
+		//add io (server) to game
+		game.setIo(io);
+		const pseudo = socket.data.user.pseudo;
+		// join room
+		socket.join(`game-${gameId}`);
 
-		socket.on("joinGame", async (gameId: number, playerId: number, tournamentId: number) => {
+		if (game.disconnectTimer) {
+			clearTimeout(game.disconnectTimer);
+			game.disconnectTimer = null;
+		}
+
+		if (game.isLocal === true)
+		{
+			console.log("game local");
+			initLocal(game, io, socket, gameId, pseudo);
+		}
+		else
+		{
+			console.log("game remote and AI");
+			initRemoteAndAi(game, io, socket, gameId, playerId, pseudo);
+		}
+
+		//after countdown, match is starting
+		socket.on("startGame", () => {
+			let tournament = tournaments_map.get(tournamentId);
+			let game;
+			if (tournament)
+			{
+				game = tournament.games.get(gameId);
+			}
+			else
+			{
+				game = games_map.get(gameId);
+			}
+			if (!game)
+				return;
+			game.status = "playing";
+			socket.emit("state", updateStateGame(game.state, game.status));
+		});
+
+		// Input
+		socket.on("input", ({ direction, player }: { direction: "up" | "down" | "stop", player?: "player1" | "player2" }) => {
 			let tournament = tournaments_map.get(tournamentId);
 			let game;
 			if (tournament)
@@ -23,240 +76,192 @@ export function setupGameServer(io: Server, socket: Socket) {
 			if (!game)
 				return;
 
-			//add io (server) to game
-			game.setIo(io);
-			const pseudo = socket.data.pseudo;
-			// join room
-			socket.join(`game-${gameId}`);
-
-			if (game.disconnectTimer) {
-				clearTimeout(game.disconnectTimer);
-				game.disconnectTimer = null;
-			}
-
-			if (game.isLocal === true)
-				initLocal(game, io, socket, gameId, pseudo.pseudo);
-			else
-				initRemoteAndAi(game, io, socket, gameId, playerId, pseudo.pseudo);
-
-			//after countdown, match is starting
-			socket.on("startGame", () => {
-				let tournament = tournaments_map.get(tournamentId);
-				let game;
-				if (tournament)
-				{
-					game = tournament.games.get(gameId);
-				}
-				else
-				{
-					game = games_map.get(gameId);
-				}
-				if (!game)
-					return;
-				game.status = "playing";
-				socket.emit("state", updateStateGame(game.state, game.status));
-			});
-
-			// Input
-			socket.on("input", ({ direction, player }: { direction: "up" | "down" | "stop", player?: "player1" | "player2" }) => {
-				let tournament = tournaments_map.get(tournamentId);
-				let game;
-				if (tournament)
-				{
-					game = tournament.games.get(gameId);
-				}
-				else
-				{
-					game = games_map.get(gameId);
-				}
-				if (!game)
-					return;
-
-				const actualPlayer = game.isLocal ? player : getPlayer(game, socket);
-				if (!actualPlayer)
-					return;
-
-				applyInput(game?.state, actualPlayer, direction);
-			});
-
-			// Disconnect
-			socket.on("disconnect", () => {
-				let tournament = tournaments_map.get(tournamentId);
-				let game;
-				if (tournament)
-				{
-					game = tournament.games.get(gameId);
-				}
-				else
-				{
-					game = games_map.get(gameId);
-				}
-				if (!game)
-					return;
-
-				console.log("Client disconnected:", socket.id);
-
-				if (game!.sockets.player1 === socket.id)
-					game!.sockets.player1 = null;
-
-				if (game!.sockets.player2 === socket.id)
-					game!.sockets.player2 = null;
-
-				game.status = "disconnected";
-				io.to(`game-${gameId}`).emit("state", updateStateGame(game.state, game.status));
-				io.to(`game-${game.id}`).emit("disconnection", updateStateGame(game.state, game.status));
-
-				if (!game.disconnectTimer) {
-					game.disconnectTimer = setTimeout(() => {
-						console.log("Timeout disconnected game : ", gameId);
-						io.to(`game-${game.id}`).emit("noReconnection");
-						games_map.delete(gameId);
-					}, 5 * 60 * 1000);
-				}
-			});
-		});
-
-
-		socket.on("joinTournament", async (tournamentId: number, playerId: number) => {
-			let tournament = tournaments_map.get(tournamentId);
-			
-			if (!tournament || playerId === undefined)
+			const actualPlayer = game.isLocal ? player : getPlayer(game, socket);
+			if (!actualPlayer)
 				return;
 
-			tournament.setIo(io);
-			const pseudo = await users.getPseudoFromId(playerId);
+			applyInput(game?.state, actualPlayer, direction);
+		});
 
-			// join room
-			socket.join(`tournament-${tournamentId}`);
-
-			if (tournament.disconnectTimer) {
-				clearTimeout(tournament.disconnectTimer);
-				tournament.disconnectTimer = null;
-			}
-
-			fillSocketTournament(playerId, tournament, socket, pseudo.pseudo);
-
-			updateBrackets(tournament);
-			io.to(`tournament-${tournamentId}`).emit("state", updateStateTournament(tournament.state));
-			if (playerId == tournament.idPlayers[0])
+		// Disconnect
+		socket.on("disconnect", () => {
+			let tournament = tournaments_map.get(tournamentId);
+			let game;
+			if (tournament)
 			{
-				if (tournament.state.status === "waiting")
-					io.to(`tournament-${tournamentId}`).emit("hostTournament", playerId);
+				game = tournament.games.get(gameId);
+			}
+			else
+			{
+				game = games_map.get(gameId);
+			}
+			if (!game)
+				return;
+
+			console.log("Client disconnected:", socket.id);
+
+			if (game!.sockets.player1 === socket.id)
+				game!.sockets.player1 = null;
+
+			if (game!.sockets.player2 === socket.id)
+				game!.sockets.player2 = null;
+
+			game.status = "disconnected";
+			io.to(`game-${gameId}`).emit("state", updateStateGame(game.state, game.status));
+			io.to(`game-${game.id}`).emit("disconnection", updateStateGame(game.state, game.status));
+
+			if (!game.disconnectTimer) {
+				game.disconnectTimer = setTimeout(() => {
+					console.log("Timeout disconnected game : ", gameId);
+					io.to(`game-${game.id}`).emit("noReconnection");
+					games_map.delete(gameId);
+				}, 5 * 60 * 1000);
+			}
+		});
+	});
+
+
+	socket.on("joinTournament", async (tournamentId: number, playerId: number) => {
+		let tournament = tournaments_map.get(tournamentId);
+		
+		if (!tournament || playerId === undefined)
+			return;
+
+		tournament.setIo(io);
+		const pseudo = socket.data.user.pseudo;
+
+		// join room
+		socket.join(`tournament-${tournamentId}`);
+
+		if (tournament.disconnectTimer) {
+			clearTimeout(tournament.disconnectTimer);
+			tournament.disconnectTimer = null;
+		}
+
+		console.log("PlayerId : ", playerId);
+		fillSocketTournament(playerId, tournament, socket, pseudo);
+
+		updateBrackets(tournament);
+		io.to(`tournament-${tournamentId}`).emit("state", updateStateTournament(tournament.state));
+		if (playerId == tournament.idPlayers[0])
+		{
+			if (tournament.state.status === "waiting")
+				io.to(`tournament-${tournamentId}`).emit("hostTournament", playerId);
+		}
+
+		socket.on("disconnect", () => {
+			let tournament = tournaments_map.get(tournamentId);
+			if (!tournament)
+				return;
+
+			console.log("Client disconnected:", socket.id);
+
+			removeSocketTournament(tournament, socket);
+
+			io.to(`tournament-${tournamentId}`).emit("state", updateStateTournament(tournament.state));
+
+			//disconnect player from tournament after 5 minutes
+			if (!tournament.disconnectTimer) {
+				tournament.disconnectTimer = setTimeout(() => {
+					console.log("Timeout disconnected game : ", tournamentId);
+					io.to(`tournament-${tournamentId}`).emit("state", updateStateTournament(tournament.state));
+					tournaments_map.delete(tournamentId);
+				}, 5 * 60 * 1000);
 			}
 
-			socket.on("disconnect", () => {
-				let tournament = tournaments_map.get(tournamentId);
-				if (!tournament)
-					return;
+		});
 
-				console.log("Client disconnected:", socket.id);
+		socket.on("startTournament", () => {
+			let tournament = tournaments_map.get(tournamentId);
+			if (!tournament)
+				return;
+			tournament.state.status = "semifinal";
+			if (tournament.idPlayers[0] === 1)
+				tournament.state.pseudo.player1 = "AI";
+			if (tournament.idPlayers[1] === 1)
+				tournament.state.pseudo.player2 = "AI";
+			if (tournament.idPlayers[2] === 1)
+				tournament.state.pseudo.player3 = "AI";
+			if (tournament.idPlayers[3] === 1)
+				tournament.state.pseudo.player4 = "AI";
+			io.to(`tournament-${tournamentId}`).emit("state", updateStateTournament(tournament.state));
+			
+		});
 
-				removeSocketTournament(tournament, socket);
-
-				io.to(`tournament-${tournamentId}`).emit("state", updateStateTournament(tournament.state));
-
-				//disconnect player from tournament after 5 minutes
-				if (!tournament.disconnectTimer) {
-					tournament.disconnectTimer = setTimeout(() => {
-						console.log("Timeout disconnected game : ", tournamentId);
-						io.to(`tournament-${tournamentId}`).emit("state", updateStateTournament(tournament.state));
-						tournaments_map.delete(tournamentId);
-					}, 5 * 60 * 1000);
-				}
-
-			});
-
-			socket.on("startTournament", () => {
-				let tournament = tournaments_map.get(tournamentId);
-				if (!tournament)
-					return;
-				tournament.state.status = "semifinal";
-				if (tournament.idPlayers[0] === 1)
-					tournament.state.pseudo.player1 = "AI";
-				if (tournament.idPlayers[1] === 1)
-					tournament.state.pseudo.player2 = "AI";
-				if (tournament.idPlayers[2] === 1)
-					tournament.state.pseudo.player3 = "AI";
-				if (tournament.idPlayers[3] === 1)
-					tournament.state.pseudo.player4 = "AI";
-				io.to(`tournament-${tournamentId}`).emit("state", updateStateTournament(tournament.state));
-				
-			});
-
-			socket.on("setupSemiFinal", () => {
-				let ennemyId;
-				let i = 0;
-				for (; i < 4; i++)
+		socket.on("setupSemiFinal", () => {
+			let ennemyId;
+			let i = 0;
+			for (; i < 4; i++)
+			{
+				if (playerId == tournament.idPlayers[i])
 				{
-					if (playerId == tournament.idPlayers[i])
-					{
-						if (i % 2 == 0)
-							ennemyId = tournament.idPlayers[i + 1];
-						else
-							ennemyId = tournament.idPlayers[i - 1];
-						break;
-					}
-				}
-				let gameId;
-				if (i < 2)
-					gameId = 0;
-				else
-					gameId = 1;
-				if (tournament.final_arr[0] == 0 && tournament.final_arr[1] == 0)
-				{
-					console.log("EnnemyId: ", ennemyId);
-					if (ennemyId == 1 || i % 2 == 0)
-					{
-						io.to(socket.id).emit("startTournamentGame", ennemyId, gameId);
-					}
+					if (i % 2 == 0)
+						ennemyId = tournament.idPlayers[i + 1];
 					else
-						io.to(socket.id).emit("joinTournamentGame", ennemyId, gameId);
+						ennemyId = tournament.idPlayers[i - 1];
+					break;
 				}
-			});
-
-			socket.on("setupFinal", () => {
-				let ennemyId;
-				let gameId = 2;
-				if (playerId == tournament.final_arr[0])
+			}
+			let gameId;
+			if (i < 2)
+				gameId = 0;
+			else
+				gameId = 1;
+			if (tournament.final_arr[0] == 0 && tournament.final_arr[1] == 0)
+			{
+				console.log("EnnemyId: ", ennemyId);
+				if (ennemyId == 1 || i % 2 == 0)
 				{
-					if (tournament.final_arr[1] == 0)
-					{
-						if (!tournament.disconnectTimer) {
-							tournament.disconnectTimer = setTimeout(() => {
-								if (tournament.final_arr[1] != 0)
-								{
-									return;
-								}
-							}, 5 * 60 * 1000);
-						}
-					}
-					ennemyId = tournament.final_arr[1];
-					if (ennemyId == -1)
-						ennemyId = 1;
-					console.log("ennemyId create : ", ennemyId);
 					io.to(socket.id).emit("startTournamentGame", ennemyId, gameId);
 				}
-				else if (playerId == tournament.final_arr[1])
-				{
-					if (tournament.final_arr[0] == 0)
-					{
-						if (!tournament.disconnectTimer) {
-							tournament.disconnectTimer = setTimeout(() => {
-								if (tournament.final_arr[0] != 0)
-								{
-									return;
-								}
-							}, 5 * 60 * 1000);
-						}
-					}
-					ennemyId = tournament.final_arr[0];
-					if (ennemyId == -1)
-						ennemyId = 1;
-					console.log("ennemyId join : ", ennemyId);
+				else
 					io.to(socket.id).emit("joinTournamentGame", ennemyId, gameId);
-				}
-			});
+			}
 		});
+
+		socket.on("setupFinal", () => {
+			let ennemyId;
+			let gameId = 2;
+			if (playerId == tournament.final_arr[0])
+			{
+				if (tournament.final_arr[1] == 0)
+				{
+					if (!tournament.disconnectTimer) {
+						tournament.disconnectTimer = setTimeout(() => {
+							if (tournament.final_arr[1] != 0)
+							{
+								return;
+							}
+						}, 5 * 60 * 1000);
+					}
+				}
+				ennemyId = tournament.final_arr[1];
+				if (ennemyId == -1)
+					ennemyId = 1;
+				console.log("ennemyId create : ", ennemyId);
+				io.to(socket.id).emit("startTournamentGame", ennemyId, gameId);
+			}
+			else if (playerId == tournament.final_arr[1])
+			{
+				if (tournament.final_arr[0] == 0)
+				{
+					if (!tournament.disconnectTimer) {
+						tournament.disconnectTimer = setTimeout(() => {
+							if (tournament.final_arr[0] != 0)
+							{
+								return;
+							}
+						}, 5 * 60 * 1000);
+					}
+				}
+				ennemyId = tournament.final_arr[0];
+				if (ennemyId == -1)
+					ennemyId = 1;
+				console.log("ennemyId join : ", ennemyId);
+				io.to(socket.id).emit("joinTournamentGame", ennemyId, gameId);
+			}
+		});
+	});
 }
 
 function updateBrackets(tournament: serverTournament)
@@ -439,22 +444,23 @@ function fillSocketTournament(playerId: Number, tournament: serverTournament, so
 {
 	if (playerId === tournament.idPlayers[0])
 	{
-		tournament.sockets.player1 = socket.id;
+		tournament.sockets.player1 = socket.data.user.id;
 		tournament.state.pseudo.player1 = pseudo;
+		console.log("tournament.sockets.player1 : ", tournament.sockets.player1);
 	}
 	else if (playerId === tournament.idPlayers[1])
 	{
-		tournament.sockets.player2 = socket.id;
+		tournament.sockets.player2 = socket.data.user.id;
 		tournament.state.pseudo.player2 = pseudo;
 	}
 	else if (playerId === tournament.idPlayers[2])
 	{
-		tournament.sockets.player3 = socket.id;
+		tournament.sockets.player3 = socket.data.user.id;
 		tournament.state.pseudo.player3 = pseudo;
 	}
 	else if (playerId === tournament.idPlayers[3])
 	{
-		tournament.sockets.player4 = socket.id;
+		tournament.sockets.player4 = socket.data.user.id;
 		tournament.state.pseudo.player4 = pseudo;
 	}
 	else

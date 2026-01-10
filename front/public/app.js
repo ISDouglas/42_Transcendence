@@ -4161,7 +4161,7 @@ var init_gameNetwork = __esm({
       constructor(serverUrl) {
         const { globalSocket: globalSocket2 } = (init_socket3(), __toCommonJS(socket_exports));
         if (!globalSocket2)
-          throw new Error("globalSocket n'est pas initialis\xE9 !");
+          throw new Error("globalSocket uninitialized");
         this.socket = globalSocket2;
         this.socket.on("assignRole", (role) => {
           this.onRoleCallback?.(role);
@@ -4398,7 +4398,6 @@ async function initPongMatch(params) {
       interval = setInterval(() => {
         countdown--;
         if (countdown < 0) {
-          console.log("oupsi");
           clearInterval(interval);
           navigateTo(`/brackets/${tournamentId}`);
         }
@@ -4554,10 +4553,12 @@ var TournamentNetwork;
 var init_tournamentNetwork = __esm({
   "front/src/tournament/tournamentNetwork.ts"() {
     "use strict";
-    init_esm5();
     TournamentNetwork = class {
       constructor(serverUrl) {
-        this.socket = lookup2(serverUrl, { transports: ["websocket"] });
+        const { globalSocket: globalSocket2 } = (init_socket3(), __toCommonJS(socket_exports));
+        if (!globalSocket2)
+          throw new Error("globalSocket uninitialized");
+        this.socket = globalSocket2;
         this.socket.on("state", (state) => {
           this.onStateCallback?.(state);
         });
@@ -4603,7 +4604,6 @@ var init_tournamentNetwork = __esm({
       }
       disconnect() {
         this.socket.emit("disconnection");
-        this.socket.disconnect();
       }
     };
   }

@@ -182,7 +182,6 @@ export async function initPongMatch(params?: any) {
 			interval = setInterval(() => {
 			countdown--;
 			if (countdown < 0) {
-				console.log("oupsi");
 				clearInterval(interval);
 				navigateTo(`/brackets/${tournamentId}`);
 			}
