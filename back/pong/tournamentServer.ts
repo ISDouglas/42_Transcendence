@@ -1,76 +1,73 @@
 import { Server, Socket } from "socket.io";
-import { createTournamentGame, joinTournamentGame, serverTournament } from "../routes/tournament/serverTournament";
+import { createTournamentGame, joinTournamentGame, serverTournament, tournaments_map } from "../routes/tournament/serverTournament";
 import { TournamentState } from "../../front/src/tournament/tournamentNetwork";
 
-export function handleTournamentSocket(io: Server, socket: Socket, tournaments_map: Map<number, serverTournament>, tournamentId: number)
+export function handleTournamentSocket(io: Server, socket: Socket)
 {
-	let tournament = tournaments_map.get(tournamentId);
-	const playerId = socket.data.user.id;
-
-	if (!tournament || playerId === undefined)
-		return;
-
-	// join room
-	socket.join(`tournament-${tournamentId}`);
-
-	//reset timer
-	if (tournament.disconnectTimer) {
-		clearTimeout(tournament.disconnectTimer);
-		tournament.disconnectTimer = null;
-	}
-
-	fillSocketTournament(playerId, tournament, socket);
-	updateBrackets(tournament);
-	io.to(`tournament-${tournamentId}`).emit("state", updateStateTournament(tournament.state));
-
-	//emit to display start button for tournament creator
-	if (playerId == tournament.idPlayers[0])
-	{
-		if (tournament.state.status === "waiting")
-			io.to(socket.id).emit("hostTournament");
-	}
+	socket.on("joinTournament", (tournamentId: number) => {
+		let tournament = tournaments_map.get(tournamentId);
+		const playerId = socket.data.user.id;
+	
+		if (!tournament || playerId === undefined)
+			return;
+	
+		// join room
+		socket.join(`tournament-${tournamentId}`);
+	
+		socket.data.tournamentId = tournamentId;
+		//reset timer
+		if (tournament.disconnectTimer) {
+			clearTimeout(tournament.disconnectTimer);
+			tournament.disconnectTimer = null;
+		}
+	
+		fillSocketTournament(playerId, tournament, socket);
+		updateBrackets(tournament);
+		io.to(`tournament-${tournamentId}`).emit("state", updateStateTournament(tournament.state));
+	
+		//emit to display start button for tournament creator
+		if (playerId == tournament.idPlayers[0] && tournament.state.status === "waiting")
+				io.to(socket.id).emit("hostTournament", tournamentId);
+	});
 
 	socket.on("disconnect", () => {
+		const tournamentId = socket.data.tournamentId;
 		let tournament = tournaments_map.get(tournamentId);
 		if (!tournament)
 			return;
 
-		console.log("Client disconnected:", socket.id);
-
-		removeSocketTournament(tournament, socket);
-
-		io.to(`tournament-${tournamentId}`).emit("state", updateStateTournament(tournament.state));
-
-		//disconnect player from tournament after 30 secondes (TO CHECK)
-		if (!tournament.disconnectTimer) {
-			tournament.disconnectTimer = setTimeout(() => {
-				console.log("Timeout disconnected game : ", tournamentId);
-				io.to(`tournament-${tournamentId}`).emit("state", updateStateTournament(tournament.state));
-				tournaments_map.delete(tournamentId);
-			}, 1 * 30 * 1000);
+		if (tournament.state.status === "finished")
+		{
+			console.log("Client disconnected:", socket.id);	
+			tournaments_map.delete(tournamentId);
 		}
-
 	});
 
 	socket.on("startTournament", () => {
+		const tournamentId = socket.data.tournamentId;
 		let tournament = tournaments_map.get(tournamentId);
 		if (!tournament)
 			return;
 		tournament.state.status = "semifinal";
-		if (tournament.idPlayers[0] === 1)
+		if (tournament.idPlayers[0] === -1)
 			tournament.state.pseudo.player1 = "AI";
-		if (tournament.idPlayers[1] === 1)
+		if (tournament.idPlayers[1] === -1)
 			tournament.state.pseudo.player2 = "AI";
-		if (tournament.idPlayers[2] === 1)
+		if (tournament.idPlayers[2] === -1)
 			tournament.state.pseudo.player3 = "AI";
-		if (tournament.idPlayers[3] === 1)
+		if (tournament.idPlayers[3] === -1)
 			tournament.state.pseudo.player4 = "AI";
 		io.to(`tournament-${tournamentId}`).emit("state", updateStateTournament(tournament.state));
 		
 	});
 
 	socket.on("setupSemiFinal", () => {
-		let ennemyId;
+		const tournamentId = socket.data.tournamentId;
+		const playerId = socket.data.user.id;
+		let tournament = tournaments_map.get(tournamentId);
+		if (!tournament)
+			return;
+		let ennemyId: number;
 		let i = 0;
 		for (; i < 4; i++)
 		{
@@ -83,30 +80,45 @@ export function handleTournamentSocket(io: Server, socket: Socket, tournaments_m
 				break;
 			}
 		}
-		let gameId;
+		let gameId: number;
 		if (i < 2)
 			gameId = 0;
 		else
 			gameId = 1;
-		if (tournament.final_arr[0] == 0 && tournament.final_arr[1] == 0)
-		{
-			console.log("EnnemyId: ", ennemyId);
-			if (ennemyId == 1 || i % 2 == 0)
-			{
-				gameId = setupGameTournament(socket, ennemyId, tournament.id, gameId);
-				io.to(socket.id).emit("startTournamentGame", gameId);
+
+		let countdown = 3;
+		let interval = setInterval(() => {
+			countdown--;
+			if (countdown <= 0) {
+				clearInterval(interval);
+				if (tournament.final_arr[0] == 0 && tournament.final_arr[1] == 0)
+				{
+					if (ennemyId == -1 || i % 2 == 0)
+					{
+						gameId = setupGameTournament(socket, ennemyId, tournament.id, gameId);
+						io.to(socket.id).emit("startTournamentGame", gameId, tournamentId);
+					}
+					else
+					{
+						gameId = joinTournamentGame(socket.data.user.id, gameId, tournamentId);
+						io.to(socket.id).emit("joinTournamentGame", gameId, tournamentId);
+					}
+				}
 			}
-			else
-			{
-				gameId = joinTournamentGame(socket.data.user.id, gameId, tournamentId);
-				io.to(socket.id).emit("joinTournamentGame", gameId);
-			}
-		}
+		}, 1000);
+
+		
 	});
 
 	socket.on("setupFinal", () => {
+		const tournamentId = socket.data.tournamentId;
+		const playerId = socket.data.user.id;
+		let tournament = tournaments_map.get(tournamentId);
+		if (!tournament)
+			return;
 		let ennemyId;
 		let gameId = 2;
+		let countdown = 3;
 		if (playerId == tournament.final_arr[0])
 		{
 			if (tournament.final_arr[1] == 0)
@@ -120,11 +132,15 @@ export function handleTournamentSocket(io: Server, socket: Socket, tournaments_m
 					}, 5 * 60 * 1000);
 				}
 			}
-			ennemyId = tournament.final_arr[1];
-			if (ennemyId == -1)
-				ennemyId = 1;
-			console.log("ennemyId create : ", ennemyId);
-			io.to(socket.id).emit("startTournamentGame", ennemyId, gameId);
+			let interval = setInterval(() => {
+				countdown--;
+				if (countdown < 0) {
+					clearInterval(interval);
+					ennemyId = tournament.final_arr[1];
+					gameId = setupGameTournament(socket, ennemyId, tournament.id, gameId);
+					io.to(socket.id).emit("startTournamentGame", gameId, tournamentId);
+				}
+			}, 1000);
 		}
 		else if (playerId == tournament.final_arr[1])
 		{
@@ -139,11 +155,15 @@ export function handleTournamentSocket(io: Server, socket: Socket, tournaments_m
 					}, 5 * 60 * 1000);
 				}
 			}
-			ennemyId = tournament.final_arr[0];
-			if (ennemyId == -1)
-				ennemyId = 1;
-			console.log("ennemyId join : ", ennemyId);
-			io.to(socket.id).emit("joinTournamentGame", ennemyId, gameId);
+			let interval = setInterval(() => {
+				countdown--;
+				if (countdown < 0) {
+					clearInterval(interval);
+					ennemyId = tournament.final_arr[0];
+					gameId = joinTournamentGame(socket.data.user.id, gameId, tournamentId);
+					io.to(socket.id).emit("joinTournamentGame", gameId, tournamentId);
+				}
+			}, 1000);
 		}
 	});
 }
@@ -151,7 +171,7 @@ export function handleTournamentSocket(io: Server, socket: Socket, tournaments_m
 function setupGameTournament(socket: Socket, ennemyId: number | undefined, tournamentId: number, gameId: number) : number
 {
 	let id;
-	if (Number(ennemyId) == 1)
+	if (ennemyId == -1)
 		id = createTournamentGame(socket.data.user.id, false, "Tournament", true ,tournamentId, gameId);
 	else
 		id = createTournamentGame(socket.data.user.id, false, "Tournament", false, tournamentId, gameId);
@@ -164,38 +184,65 @@ function updateBrackets(tournament: serverTournament)
 	let gameId = id * 1000;
 	if (tournament.state.status == "semifinal")
 	{
-		const game1 = tournament.games.get(gameId);
-		if (!game1)
+		//Only AI in first game
+		if (tournament.idPlayers[0] == -1 && tournament.idPlayers[1] == -1)
 		{
-			console.log("Problem getting game1");
-			return;
+			tournament.final_arr[0] = -1;
+			tournament.state.finalists.player1 = "AI";
 		}
-		tournament.state.finalists.player1 = game1.winner;
-		tournament.final_arr[0] = game1.idwinner;
+		else
+		{
+			const game1 = tournament.games.get(gameId);
+			if (!game1)
+			{
+				console.log("Problem getting game1");
+				return;
+			}
+			tournament.state.finalists.player1 = game1.winner;
+			tournament.final_arr[0] = game1.idwinner;
+		}
 
-		const game2 = tournament.games.get(gameId + 1);
-		if (!game2)
+		//Only AI in second game
+		if (tournament.idPlayers[2] == -1 && tournament.idPlayers[3] == -1)
 		{
-			console.log("Problem getting game2");
-			return;
+			tournament.final_arr[1] = -1;
+			tournament.state.finalists.player2 = "AI";
 		}
-		tournament.state.finalists.player2 = game2.winner;
-		tournament.final_arr[1] = game2.idwinner;
+		else
+		{
+			const game2 = tournament.games.get(gameId + 1);
+			if (!game2)
+			{
+				console.log("Problem getting game2");
+				return;
+			}
+			tournament.state.finalists.player2 = game2.winner;
+			tournament.final_arr[1] = game2.idwinner;
+		}
 
 		if (tournament.final_arr[0] != 0 && tournament.final_arr[1] != 0)
 			tournament.state.status = "final";
 	}
 	if (tournament.state.status == "final")
 	{
-		const game3 = tournament.games.get(gameId + 2);
-		if (!game3)
+		//Only AI in final
+		if (tournament.final_arr[0] == -1 && tournament.final_arr[1] == -1)
 		{
-			console.log("Problem getting game3");
-			return;
+			tournament.state.champion.player = "AI";
+			tournament.state.status = "finished";
 		}
-
-		tournament.state.champion.player = game3.winner;
-		tournament.state.status = "finished";
+		else
+		{
+			const game3 = tournament.games.get(gameId + 2);
+			if (!game3)
+			{
+				console.log("Problem getting game3");
+				return;
+			}
+	
+			tournament.state.champion.player = game3.winner;
+			tournament.state.status = "finished";
+		}
 	}
 }
 
@@ -216,7 +263,6 @@ function fillSocketTournament(playerId: Number, tournament: serverTournament, so
 	{
 		tournament.sockets.player1 = socket.data.user.id;
 		tournament.state.pseudo.player1 = pseudo;
-		console.log("tournament.sockets.player1 : ", tournament.sockets.player1);
 	}
 	else if (playerId === tournament.idPlayers[1])
 	{

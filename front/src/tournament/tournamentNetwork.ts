@@ -12,14 +12,15 @@ export class TournamentNetwork {
 	private onStateCallback?: (state: TournamentState) => void;
 	private onTournamentHostCallback?: () => void;
 	private onDisconnectionCallback?: () => void;
-	private onStartTournamentGameCallback?: (gameId: number) => void;
-	private onjoinTournamentGameCallback?: (gameId: number) => void;
+	private onStartTournamentGameCallback?: (gameId: number, tournamentId: number) => void;
+	private onjoinTournamentGameCallback?: (gameId: number, tournamentId: number) => void;
 
 	constructor() {
-		const { globalSocket } = require("../socket/socket");
-		if (!globalSocket)
-			throw new Error("globalSocket uninitialized");
-		this.socket = globalSocket;
+		const serverUrl = window.location.host;
+		this.socket = io(serverUrl, {
+			transports: ["websocket"],
+			withCredentials: true,
+		});;
 
 
 		this.socket.on("state", (state: TournamentState) => {
@@ -30,12 +31,12 @@ export class TournamentNetwork {
 			this.onTournamentHostCallback?.();
 		});
 
-		this.socket.on("startTournamentGame", (gameId: number) => {
-			this.onStartTournamentGameCallback?.(gameId);
+		this.socket.on("startTournamentGame", (gameId: number, tournamentId: number) => {
+			this.onStartTournamentGameCallback?.(gameId, tournamentId);
 		});
 
-		this.socket.on("joinTournamentGame", (gameId: number) => {
-			this.onjoinTournamentGameCallback?.(gameId);
+		this.socket.on("joinTournamentGame", (gameId: number, tournamentId: number) => {
+			this.onjoinTournamentGameCallback?.(gameId, tournamentId);
 		});
 
 		this.socket.on("disconnection", () => {
@@ -63,11 +64,11 @@ export class TournamentNetwork {
 		this.socket.emit("setupFinal");
 	}
 
-	onStartTournamentGame(cb: (gameId: number) => void) {
+	onStartTournamentGame(cb: (gameId: number, tournamentId: number) => void) {
 		this.onStartTournamentGameCallback = cb;
 	}
 
-	onJoinTournamentGame(cb: (gameId: number) => void) {
+	onJoinTournamentGame(cb: (gameId: number, tournamentId: number) => void) {
 		this.onjoinTournamentGameCallback = cb;
 	}
 
@@ -80,6 +81,6 @@ export class TournamentNetwork {
 	}
 
 	disconnect() {
-		this.socket.emit("disconnection");
+		this.socket.disconnect();
 	}
 }

@@ -4,43 +4,42 @@ import { ServerGame, games_map, endGame } from "../routes/game/serverGame";
 import { gameInfo } from "../server";
 import { tournaments_map } from "../routes/tournament/serverTournament";
 
-export function handleGameSocket(io: Server, socket: Socket, gameId: number, tournamentId: number) {
+export function handleGameSocket(io: Server, socket: Socket) {
+	socket.on("joinGame", async (gameId: number, tournamentId: number) => {
+		let tournament = tournaments_map.get(tournamentId);
+		let game;
+		if (tournament)
+			game = tournament.games.get(gameId);
+		else
+			game = games_map.get(gameId);
+		if (!game)
+			return;
 	
-	let tournament = tournaments_map.get(tournamentId);
-	let game;
-	if (tournament)
-		game = tournament.games.get(gameId);
-	else
-		game = games_map.get(gameId);
-	if (!game)
-		return;
-
-	//add io (server) to game
-	game.setIo(io);
-
-	const playerId = socket.data.user.id;
-	const pseudo = socket.data.user.pseudo;
-	// join room
-	socket.join(`game-${gameId}`);
-
-	if (game.disconnectTimer) {
-		clearTimeout(game.disconnectTimer);
-		game.disconnectTimer = null;
-	}
-
-	if (game.isLocal === true)
-	{
-		console.log("game local");
-		initLocal(game, io, socket, gameId, pseudo);
-	}
-	else
-	{
-		console.log("game remote and AI");
-		initRemoteAndAi(game, io, socket, gameId, playerId, pseudo);
-	}
+		socket.data.tournamentId = tournamentId;
+		socket.data.gameId = gameId;
+		//add io (server) to game
+		game.setIo(io);
+	
+		const playerId = socket.data.user.id;
+		const pseudo = socket.data.user.pseudo;
+		// join room
+		socket.join(`game-${gameId}`);
+	
+		if (game.disconnectTimer) {
+			clearTimeout(game.disconnectTimer);
+			game.disconnectTimer = null;
+		}
+	
+		if (game.isLocal === true)
+			initLocal(game, io, socket, gameId, pseudo);
+		else
+			initRemoteAndAi(game, io, socket, gameId, playerId, pseudo);
+	});
 
 	//after countdown, match is starting
 	socket.on("startGame", () => {
+		const tournamentId = socket.data.tournamentId;
+		const gameId = socket.data.gameId;
 		let tournament = tournaments_map.get(tournamentId);
 		let game;
 		if (tournament)
@@ -55,6 +54,8 @@ export function handleGameSocket(io: Server, socket: Socket, gameId: number, tou
 
 	// Input
 	socket.on("input", ({ direction, player }: { direction: "up" | "down" | "stop", player?: "player1" | "player2" }) => {
+		const tournamentId = socket.data.tournamentId;
+		const gameId = socket.data.gameId;
 		let tournament = tournaments_map.get(tournamentId);
 		let game;
 		if (tournament)
@@ -73,6 +74,8 @@ export function handleGameSocket(io: Server, socket: Socket, gameId: number, tou
 
 	// Disconnect
 	socket.on("disconnect", () => {
+		const tournamentId = socket.data.tournamentId;
+		const gameId = socket.data.gameId;
 		let tournament = tournaments_map.get(tournamentId);
 		let game;
 		if (tournament)

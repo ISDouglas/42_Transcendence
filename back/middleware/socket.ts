@@ -38,14 +38,8 @@ export async function createWebSocket(io: Server) {
 });
 
 	io.on("connection", async (socket) => {
-		socket.on("joinGame", async (gameId: number, tournamentId: number) => {
-			handleGameSocket(io, socket, gameId, tournamentId);
-		});
-
-		socket.on("joinTournament", async (tournamentId: number) => {
-			handleTournamentSocket(io, socket, tournaments_map, tournamentId);
-		});
-
+		handleGameSocket(io, socket);
+		handleTournamentSocket(io, socket);
 
 		// const raw = socket.handshake.query.token;
 		// const token: string = Array.isArray(raw) ? raw[0] : raw ?? "";

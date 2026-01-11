@@ -46,12 +46,12 @@ export async function initBrackets(params?: any) {
 		});
 	});
 
-	net.onStartTournamentGame((gameId: number) => {
-		navigateTo(`/pongmatch/${gameId}?tournamentId=${tournamentID}`);
+	net.onStartTournamentGame((gameId: number, tournamentId: number) => {
+		navigateTo(`/pongmatch/${gameId}?tournamentId=${tournamentId}`);
 	});
 
-	net.onJoinTournamentGame(async (gameId: number) => {
-		navigateTo(`/pongmatch/${gameId}?tournamentId=${tournamentID}`);
+	net.onJoinTournamentGame(async (gameId: number, tournamentId: number) => {
+		navigateTo(`/pongmatch/${gameId}?tournamentId=${tournamentId}`);
 	});
 
 	function updatePseudo() {

@@ -1,7 +1,5 @@
 var __defProp = Object.defineProperty;
-var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
 var __getOwnPropNames = Object.getOwnPropertyNames;
-var __hasOwnProp = Object.prototype.hasOwnProperty;
 var __esm = (fn, res) => function __init() {
   return fn && (res = (0, fn[__getOwnPropNames(fn)[0]])(fn = 0)), res;
 };
@@ -12,15 +10,6 @@ var __export = (target, all) => {
   for (var name in all)
     __defProp(target, name, { get: all[name], enumerable: true });
 };
-var __copyProps = (to, from, except, desc) => {
-  if (from && typeof from === "object" || typeof from === "function") {
-    for (let key of __getOwnPropNames(from))
-      if (!__hasOwnProp.call(to, key) && key !== except)
-        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
-  }
-  return to;
-};
-var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
 // front/src/views/home.ts
 function View() {
@@ -4121,49 +4110,20 @@ var init_esm5 = __esm({
   }
 });
 
-// front/src/socket/socket.ts
-var socket_exports = {};
-__export(socket_exports, {
-  globalSocket: () => globalSocket,
-  initSocket: () => initSocket
-});
-function initSocket() {
-  globalSocket = lookup2(window.location.origin, {
-    transports: ["websocket"],
-    withCredentials: true
-  });
-  globalSocket.on("connect_error", (err) => {
-    console.log("CONNECT ERROR:", err.message);
-  });
-  console.log("Socket attempting connection...");
-  globalSocket.on("connect", () => console.log("CONNECTED!"));
-  globalSocket.on("connect_error", (err) => console.log("CONNECT ERROR:", err));
-  globalSocket.on("error", (err) => console.log("ERROR:", err));
-  console.log((/* @__PURE__ */ new Date()).toISOString(), "globalsocket s ocket=", globalSocket);
-  setTimeout(() => {
-    console.log("Final socket state:", globalSocket);
-  }, 500);
-}
-var globalSocket;
-var init_socket3 = __esm({
-  "front/src/socket/socket.ts"() {
-    "use strict";
-    init_esm5();
-    globalSocket = null;
-  }
-});
-
 // front/src/game/gameNetwork.ts
 var GameNetwork;
 var init_gameNetwork = __esm({
   "front/src/game/gameNetwork.ts"() {
     "use strict";
+    init_esm5();
     GameNetwork = class {
       constructor() {
-        const { globalSocket: globalSocket2 } = (init_socket3(), __toCommonJS(socket_exports));
-        if (!globalSocket2)
-          throw new Error("globalSocket uninitialized");
-        this.socket = globalSocket2;
+        const serverUrl = window.location.host;
+        this.socket = lookup2(serverUrl, {
+          transports: ["websocket"],
+          withCredentials: true
+        });
+        ;
         this.socket.on("assignRole", (role) => {
           this.onRoleCallback?.(role);
         });
@@ -4181,7 +4141,6 @@ var init_gameNetwork = __esm({
         });
         this.socket.on("gameOver", () => {
           this.onGameOverCallback?.();
-          console.log("Game over, closing socket...");
         });
       }
       onRole(cb) {
@@ -4212,7 +4171,7 @@ var init_gameNetwork = __esm({
         this.onGameOverCallback = cb;
       }
       disconnect() {
-        this.socket.emit("disconnection");
+        this.socket.disconnect();
       }
     };
   }
@@ -4455,8 +4414,6 @@ async function initHomePage() {
     navigateTo("/login");
     return;
   }
-  const { initSocket: initSocket2 } = await Promise.resolve().then(() => (init_socket3(), socket_exports));
-  initSocket2();
   const btn = document.getElementById("scroll-button");
   const target = document.getElementById("gamepage");
   btn.addEventListener("click", () => {
@@ -4542,23 +4499,26 @@ var TournamentNetwork;
 var init_tournamentNetwork = __esm({
   "front/src/tournament/tournamentNetwork.ts"() {
     "use strict";
+    init_esm5();
     TournamentNetwork = class {
       constructor() {
-        const { globalSocket: globalSocket2 } = (init_socket3(), __toCommonJS(socket_exports));
-        if (!globalSocket2)
-          throw new Error("globalSocket uninitialized");
-        this.socket = globalSocket2;
+        const serverUrl = window.location.host;
+        this.socket = lookup2(serverUrl, {
+          transports: ["websocket"],
+          withCredentials: true
+        });
+        ;
         this.socket.on("state", (state) => {
           this.onStateCallback?.(state);
         });
         this.socket.on("hostTournament", () => {
           this.onTournamentHostCallback?.();
         });
-        this.socket.on("startTournamentGame", (gameId) => {
-          this.onStartTournamentGameCallback?.(gameId);
+        this.socket.on("startTournamentGame", (gameId, tournamentId) => {
+          this.onStartTournamentGameCallback?.(gameId, tournamentId);
         });
-        this.socket.on("joinTournamentGame", (gameId) => {
-          this.onjoinTournamentGameCallback?.(gameId);
+        this.socket.on("joinTournamentGame", (gameId, tournamentId) => {
+          this.onjoinTournamentGameCallback?.(gameId, tournamentId);
         });
         this.socket.on("disconnection", () => {
           this.onDisconnectionCallback?.();
@@ -4592,7 +4552,7 @@ var init_tournamentNetwork = __esm({
         this.socket.emit("joinTournament", tournamentId);
       }
       disconnect() {
-        this.socket.emit("disconnection");
+        this.socket.disconnect();
       }
     };
   }
@@ -4633,11 +4593,11 @@ async function initBrackets(params) {
       startTournamentButton?.classList.add("hidden");
     });
   });
-  net2.onStartTournamentGame((gameId) => {
-    navigateTo(`/pongmatch/${gameId}?tournamentId=${tournamentID}`);
+  net2.onStartTournamentGame((gameId, tournamentId) => {
+    navigateTo(`/pongmatch/${gameId}?tournamentId=${tournamentId}`);
   });
-  net2.onJoinTournamentGame(async (gameId) => {
-    navigateTo(`/pongmatch/${gameId}?tournamentId=${tournamentID}`);
+  net2.onJoinTournamentGame(async (gameId, tournamentId) => {
+    navigateTo(`/pongmatch/${gameId}?tournamentId=${tournamentId}`);
   });
   function updatePseudo() {
     if (currentTournament) {

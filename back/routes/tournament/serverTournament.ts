@@ -24,10 +24,10 @@ export class serverTournament {
 	constructor(id: number, io?: Server)
 	{
 		this.id = id;
-		this.idPlayers = Array(4).fill(1);
+		this.idPlayers = Array(4).fill(-1);
 		this.sockets = { player1: null, player2: null, player3: null, player4: null };
 		this.io = io;
-		this.semi_index = [0, 1, 2, 3];
+		this.semi_index = [0, 2, 1, 3];
 		this.final_arr = [0, 0];
 		this.index = 0;
 		this.disconnectTimer = null;
@@ -103,7 +103,7 @@ export function joinTournament(playerId: number, tournamentId: number)
 		let i = tournament.index;
 		for (i; i < 4; i++)
 		{
-			if (tournament.idPlayers[tournament.semi_index[i]] == 1)
+			if (tournament.idPlayers[tournament.semi_index[i]] == -1)
 			{
 				tournament.idPlayers[tournament.semi_index[i]] = playerId;
 				return;
@@ -129,7 +129,7 @@ export function createTournamentGame(PlayerId: number, isLocal: boolean, type: "
 		return id;
 	}
 	else
-		return -1;
+		return -2;
 }
 
 export function joinTournamentGame(playerId: number, gameId: number, tournamentID: number) : number
