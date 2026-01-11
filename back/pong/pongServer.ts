@@ -4,7 +4,7 @@ import { ServerGame, games_map, endGame } from "../routes/game/serverGame";
 import { gameInfo } from "../server";
 import { tournaments_map } from "../routes/tournament/serverTournament";
 
-export function handleGameSocket(io: Server, socket: Socket, gameId: number, playerId: number, tournamentId: number) {
+export function handleGameSocket(io: Server, socket: Socket, gameId: number, tournamentId: number) {
 	
 	let tournament = tournaments_map.get(tournamentId);
 	let game;
@@ -17,6 +17,8 @@ export function handleGameSocket(io: Server, socket: Socket, gameId: number, pla
 
 	//add io (server) to game
 	game.setIo(io);
+
+	const playerId = socket.data.user.id;
 	const pseudo = socket.data.user.pseudo;
 	// join room
 	socket.join(`game-${gameId}`);
@@ -48,7 +50,7 @@ export function handleGameSocket(io: Server, socket: Socket, gameId: number, pla
 		if (!game)
 			return;
 		game.status = "playing";
-		socket.emit("state", updateStateGame(game.state, game.status));
+		socket.emit("state", updateStateGame(game.state, game.status, game.type));
 	});
 
 	// Input
@@ -89,8 +91,8 @@ export function handleGameSocket(io: Server, socket: Socket, gameId: number, pla
 			game!.sockets.player2 = null;
 
 		game.status = "disconnected";
-		io.to(`game-${gameId}`).emit("state", updateStateGame(game.state, game.status));
-		io.to(`game-${game.id}`).emit("disconnection", updateStateGame(game.state, game.status));
+		io.to(`game-${gameId}`).emit("state", updateStateGame(game.state, game.status, game.type));
+		io.to(`game-${game.id}`).emit("disconnection", updateStateGame(game.state, game.status, game.type));
 
 		if (!game.disconnectTimer) {
 			game.disconnectTimer = setTimeout(() => {
@@ -133,13 +135,14 @@ export function checkForWinner(game: ServerGame, io: Server)
 	}
 }
 
-export function updateStateGame(state: GameState, status: "waiting" | "playing" | "finished" | "countdown" | "disconnected") {
+export function updateStateGame(state: GameState, status: "waiting" | "playing" | "finished" | "countdown" | "disconnected", type: "Local" | "AI" | "Online" | "Tournament") {
 	return {
 		ball: { x: state.ball.x, y: state.ball.y },
 		paddles: state.paddles,
 		score: state.score,
 		status: status,
-		pseudo: { player1: state.pseudo.player1, player2: state.pseudo.player2 }
+		pseudo: { player1: state.pseudo.player1, player2: state.pseudo.player2 },
+		type: type
 	};
 }
 
@@ -160,12 +163,12 @@ function initLocal(game: ServerGame, io: Server, socket: Socket, gameId: number,
 		game.status = "countdown";
 		socket.emit("assignRole", "player1");
 
-		io.to(`game-${gameId}`).emit("state", updateStateGame(game.state, game.status));
+		io.to(`game-${gameId}`).emit("state", updateStateGame(game.state, game.status, game.type));
 		
 		//countdown starting
-		io.to(`game-${gameId}`).emit("startCountdown", updateStateGame(game.state, game.status));
+		io.to(`game-${gameId}`).emit("startCountdown", updateStateGame(game.state, game.status, game.type));
 		//predraw canvas without score to avoid empty screen before countdown
-		socket.emit("predraw", updateStateGame(game.state, game.status));
+		socket.emit("predraw", updateStateGame(game.state, game.status, game.type));
 	}
 	else
 	{
@@ -189,7 +192,7 @@ async function initRemoteAndAi(game: ServerGame, io: Server, socket: Socket, gam
 		role = "player2";
 		game.sockets.player2 = socket.id;
 		game.state.pseudo.player2 = pseudo;
-		io.to(`game-${gameId}`).emit("state", updateStateGame(game.state, game.status));
+		io.to(`game-${gameId}`).emit("state", updateStateGame(game.state, game.status, game.type));
 	}
 	else
 	{
@@ -211,12 +214,12 @@ async function initRemoteAndAi(game: ServerGame, io: Server, socket: Socket, gam
 	if ((game.sockets.player1 && game.idPlayer2 == -1) 
 		|| (game.sockets.player1 && game.sockets.player2 && (game.status === "waiting" || game.status === "disconnected"))) {
 		game.status = "countdown";
-		io.to(`game-${gameId}`).emit("state", updateStateGame(game.state, game.status));
-		io.to(`game-${gameId}`).emit("startCountdown", updateStateGame(game.state, game.status));
+		io.to(`game-${gameId}`).emit("state", updateStateGame(game.state, game.status, game.type));
+		io.to(`game-${gameId}`).emit("startCountdown", updateStateGame(game.state, game.status, game.type));
 	}
 
 	//predraw canvas without score to avoid empty screen before countdown
-	socket.emit("predraw", updateStateGame(game.state, game.status));
+	socket.emit("predraw", updateStateGame(game.state, game.status, game.type));
 }
 
 function getPlayer(game: ServerGame, socket: Socket) {

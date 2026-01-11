@@ -6,6 +6,7 @@ export interface GameState {
 	score: { player1: number; player2: number };
 	status: "waiting" | "playing" | "finished" | "countdown" | "disconnected";
 	pseudo: { player1: string; player2: string };
+	type: "Local" | "AI" | "Online" | "Tournament";
 }
 
 export class GameNetwork {
@@ -22,7 +23,7 @@ export class GameNetwork {
 
 	private onRoleCallback?: (role: "player1" | "player2") => void;
 
-	constructor(serverUrl: string) {
+	constructor() {
 		const { globalSocket } = require("../socket/socket");
 		if (!globalSocket)
 			throw new Error("globalSocket uninitialized");
@@ -83,8 +84,8 @@ export class GameNetwork {
 		this.socket.emit("input", { direction, player });
 	}
 
-	join(gameId: number, playerId: number, tournamentId: number) {
-		this.socket.emit("joinGame", gameId, playerId, tournamentId);
+	join(gameId: number, tournamentId: number) {
+		this.socket.emit("joinGame", gameId, tournamentId);
 	}
 
 	onGameOver(cb: () => void) {

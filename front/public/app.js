@@ -501,7 +501,8 @@ var init_gameRenderer = __esm({
             );
           }
         }
-        document.getElementById("buttons")?.classList.remove("hidden");
+        if (state.type != "Tournament")
+          document.getElementById("buttons")?.classList.remove("hidden");
       }
       draw(state, drawScore) {
         this.clear();
@@ -4158,7 +4159,7 @@ var init_gameNetwork = __esm({
   "front/src/game/gameNetwork.ts"() {
     "use strict";
     GameNetwork = class {
-      constructor(serverUrl) {
+      constructor() {
         const { globalSocket: globalSocket2 } = (init_socket3(), __toCommonJS(socket_exports));
         if (!globalSocket2)
           throw new Error("globalSocket uninitialized");
@@ -4204,8 +4205,8 @@ var init_gameNetwork = __esm({
       sendInput(direction, player) {
         this.socket.emit("input", { direction, player });
       }
-      join(gameId, playerId, tournamentId) {
-        this.socket.emit("joinGame", gameId, playerId, tournamentId);
+      join(gameId, tournamentId) {
+        this.socket.emit("joinGame", gameId, tournamentId);
       }
       onGameOver(cb) {
         this.onGameOverCallback = cb;
@@ -4230,7 +4231,8 @@ var init_gameInstance = __esm({
           paddles: { player1: 210, player2: 210 },
           score: { player1: 0, player2: 0 },
           status: "waiting",
-          pseudo: { player1: "", player2: "" }
+          pseudo: { player1: "", player2: "" },
+          type: "AI"
         };
         this.network = null;
         this.localMode = false;
@@ -4281,32 +4283,19 @@ async function initPongMatch(params) {
   const dashboardBtn = document.getElementById("dashboard-btn");
   const pseudoP1 = document.getElementById("player1-name");
   const pseudoP2 = document.getElementById("player2-name");
-  const res = await genericFetch("/api/private/game/playerinfo");
-  const resType = await genericFetch("/api/private/game/type", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      gameId: gameID,
-      tournamentId
-    })
-  });
-  const { playerId } = res;
-  const type = resType.type;
-  const serverUrl = window.location.host;
   let input1 = "stop";
   let input2 = "stop";
   let input = "stop";
   currentGame = new GameInstance();
   renderer = new GameRenderer();
-  if (type == "Local") {
+  if (currentGame.getCurrentState().type == "Local")
     currentGame.enableLocalMode();
-  }
-  net = new GameNetwork(serverUrl);
+  net = new GameNetwork();
   net.onRole((role) => {
     if (net)
       currentGame?.setNetwork(net, role);
   });
-  net.join(Number(gameID), Number(playerId), Number(tournamentId));
+  net.join(Number(gameID), Number(tournamentId));
   net.onCountdown(() => {
     let countdown = 4;
     interval = setInterval(() => {
@@ -4393,7 +4382,7 @@ async function initPongMatch(params) {
     if (!currentGame || !renderer)
       return;
     renderer.drawGameOver(currentGame.getCurrentState());
-    if (type == "Tournament") {
+    if (currentGame.getCurrentState().type == "Tournament") {
       let countdown = 3;
       interval = setInterval(() => {
         countdown--;
@@ -4402,7 +4391,7 @@ async function initPongMatch(params) {
           navigateTo(`/brackets/${tournamentId}`);
         }
       }, 1e3);
-    } else if (currentGame.isLocalMode() || type == "AI") {
+    } else if (currentGame.isLocalMode() || currentGame.getCurrentState().type == "AI") {
       replayBtn?.addEventListener("click", async () => {
         navigateTo(`/gamelocal`);
       });

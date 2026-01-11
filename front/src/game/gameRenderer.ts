@@ -91,7 +91,8 @@ export class GameRenderer {
 				);
 			}
 		}
-		document.getElementById("buttons")?.classList.remove("hidden");
+		if (state.type != "Tournament")
+			document.getElementById("buttons")?.classList.remove("hidden");
 	}
 
 	public draw(state: GameState, drawScore: boolean) {

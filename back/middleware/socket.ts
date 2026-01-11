@@ -38,8 +38,8 @@ export async function createWebSocket(io: Server) {
 });
 
 	io.on("connection", async (socket) => {
-		socket.on("joinGame", async (gameId: number, playerId: number, tournamentId: number) => {
-			handleGameSocket(io, socket, gameId, playerId, tournamentId);
+		socket.on("joinGame", async (gameId: number, tournamentId: number) => {
+			handleGameSocket(io, socket, gameId, tournamentId);
 		});
 
 		socket.on("joinTournament", async (tournamentId: number) => {

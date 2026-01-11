@@ -1,6 +1,6 @@
 import { GameRenderer } from "../game/gameRenderer";
 import { GameNetwork } from "../game/gameNetwork";
-import { genericFetch, loadHeader, navigateTo } from "../router";
+import { loadHeader, navigateTo } from "../router";
 import { GameInstance } from "../game/gameInstance";
 
 let renderer: GameRenderer | null = null;
@@ -22,20 +22,6 @@ export async function initPongMatch(params?: any) {
 	const pseudoP1 = document.getElementById("player1-name");
 	const pseudoP2 = document.getElementById("player2-name");
 
-	const res = await genericFetch("/api/private/game/playerinfo");
-	const resType = await genericFetch("/api/private/game/type", {
-		method: "POST",
-		headers: { "Content-Type": "application/json" },
-		body: JSON.stringify({
-			gameId: gameID,
-			tournamentId: tournamentId
-		})
-	});
-
-	const { playerId } = res;
-	const type = resType.type;
-
-	const serverUrl = window.location.host;
 	let input1: "up" | "down" | "stop" = "stop";
 	let input2: "up" | "down" | "stop" = "stop";
 	let input: "up" | "down" | "stop" = "stop";
@@ -46,12 +32,11 @@ export async function initPongMatch(params?: any) {
 	// 2. Prepare drawing system
 	renderer = new GameRenderer();
 
-	if (type == "Local")
-	{
+	if (currentGame.getCurrentState().type == "Local")
 		currentGame.enableLocalMode();
-	}
+
 	// 3. Connect to server
-	net = new GameNetwork(serverUrl);
+	net = new GameNetwork();
 
 	//4. set role (player 1 or 2)
 	net.onRole((role) => {
@@ -60,7 +45,7 @@ export async function initPongMatch(params?: any) {
 	});
 
 	// 5. Join game room
-	net.join(Number(gameID), Number(playerId), Number(tournamentId));
+	net.join(Number(gameID), Number(tournamentId));
 
 	net.onCountdown(() => {
 		let countdown = 4;
@@ -176,7 +161,7 @@ export async function initPongMatch(params?: any) {
 		if (!currentGame || !renderer)
 			return;
 		renderer.drawGameOver(currentGame.getCurrentState());
-		if (type == "Tournament")
+		if (currentGame.getCurrentState().type == "Tournament")
 		{
 			let countdown = 3;
 			interval = setInterval(() => {
@@ -187,7 +172,7 @@ export async function initPongMatch(params?: any) {
 			}
 			}, 1000);
 		}
-		else if (currentGame.isLocalMode() || type == "AI")
+		else if (currentGame.isLocalMode() || currentGame.getCurrentState().type == "AI")
 		{
 			replayBtn?.addEventListener("click", async () => {
 				navigateTo(`/gamelocal`);

@@ -1,4 +1,4 @@
-import { navigateTo, genericFetch, loadHeader } from "../router";
+import { navigateTo, loadHeader } from "../router";
 import { TournamentInstance } from "../tournament/tournamentInstance";
 import { TournamentNetwork, TournamentState } from "../tournament/tournamentNetwork";
 

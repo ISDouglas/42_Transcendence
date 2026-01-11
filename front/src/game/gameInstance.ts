@@ -7,7 +7,8 @@ export class GameInstance {
 		paddles: { player1: 210, player2: 210 },
 		score: { player1: 0, player2: 0 },
 		status: "waiting",
-		pseudo: { player1: "", player2: "" }
+		pseudo: { player1: "", player2: "" },
+		type: "AI"
 	};
 	private network: GameNetwork | null = null;
 	private localMode: boolean = false;

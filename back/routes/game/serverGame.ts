@@ -78,7 +78,7 @@ export class ServerGame {
 				simulateAI(this.state as any, deltaTime);
 
 			updatePaddles(this.state, deltaTime);
-			this.io.to(`game-${this.id}`).emit("state", updateStateGame(this.state, this.status));
+			this.io.to(`game-${this.id}`).emit("state", updateStateGame(this.state, this.status, this.type));
 
 			checkForWinner(this, this.io);
 		}

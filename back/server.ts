@@ -235,13 +235,6 @@ fastify.get("/api/private/game/list", async (request, reply) => {
 	return { games: list };
 });
 
-fastify.get("/api/private/game/playerinfo", async (request, reply) => {
-	const id = request.user?.user_id as any;
-	const playerId = Number(id);
-	const pseudo = await users.getPseudoFromId(playerId);
-	reply.send({ playerId, pseudo });
-});
-
 fastify.post("/api/private/game/type", async (request, reply) => {
 	const { gameId, tournamentId } = request.body as { gameId: number, tournamentId: number };
 	let type;
