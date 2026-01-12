@@ -36,6 +36,7 @@ import { oauthStatus } from "./routes/login/oauth.status";
 import { registerGoogle, callbackGoogle } from "./routes/login/oauth.google";
 import { UpdatePasswordView } from "../front/src/views/p_updatepassword";
 import { createWebSocket } from "./middleware/socket";
+import { leaderboardInfo } from "./routes/leaderboard/leaderboard";
 
 export const db = new ManageDB("./back/DB/database.db");
 export const users = new Users(db);
@@ -332,6 +333,10 @@ fastify.get("/api/private/dashboard", async (request, reply) => {
 	await dashboardInfo(request, reply);
 });
 
+fastify.get("/api/private/leaderboard", async (request, reply) => {
+	await leaderboardInfo(reply);
+});
+
 fastify.post("/api/twofa", async (request, reply) => {
 	const { code } = request.body as { code: number};
 	await checkTwoFA(request, reply, code);
@@ -357,14 +362,14 @@ const start = async () => {
 		await users.CreateUserGuest();
 		// const hashedPasswor= await bcrypt.hash("42", 12);
 		// let hashedPassword = await bcrypt.hash("a", 12);
-		// users.addUser("a", "e@g.c", hashedPassword);
-		// users.addUser("new", "e@g.c", hashedPassword);
-		// users.addUser("ok", "e@g.c", hashedPassword);
-		// users.addUser("b", "e@g.c", hashedPassword);
-		// users.addUser("c", "e@g.c", hashedPassword);
-		// users.addUser("d", "e@g.c", hashedPassword);
-		// users.addUser("42", "42", hashedPasswor);
 		const hashedPassword = await bcrypt.hash("42", 12);
+		// users.addUser("a", "e@g.c", hashedPassword, 200);
+		// users.addUser("new", "e@g.c", hashedPassword, 300);
+		// users.addUser("ok", "e@g.c", hashedPassword, 500);
+		// users.addUser("b", "e@g.c", hashedPassword, 700);
+		// users.addUser("c", "e@g.c", hashedPassword, 1500);
+		// users.addUser("d", "e@g.c", hashedPassword,2300);
+		// users.addUser("42", "42", hashedPassword, 2800);
 		// users.addUser("42", "42", hashedPassword);
 		// friends.addFriendship(5, 6);
 		// friends.addFriendship(4, 5);

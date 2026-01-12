@@ -24,11 +24,13 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 
 // front/src/views/home.ts
 function View() {
+  loadHeader();
   return document.getElementById("html").innerHTML;
 }
 async function init() {
   const res = await fetch("/api/checkLogin", { method: "GET", credentials: "include" });
-  if (res.ok) {
+  const data = await res.json();
+  if (data.loggedIn) {
     navigateTo("/home");
   }
 }
@@ -41,11 +43,13 @@ var init_home = __esm({
 
 // front/src/views/login.ts
 function LoginView() {
+  loadHeader();
   return document.getElementById("loginhtml").innerHTML;
 }
 async function initLogin() {
   const res = await fetch("/api/checkLogin", { method: "GET", credentials: "include" });
-  if (res.ok) {
+  const data = await res.json();
+  if (data.loggedIn) {
     navigateTo("/home");
     return;
   }
@@ -60,6 +64,10 @@ async function initLogin() {
     if (success == 1) {
       navigateTo("/home");
     }
+  });
+  const googleBtn = document.getElementById("google-login-btn");
+  googleBtn?.addEventListener("click", () => {
+    window.location.href = "/api/oauth/google";
   });
 }
 async function login(username, password, form) {
@@ -86,7 +94,6 @@ async function login(username, password, form) {
       return 2;
     return 1;
   } catch (err) {
-    console.error(err);
     return 0;
   }
 }
@@ -122,6 +129,20 @@ function formatDuration(seconds) {
   const remainingSeconds = seconds % 60;
   return `${minutes}m ${remainingSeconds}s`;
 }
+function getRankInfo(elo) {
+  for (const rank of ranks) {
+    if (elo < rank.max) {
+      const progress = rank.max === Infinity ? 100 : Math.floor((elo - rank.min) / (rank.max - rank.min) * 100);
+      return {
+        src: rank.src,
+        next: rank.max === Infinity ? 0 : rank.max - elo,
+        progress,
+        type: rank.type
+      };
+    }
+  }
+  return { src: "/src/image/rank6.png", next: 0, progress: 100, type: "Champion" };
+}
 async function initDashboard() {
   const container = document.getElementById("game-list");
   if (!container)
@@ -131,69 +152,122 @@ async function initDashboard() {
       method: "GET"
     });
     const dashboards = await response.json();
-    dashboards.GamesInfo.forEach(async (game) => {
-      const template = document.getElementById("history-dashboard");
-      const item = document.createElement("div");
-      item.classList.add("dash");
-      const clone = template.content.cloneNode(true);
-      const winnerpath = clone.getElementById("winnerpath");
-      const winnerscore = clone.getElementById("winnerscore");
-      const winnerpseudo = clone.getElementById("winnerpseudo");
-      const loserpath = clone.getElementById("loserpath");
-      const loserscore = clone.getElementById("loserscore");
-      const loserpseudo = clone.getElementById("loserpseudo");
-      const date = clone.getElementById("date");
-      const duration = clone.getElementById("duration");
-      const type = clone.getElementById("type");
-      winnerpath.src = game.winner_avatar;
-      winnerscore.textContent = game.winner_score.toString();
-      winnerpseudo.textContent = game.winner_pseudo;
-      loserpath.src = game.loser_avatar;
-      loserscore.textContent = game.loser_score.toString();
-      loserpseudo.textContent = game.loser_pseudo;
-      date.textContent = new Date(game.date_game).toLocaleDateString();
-      duration.textContent = "Dur\xE9e : " + formatDuration(game.duration_game);
-      type.textContent = game.type;
-      item.appendChild(clone);
+    if (dashboards.GamesInfo.length > 0) {
+      dashboards.GamesInfo.forEach(async (game) => {
+        const template = document.getElementById("history-dashboard");
+        const item = document.createElement("div");
+        item.classList.add("dash");
+        const clone = template.content.cloneNode(true);
+        const winnerpath = clone.getElementById("winnerpath");
+        const winnerscore = clone.getElementById("winnerscore");
+        const winnerpseudo = clone.getElementById("winnerpseudo");
+        const loserpath = clone.getElementById("loserpath");
+        const loserscore = clone.getElementById("loserscore");
+        const loserpseudo = clone.getElementById("loserpseudo");
+        const date = clone.getElementById("date");
+        const duration = clone.getElementById("duration");
+        const type = clone.getElementById("type");
+        winnerpath.src = game.winner_avatar;
+        winnerscore.textContent = game.winner_score.toString();
+        winnerpseudo.textContent = game.winner_pseudo;
+        loserpath.src = game.loser_avatar;
+        loserscore.textContent = game.loser_score.toString();
+        loserpseudo.textContent = game.loser_pseudo;
+        date.textContent = new Date(game.date_game).toLocaleDateString();
+        duration.textContent = "Dur\xE9e : " + formatDuration(game.duration_game);
+        type.textContent = game.type;
+        item.appendChild(clone);
+        container.appendChild(item);
+      });
+    } else {
+      const item = document.createElement("p");
+      item.textContent = "Go play some game newbie !";
+      item.classList.add("text-center");
+      item.classList.add("text-3xl");
+      item.classList.add("mt-68");
       container.appendChild(item);
-    });
-    const winrate = document.getElementById("winrate");
-    const win = document.getElementById("win");
-    const loose = document.getElementById("loose");
-    winrate.textContent = winrateCalcul(dashboards.WinLoose.win, dashboards.WinLoose.loose) + "%";
-    win.textContent = dashboards.WinLoose.win.toString();
-    loose.textContent = dashboards.WinLoose.loose.toString();
-    const taken = document.getElementById("taken");
-    const scored = document.getElementById("scored");
-    const ratio = document.getElementById("ratio");
-    ratio.textContent = winrateCalcul(dashboards.TotalScore.scored, dashboards.TotalScore.taken) + "%";
-    taken.textContent = dashboards.TotalScore.taken.toString();
-    scored.textContent = dashboards.TotalScore.scored.toString();
+    }
+    if (dashboards.WinLoose.win > 0 && dashboards.WinLoose.loose > 0) {
+      const winrate = document.getElementById("winrate");
+      const win = document.getElementById("win");
+      const loose = document.getElementById("loose");
+      winrate.textContent = winrateCalcul(dashboards.WinLoose.win, dashboards.WinLoose.loose) + "%";
+      win.textContent = dashboards.WinLoose.win.toString();
+      loose.textContent = dashboards.WinLoose.loose.toString();
+    }
+    if (dashboards.TotalScore.scored > 0 && dashboards.TotalScore.taken > 0) {
+      const taken = document.getElementById("taken");
+      const scored = document.getElementById("scored");
+      const ratio = document.getElementById("ratio");
+      ratio.textContent = winrateCalcul(dashboards.TotalScore.scored, dashboards.TotalScore.taken) + "%";
+      taken.textContent = dashboards.TotalScore.taken.toString();
+      scored.textContent = dashboards.TotalScore.scored.toString();
+    }
+    const rankinfo = getRankInfo(dashboards.Elo);
+    document.getElementById("rank-img").src = rankinfo.src;
+    document.getElementById("rank-img").classList.add(rankColors[rankinfo.type]);
+    document.getElementById("rank-player").classList.add(rankinfo.type);
+    document.getElementById("rank-player").textContent = rankinfo.type;
+    document.getElementById("elo-player").textContent = dashboards.Elo.toString();
+    document.getElementById("elo-next").textContent = rankinfo.next.toString();
+    setTimeout(() => {
+      const bar = document.getElementById("progress-fill");
+      bar.style.width = `${rankinfo.progress}%`;
+      bar.classList.add(...progressionColors[rankinfo.type].split(" "));
+    }, 50);
   } catch (error) {
     console.error("Erreur lors du chargement :", error);
   }
 }
+var ranks, rankColors, progressionColors;
 var init_p_dashboard = __esm({
   "front/src/views/p_dashboard.ts"() {
     "use strict";
     init_router();
+    ranks = [
+      { min: 0, max: 400, src: "/src/image/rank1.png", type: "Wood" },
+      { min: 400, max: 800, src: "/src/image/rank2.png", type: "Iron" },
+      { min: 800, max: 1200, src: "/src/image/rank3.png", type: "Bronze" },
+      { min: 1200, max: 1600, src: "/src/image/rank4.png", type: "Silver" },
+      { min: 1600, max: 2e3, src: "/src/image/rank5.png", type: "Gold" },
+      { min: 2e3, max: Infinity, src: "/src/image/rank6.png", type: "Champion" }
+    ];
+    rankColors = {
+      Wood: "border-stone-400",
+      Iron: "border-orange-500",
+      Bronze: "border-amber-600",
+      Silver: "border-gray-400",
+      Gold: "border-yellow-400",
+      Champion: "border-purple-500"
+    };
+    progressionColors = {
+      Wood: "bg-linear-to-br from-orange-800 via-amber-700 to-yellow-800",
+      Iron: "bg-linear-to-br from-neutral-700 via-neutral-500",
+      Bronze: "bg-linear-to-br from-yellow-700 via-amber-600 to-orange-700",
+      Silver: "bg-linear-to-br from-gray-200 via-white to-gray-300",
+      Gold: "bg-linear-to-br from-amber-400 via-yellow-500 to-amber-600",
+      Champion: "bg-linear-to-br from-purple-600 via-violet-500 to-fuchsia-600"
+    };
   }
 });
 
 // front/src/views/register.ts
 function RegisterView() {
+  loadHeader();
   return document.getElementById("registerhtml").innerHTML;
 }
 async function initRegister() {
   const res = await fetch("/api/checkLogin", { method: "GET", credentials: "include" });
-  if (res.ok) {
+  const data = await res.json();
+  if (data.loggedIn) {
     navigateTo("/home");
+    return;
   }
   const form = document.getElementById("register-form");
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     const formData = new FormData(form);
-    const data = {
+    const data2 = {
       username: formData.get("username"),
       email: formData.get("email"),
       password: formData.get("password"),
@@ -203,7 +277,7 @@ async function initRegister() {
       const res2 = await fetch("/api/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
+        body: JSON.stringify(data2)
       });
       const result = await res2.json();
       if (result.ok == true)
@@ -247,6 +321,7 @@ function RegisterValidView() {
 var init_register = __esm({
   "front/src/views/register.ts"() {
     "use strict";
+    init_router();
     init_router();
   }
 });
@@ -4087,19 +4162,11 @@ var init_gameNetwork = __esm({
   "front/src/game/gameNetwork.ts"() {
     "use strict";
     GameNetwork = class {
-<<<<<<< HEAD
       constructor(serverUrl) {
-        this.socket = lookup2(serverUrl, { transports: ["websocket"] });
-=======
-      // constructor(serverUrl: string, gameId: number) {
-      // 	this.socket = io(serverUrl, { transports: ["websocket"] });
-      constructor(serverUrl, gameId) {
         const { globalSocket: globalSocket2 } = (init_socket3(), __toCommonJS(socket_exports));
         if (!globalSocket2)
           throw new Error("globalSocket n'est pas initialis\xE9 !");
         this.socket = globalSocket2;
-        this.socket.emit("joinGame", gameId);
->>>>>>> elisa
         this.socket.on("assignRole", (role) => {
           this.onRoleCallback?.(role);
         });
@@ -4395,6 +4462,14 @@ function smoothScrollTo(targetY, duration) {
   requestAnimationFrame(animation);
 }
 async function initHomePage() {
+  const res = await fetch("/api/checkLogin", {
+    credentials: "include"
+  });
+  const data = await res.json();
+  if (!data.loggedIn) {
+    navigateTo("/login");
+    return;
+  }
   const { initSocket: initSocket2 } = await Promise.resolve().then(() => (init_socket3(), socket_exports));
   initSocket2();
   const btn = document.getElementById("scroll-button");
@@ -4407,6 +4482,7 @@ async function initHomePage() {
 var init_p_homelogin = __esm({
   "front/src/views/p_homelogin.ts"() {
     "use strict";
+    init_router();
     init_router();
   }
 });
@@ -4437,76 +4513,13 @@ async function initProfile() {
       console.log("Status changed :", status);
     });
   }
-  document.getElementById("profile-money").textContent = profile.money;
-  document.getElementById("profile-elo").textContent = profile.elo;
+  document.getElementById("profile-money").textContent = profile.money.toString();
+  document.getElementById("profile-elo").textContent = profile.elo.toString();
   const twofaStatusText = document.getElementById("twofa-status");
-  const twofaEnableBtn = document.getElementById("twofa-enable-btn");
-  const twofaDisableBtn = document.getElementById("twofa-disable-btn");
-  const twofaQr = document.getElementById("twofa-qr");
-  const verifyContainer = document.getElementById("twofa-verify-container");
-  const verifyInput = document.getElementById("twofa-code-input");
-  const verifyBtn = document.getElementById("twofa-verify-btn");
-  twofaEnableBtn.classList.add("hidden");
-  twofaDisableBtn.classList.add("hidden");
-  twofaQr.classList.add("hidden");
-  verifyContainer.classList.add("hidden");
-  if (profile.twofa_enabled) {
-    twofaStatusText.textContent = "2FA Enabled";
-    twofaDisableBtn.classList.remove("hidden");
-  } else {
-    twofaStatusText.textContent = "2FA Disabled";
-    twofaEnableBtn.classList.remove("hidden");
-  }
-  twofaEnableBtn.addEventListener("click", async () => {
-    try {
-      const res = await genericFetch("/api/private/2fa/setup", { method: "POST" });
-      twofaQr.src = res.qr;
-      twofaQr.classList.remove("hidden");
-      verifyContainer.classList.remove("hidden");
-    } catch (err) {
-      console.error(err);
-      alert("Failed to setup 2FA.");
-    }
-  });
-  verifyBtn.addEventListener("click", async () => {
-    const code = verifyInput.value.trim();
-    if (code.length !== 6) {
-      alert("Please enter a valid 6-digit code.");
-      return;
-    }
-    try {
-      await genericFetch("/api/private/2fa/enable", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code })
-      });
-      alert("2FA Enabled!");
-      twofaEnableBtn.classList.add("hidden");
-      twofaDisableBtn.classList.remove("hidden");
-      twofaStatusText.textContent = "2FA Enabled";
-      twofaQr.classList.add("hidden");
-      verifyContainer.classList.add("hidden");
-      verifyInput.value = "";
-    } catch (err) {
-      console.error(err);
-      alert("Invalid code, please try again.");
-    }
-  });
-  twofaDisableBtn.addEventListener("click", async () => {
-    try {
-      await genericFetch("/api/private/2fa/disable", { method: "POST" });
-      alert("2FA Disabled!");
-      twofaDisableBtn.classList.add("hidden");
-      twofaEnableBtn.classList.remove("hidden");
-      twofaStatusText.textContent = "2FA Disabled";
-      twofaQr.classList.add("hidden");
-      verifyContainer.classList.add("hidden");
-      verifyInput.value = "";
-    } catch (err) {
-      console.error(err);
-      alert("Failed to disable 2FA.");
-    }
-  });
+  if (profile.twofa_enabled === 1)
+    twofaStatusText.textContent = "Enable";
+  else
+    twofaStatusText.textContent = "Disable";
 }
 var init_p_profile = __esm({
   "front/src/views/p_profile.ts"() {
@@ -4884,36 +4897,31 @@ async function initFriends() {
   }
 }
 async function myFriends(acceptedFriends) {
-  const divNoFriend = document.getElementById("no-friend");
-  const divFriend = document.getElementById("friends");
+  const container = document.getElementById("friend-list");
+  if (!container)
+    return;
   if (acceptedFriends.length === 0) {
-    divNoFriend.textContent = "No friends yet";
-    divFriend.classList.add("hidden");
-    divNoFriend.classList.remove("hidden");
-  } else {
-    divFriend.classList.remove("hidden");
-    divNoFriend.classList.add("hidden");
-    const ul = divFriend.querySelector("ul");
-    acceptedFriends.forEach(async (friend) => {
-      const status = document.createElement("span");
-      status.className = "absolute w-4 h-4 rounded-full border-2 border-white";
-      displayStatus(friend, status);
-      const li = document.createElement("li");
-      li.className = "flex items-center gap-3";
-      const span = document.createElement("span");
-      span.textContent = friend.pseudo + " friend since: " + friend.friendship_date;
-      const img = document.createElement("img");
-      img.src = friend.avatar;
-      img.alt = `${friend.pseudo}'s avatar`;
-      img.width = 64;
-      const button = toDeleteFriend(friend.id);
-      li.appendChild(img);
-      li.appendChild(status);
-      li.appendChild(span);
-      li.appendChild(button);
-      ul?.appendChild(li);
-    });
+    container.innerHTML = `<p class="text-l italic text-center text-amber-800">No friend yet</p>`;
+    return;
   }
+  acceptedFriends.forEach(async (friend) => {
+    const template = document.getElementById("myfriends");
+    const item = document.createElement("div");
+    item.classList.add("dash");
+    const clone = template.content.cloneNode(true);
+    const avatar = clone.getElementById("avatar");
+    const pseudo = clone.getElementById("pseudo");
+    const date = clone.getElementById("date-friendship");
+    const status = clone.getElementById("f_status");
+    pseudo.textContent = friend.pseudo;
+    avatar.src = friend.avatar;
+    avatar.alt = `${friend.pseudo}'s avatar`;
+    date.textContent = "friend since " + new Date(friend.friendship_date).toLocaleDateString();
+    displayStatus(friend, status);
+    toDeleteFriend(friend.id, clone);
+    item.appendChild(clone);
+    container.appendChild(item);
+  });
 }
 function debounce(fn, delay) {
   let timeout;
@@ -4992,14 +5000,14 @@ function toAddFriend(id, li) {
     }
   });
 }
-function toAcceptFriend(friend) {
-  const button = document.createElement("button");
+function toAcceptFriend(friend, li) {
+  const button = li.getElementById("addordelete");
   if (friend.asked_by !== friend.id) {
-    button.disabled = true;
+    toDeleteFriend(friend.id, li);
     return button;
   }
-  button.textContent = "Accept invitation";
-  button.className = "px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600";
+  button.textContent = "Accept";
+  button.classList.add("hover:bg-amber-800");
   button.addEventListener("click", async () => {
     try {
       await genericFetch("/api/private/friend/accept", {
@@ -5015,7 +5023,6 @@ function toAcceptFriend(friend) {
       button.disabled = false;
     }
   });
-  return button;
 }
 function toDeleteFriend(id, li) {
   const button = li.getElementById("addordelete");
@@ -5038,53 +5045,53 @@ function toDeleteFriend(id, li) {
   });
 }
 function pendingFr(pendingFriends) {
-  const divNoPending = document.getElementById("no-pending");
-  const divPending = document.getElementById("pending");
+  const container = document.getElementById("pending-list");
+  if (!container)
+    return;
   if (pendingFriends.length === 0) {
-    divNoPending.textContent = "No pending friends";
-    divPending.classList.add("hidden");
-    divNoPending.classList.remove("hidden");
-  } else {
-    divPending.classList.remove("hidden");
-    divNoPending.classList.add("hidden");
-    const ul = divPending.querySelector("ul");
-    pendingFriends.forEach(async (friend) => {
-      const li = document.createElement("li");
-      li.textContent = friend.pseudo + ", requested since: " + friend.friendship_date;
-      const img = document.createElement("img");
-      img.src = friend.avatar;
-      img.alt = `${friend.pseudo}'s avatar`;
-      img.width = 64;
-      const button = toAcceptFriend(friend);
-      li.appendChild(img);
-      li.appendChild(button);
-      ul?.appendChild(li);
-    });
+    container.innerHTML = `<p class="text-l italic text-center text-amber-800">No pending invitation</p>`;
+    return;
   }
+  pendingFriends.forEach(async (friend) => {
+    const template = document.getElementById("myfriends");
+    const item = document.createElement("div");
+    item.classList.add("dash");
+    const clone = template.content.cloneNode(true);
+    const avatar = clone.getElementById("avatar");
+    const pseudo = clone.getElementById("pseudo");
+    const date = clone.getElementById("date-friendship");
+    pseudo.textContent = friend.pseudo;
+    avatar.src = friend.avatar;
+    avatar.alt = `${friend.pseudo}'s avatar`;
+    date.textContent = "pending since " + new Date(friend.friendship_date).toLocaleDateString();
+    toAcceptFriend(friend, clone);
+    item.appendChild(clone);
+    container.appendChild(item);
+  });
 }
 function youMayKnow(opponent) {
+  console.log(opponent, opponent.length);
   const divNoOpponent = document.getElementById("no-opponent");
   const divOpponent = document.getElementById("opponent");
   if (opponent.length === 0) {
-    divOpponent.classList.add("hidden");
     divNoOpponent.classList.remove("hidden");
-  } else {
-    divOpponent.classList.remove("hidden");
-    divNoOpponent.classList.add("hidden");
-    const ul = divOpponent.querySelector("ul");
-    opponent.forEach(async (players) => {
-      const li = document.createElement("li");
-      li.textContent = players.pseudo;
-      const img = document.createElement("img");
-      img.src = players.avatar;
-      img.alt = `${players.pseudo}'s avatar`;
-      img.width = 64;
-      const button = toAddFriend(players.id);
-      li.appendChild(img);
-      li.appendChild(button);
-      ul?.appendChild(li);
-    });
+    return;
   }
+  const container = document.getElementById("opponent-list");
+  opponent.forEach(async (user) => {
+    const template = document.getElementById("myfriends");
+    const item = document.createElement("div");
+    item.classList.add("dash");
+    const clone = template.content.cloneNode(true);
+    const avatar = clone.getElementById("avatar");
+    const pseudo = clone.getElementById("pseudo");
+    pseudo.textContent = user.pseudo;
+    avatar.src = user.avatar;
+    avatar.alt = `${user.pseudo}'s avatar`;
+    toAddFriend(user.id, clone);
+    item.appendChild(clone);
+    container.appendChild(item);
+  });
 }
 var init_p_friends = __esm({
   "front/src/views/p_friends.ts"() {
@@ -5107,6 +5114,7 @@ var init_error = __esm({
 
 // front/src/views/twofa.ts
 function towfaView() {
+  loadHeader();
   return document.getElementById("twofahtml").innerHTML;
 }
 async function initTowfa() {
@@ -5185,6 +5193,28 @@ async function initUpdateUsername() {
   const avatar = document.getElementById("profile-avatar");
   avatar.src = profile.avatar + "?ts=" + Date.now();
   document.getElementById("profile-pseudo").textContent = profile.pseudo;
+  const usernameBtn = document.getElementById("toggle-username");
+  const deleteBtn = document.getElementById("toggle-delete");
+  const usernameSection = document.getElementById("update-username-section");
+  const deleteSection = document.getElementById("delete-user-section");
+  const showUsernameSection = () => {
+    usernameBtn?.classList.add("hidden");
+    deleteBtn?.classList.remove("hidden");
+    usernameSection?.classList.remove("hidden");
+    deleteSection?.classList.add("hidden");
+  };
+  const showDeleteSection = () => {
+    usernameBtn?.classList.remove("hidden");
+    deleteBtn?.classList.add("hidden");
+    deleteSection?.classList.remove("hidden");
+    usernameSection?.classList.add("hidden");
+  };
+  deleteBtn?.addEventListener("click", showDeleteSection);
+  usernameBtn?.addEventListener("click", showUsernameSection);
+  await updateUsername();
+  await deleteUser();
+}
+async function updateUsername() {
   const formUsername = document.getElementById("change-username-form");
   formUsername.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -5198,6 +5228,25 @@ async function initUpdateUsername() {
       });
       alert("Username updated successfully to <<  " + response.pseudo + "  >>");
       navigateTo("/profile");
+    } catch (err) {
+      alert(err.message);
+    }
+  });
+}
+async function deleteUser() {
+  const formDelete = document.getElementById("delete-user-form");
+  formDelete.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const confirmUser = formDelete["confirm-username"].value;
+    const password = formDelete["password"].value;
+    try {
+      await genericFetch("/api/private/updateinfo/delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ confirmUser, password })
+      });
+      alert("Account deleted successfully!");
+      navigateTo("/logout");
     } catch (err) {
       alert(err.message);
     }
@@ -5297,8 +5346,94 @@ var init_p_updateavatar = __esm({
   }
 });
 
-<<<<<<< HEAD
-=======
+// front/src/views/p_update2fa.ts
+function Update2faView() {
+  loadHeader();
+  return document.getElementById("update-2fa-html").innerHTML;
+}
+async function initUpdate2fa() {
+  const profile = await genericFetch("/api/private/profile", {
+    method: "POST"
+  });
+  const avatar = document.getElementById("profile-avatar");
+  avatar.src = profile.avatar + "?ts=" + Date.now();
+  document.getElementById("profile-pseudo").textContent = profile.pseudo;
+  const twofaStatusText = document.getElementById("twofa-status");
+  const twofaEnableBtn = document.getElementById("twofa-enable-btn");
+  const twofaDisableBtn = document.getElementById("twofa-disable-btn");
+  const twofaQr = document.getElementById("twofa-qr");
+  const verifyContainer = document.getElementById("twofa-verify-container");
+  const verifyInput = document.getElementById("twofa-code-input");
+  const verifyBtn = document.getElementById("twofa-verify-btn");
+  twofaEnableBtn.classList.add("hidden");
+  twofaDisableBtn.classList.add("hidden");
+  twofaQr.classList.add("hidden");
+  verifyContainer.classList.add("hidden");
+  if (profile.twofa_enabled) {
+    twofaStatusText.textContent = "Enabled";
+    twofaDisableBtn.classList.remove("hidden");
+  } else {
+    twofaStatusText.textContent = "Disabled";
+    twofaEnableBtn.classList.remove("hidden");
+  }
+  twofaEnableBtn.addEventListener("click", async () => {
+    try {
+      const res = await genericFetch("/api/private/2fa/setup", { method: "POST" });
+      twofaQr.src = res.qr;
+      twofaQr.classList.remove("hidden");
+      verifyContainer.classList.remove("hidden");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to setup 2FA.");
+    }
+  });
+  verifyBtn.addEventListener("click", async () => {
+    const code = verifyInput.value.trim();
+    if (code.length !== 6) {
+      alert("Please enter a valid 6-digit code.");
+      return;
+    }
+    try {
+      await genericFetch("/api/private/2fa/enable", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code })
+      });
+      alert("2FA Enabled!");
+      twofaEnableBtn.classList.add("hidden");
+      twofaDisableBtn.classList.remove("hidden");
+      twofaStatusText.textContent = "2FA Enabled";
+      twofaQr.classList.add("hidden");
+      verifyContainer.classList.add("hidden");
+      verifyInput.value = "";
+    } catch (err) {
+      console.error(err);
+      alert("Invalid code, please try again.");
+    }
+  });
+  twofaDisableBtn.addEventListener("click", async () => {
+    try {
+      await genericFetch("/api/private/2fa/disable", { method: "POST" });
+      alert("2FA Disabled!");
+      twofaDisableBtn.classList.add("hidden");
+      twofaEnableBtn.classList.remove("hidden");
+      twofaStatusText.textContent = "2FA Disabled";
+      twofaQr.classList.add("hidden");
+      verifyContainer.classList.add("hidden");
+      verifyInput.value = "";
+    } catch (err) {
+      console.error(err);
+      alert("Failed to disable 2FA.");
+    }
+  });
+}
+var init_p_update2fa = __esm({
+  "front/src/views/p_update2fa.ts"() {
+    "use strict";
+    init_router();
+  }
+});
+
 // front/src/views/oauth_callback.ts
 async function initOAuthCallback() {
   const res = await fetch("/api/auth/status", {
@@ -5356,7 +5491,52 @@ var init_privacypolicy = __esm({
   }
 });
 
->>>>>>> elisa
+// front/src/views/p_leaderboard.ts
+function LeaderboardView() {
+  loadHeader();
+  return document.getElementById("leaderboard").innerHTML;
+}
+async function InitLeaderboard() {
+  const leaderboard = await genericFetch("/api/private/leaderboard", {
+    method: "GET"
+  });
+  const container = document.getElementById("leaderboard-l");
+  console.log(leaderboard);
+  if (leaderboard.InfoUsers.length > 0) {
+    document.getElementById("avatar-1").src = leaderboard.InfoUsers[0].avatar;
+    document.getElementById("pseudo-1").textContent = leaderboard.InfoUsers[0].pseudo;
+    document.getElementById("elo-1").textContent = leaderboard.InfoUsers[0].elo.toString();
+  }
+  if (leaderboard.InfoUsers.length > 1) {
+    document.getElementById("avatar-2").src = leaderboard.InfoUsers[1].avatar;
+    document.getElementById("pseudo-2").textContent = leaderboard.InfoUsers[1].pseudo;
+    document.getElementById("elo-2").textContent = leaderboard.InfoUsers[1].elo.toString();
+  }
+  if (leaderboard.InfoUsers.length > 2) {
+    document.getElementById("avatar-3").src = leaderboard.InfoUsers[2].avatar;
+    document.getElementById("pseudo-3").textContent = leaderboard.InfoUsers[2].pseudo;
+    document.getElementById("elo-3").textContent = leaderboard.InfoUsers[2].elo.toString();
+  }
+  for (let i = 3; i < 50; i++) {
+    const template = document.getElementById("leaderboard-list");
+    const li = template.content.cloneNode(true);
+    if (i < leaderboard.InfoUsers.length) {
+      li.getElementById("avatar").src = leaderboard.InfoUsers[i].avatar;
+      li.getElementById("pseudo").textContent = leaderboard.InfoUsers[i].pseudo;
+      li.getElementById("elo").textContent = leaderboard.InfoUsers[i].elo.toString();
+    }
+    li.getElementById("position").textContent = "#" + (i + 1).toString();
+    container.appendChild(li);
+  }
+  console.log(leaderboard);
+}
+var init_p_leaderboard = __esm({
+  "front/src/views/p_leaderboard.ts"() {
+    "use strict";
+    init_router();
+  }
+});
+
 // front/src/router.ts
 function navigateTo(url2) {
   const state = { from: window.location.pathname };
@@ -5398,36 +5578,30 @@ function matchRoute(pathname) {
   return null;
 }
 async function loadHeader() {
-  const response = await fetch("/header.html");
-  const html = await response.text();
+  const result = await getPseudoHeader3();
   const container = document.getElementById("header-container");
-  if (container) {
-    container.innerHTML = html;
-    getPseudoHeader3();
-  }
+  container.innerHTML = "";
+  const templateID = result.logged ? "headerconnect" : "headernotconnect";
+  const template = document.getElementById(templateID);
+  const clone = template.content.cloneNode(true);
+  container.appendChild(clone);
+  if (result.logged)
+    displayPseudoHeader(result);
 }
 async function getPseudoHeader3() {
   try {
-    const result = await genericFetch("/api/private/getpseudoAvStatus", {
+    const res = await fetch("/api/private/getpseudoAvStatus", {
       method: "POST",
       credentials: "include"
     });
-    document.getElementById("pseudo-header").textContent = result.pseudo;
-    const avatar = document.getElementById("header-avatar");
-    const status = document.getElementById("status");
-    avatar.src = result.avatar + "?ts" + Date.now();
-    displayStatus(result, status);
-    const notification = document.getElementById("notification");
-    notification.classList.add("hidden");
-    if (result.notif === true) {
-      notification.classList.remove("hidden");
-    }
+    const result = await res.json();
+    if (!result.logged)
+      return { logged: false, pseudo: "", avatar: "", web_status: "", notif: false };
+    return { logged: true, ...result };
   } catch (err) {
-    console.error(err);
+    return { logged: false, pseudo: "", avatar: "", web_status: "", notif: false };
   }
 }
-<<<<<<< HEAD
-=======
 function displayPseudoHeader(result) {
   document.getElementById("pseudo-header").textContent = result.pseudo;
   const avatar = document.getElementById("header-avatar");
@@ -5440,7 +5614,6 @@ function displayPseudoHeader(result) {
     notification.classList.remove("hidden");
   return true;
 }
->>>>>>> elisa
 function displayStatus(info, status) {
   switch (info.web_status) {
     case "online":
@@ -5450,7 +5623,7 @@ function displayStatus(info, status) {
       status.classList.add("bg-red-500");
       break;
     case "offline":
-      status.classList.add("bg-white");
+      status.classList.add("bg-gray-900");
   }
   status.title = info.web_status;
 }
@@ -5465,6 +5638,7 @@ function router() {
     return;
   }
   const { route, params } = match;
+  document.querySelector("#header-container").innerHTML;
   if (route.view)
     document.querySelector("#app").innerHTML = route.view(params);
   route.init?.(params);
@@ -5494,15 +5668,15 @@ function popState3() {
   const toIsPrivate = !publicPath.includes(path);
   const fromIsPrivate = !publicPath.includes(currentPath);
   if (!history.state.from && fromIsPrivate) {
-    history.replaceState({ from: "/homelogin" }, "", "/homelogin");
-    currentPath = "/homelogin";
+    history.replaceState({ from: "/home" }, "", "/home");
+    currentPath = "/home";
     navigateTo("/logout");
   } else if (!history.state.from && !fromIsPrivate) {
     history.replaceState({ from: "/" }, "", "/");
     currentPath = "/";
   } else if (!toIsPrivate && fromIsPrivate) {
-    history.replaceState({ from: "/homelogin" }, "", "/homelogin");
-    currentPath = "/homelogin";
+    history.replaceState({ from: "/home" }, "", "/home");
+    currentPath = "/home";
   } else
     currentPath = path;
   router();
@@ -5530,12 +5704,11 @@ var init_router = __esm({
     init_p_updateusername();
     init_p_updatepassword();
     init_p_updateavatar();
-<<<<<<< HEAD
-=======
+    init_p_update2fa();
     init_oauth_callback();
     init_terms_of_service();
     init_privacypolicy();
->>>>>>> elisa
+    init_p_leaderboard();
     routes = [
       { path: "/", view: View, init },
       { path: "/login", view: LoginView, init: initLogin },
@@ -5543,25 +5716,25 @@ var init_router = __esm({
       { path: "/logout", init: initLogout },
       { path: "/register", view: RegisterView, init: initRegister },
       { path: "/registerok", view: RegisterValidView },
-<<<<<<< HEAD
-=======
       { path: "/termsofservice", view: TermsOfServiceView, init: InitTermsOfService },
       { path: "/privacypolicy", view: PriavacyPolicyView, init: InitPrivacyPolicy },
->>>>>>> elisa
       { path: "/home", view: homeView, init: initHomePage },
       { path: "/dashboard", view: DashboardView, init: initDashboard },
       { path: "/friends", view: FriendsView, init: initFriends },
       { path: "/profile", view: ProfileView, init: initProfile },
+      { path: "/leaderboard", view: LeaderboardView, init: InitLeaderboard },
       { path: "/updateemail", view: UpdateEmailView, init: initUpdateEmail },
       { path: "/updateusername", view: UpdateUsernameView, init: initUpdateUsername },
       { path: "/updatepassword", view: UpdatePasswordView, init: initUpdatePassword },
       { path: "/updateavatar", view: UpdateAvatarView, init: initUpdateAvatar },
+      { path: "/update2fa", view: Update2faView, init: initUpdate2fa },
       { path: "/gameonline", view: GameOnlineView, init: GameOnlineinit },
       { path: "/gamelocal", view: GameLocalView, init: GameLocalinit },
       { path: "/pongmatch/:id", view: PongMatchView, init: initPongMatch, cleanup: stopGame },
       { path: "/tournament", view: TournamentView },
       { path: "/brackets/:id", view: BracketsView, init: initBrackets, cleanup: stopTournament },
-      { path: "/error", view: ErrorView, init: initError }
+      { path: "/error", view: ErrorView, init: initError },
+      { path: "/oauth/callback", init: initOAuthCallback }
     ];
     currentRoute = null;
   }
