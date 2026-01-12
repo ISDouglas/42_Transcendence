@@ -55,7 +55,7 @@ export const tokenOK = async (request: FastifyRequest, reply: FastifyReply): Pro
 		return { user_id: null, error: user_loged.name };
 	}
 	//reply.code(200);
-	console.log("user_loged ", user_loged);
+	// console.log("user_loged ", user_loged);
 	return { user_id: user_loged.user_id, pseudo: user_loged.pseudo, avatar: user_loged.avatar, status: user_loged.status };
 }
 
