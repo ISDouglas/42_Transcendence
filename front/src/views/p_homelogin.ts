@@ -1,7 +1,8 @@
-import { genericFetch, getPseudoHeader, loadHeader } from "../router";
+import { genericFetch, loadHeader } from "../router";
 import { IMyFriends } from "../../../back/DB/friend";
 import { AsyncLocalStorage } from "async_hooks";
 import { navigateTo } from "../router";
+import { displayChat } from "./p_chat";
 
 export function homeView(): string {
 	 	return (document.getElementById("homehtml") as HTMLTemplateElement).innerHTML;
@@ -47,4 +48,5 @@ export async function initHomePage() {
         const targetY = target.getBoundingClientRect().top + window.scrollY;
         smoothScrollTo(targetY, 1000);
     });
+	displayChat();
 }

@@ -1,4 +1,5 @@
 import { navigateTo } from "../router";
+import { displayChat } from "./p_chat";
 
 export async function initOAuthCallback() {
     const res = await fetch("/api/auth/status", {
@@ -13,5 +14,6 @@ export async function initOAuthCallback() {
       navigateTo("/twofa");
     } else {
       navigateTo("/home");
+      // displayChat();
     }
   }

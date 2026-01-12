@@ -4097,7 +4097,6 @@ var init_gameNetwork = __esm({
           transports: ["websocket"],
           withCredentials: true
         });
-        ;
         this.socket.on("assignRole", (role) => {
           this.onRoleCallback?.(role);
         });
@@ -4358,6 +4357,105 @@ var init_p_pongmatch = __esm({
   }
 });
 
+// front/src/chat/chatNetwork.ts
+var chatNetwork;
+var init_chatNetwork = __esm({
+  "front/src/chat/chatNetwork.ts"() {
+    "use strict";
+    init_esm5();
+    chatNetwork = class {
+      constructor() {
+        const serverUrl = window.location.host;
+        this.socket = lookup2(serverUrl, {
+          transports: ["websocket"],
+          withCredentials: true
+        });
+      }
+      sendMessage(message) {
+        this.socket.emit("generalChatMessage", message);
+      }
+      receiveMessage(callback) {
+        this.socket.on("generalChatMessage", callback);
+      }
+      receiveHistory(callback) {
+        this.socket.on("chatHistory", callback);
+      }
+      receiveError(callback) {
+        this.socket.on("chatError", callback);
+      }
+      disconnect() {
+        this.socket.disconnect();
+      }
+      requestHistory() {
+        this.socket.emit("requestHistory");
+      }
+    };
+  }
+});
+
+// front/src/views/p_chat.ts
+async function displayChat() {
+  const template = document.getElementById("chat-template");
+  const clone = template.content.cloneNode(true);
+  document.getElementById("chat-container").appendChild(clone);
+  const chatBar = document.getElementById("chat-bar");
+  const chatWindow = document.getElementById("chat-window");
+  chatBar.addEventListener("click", () => {
+    chatWindow.classList.toggle("hidden");
+    chatWindow.classList.toggle("flex");
+  });
+  const form = document.getElementById("chat-form");
+  const input = document.getElementById("chat-input");
+  chatnet.receiveHistory((messages) => {
+    messages.forEach((msg) => addMessageGeneral(msg));
+  });
+  chatnet.receiveMessage((data) => {
+    addMessageGeneral(data);
+  });
+  chatnet.receiveError((error) => {
+    displayError(error.error);
+  });
+  chatnet.requestHistory();
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    chatnet.sendMessage(input.value);
+    input.value = "";
+  });
+}
+function addMessageGeneral(data) {
+  const box = document.getElementById("chat-box");
+  const div = document.createElement("div");
+  div.className = "bg-gray-800 p-2 rounded-lg";
+  div.innerHTML = `
+		<div class="flex items-center justify-between">
+			<span class="font-semibold text-green-400">${data.pseudo}</span>
+			<span class="text-xs text-gray-400">${new Date(data.date).toLocaleTimeString()}</span>
+		</div>
+		<div class="text-gray-200">${data.message}</div>
+	`;
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+}
+function displayError(message) {
+  const input = document.getElementById("chat-input");
+  const oldPlaceholder = input.placeholder;
+  input.style.border = "2px solid red";
+  input.placeholder = message;
+  setTimeout(() => {
+    input.classList.remove("input-error");
+    input.placeholder = oldPlaceholder;
+    input.style.border = "";
+  }, 1500);
+}
+var chatnet;
+var init_p_chat = __esm({
+  "front/src/views/p_chat.ts"() {
+    "use strict";
+    init_chatNetwork();
+    chatnet = new chatNetwork();
+  }
+});
+
 // front/src/views/p_homelogin.ts
 function homeView() {
   return document.getElementById("homehtml").innerHTML;
@@ -4392,11 +4490,13 @@ async function initHomePage() {
     const targetY = target.getBoundingClientRect().top + window.scrollY;
     smoothScrollTo(targetY, 1e3);
   });
+  displayChat();
 }
 var init_p_homelogin = __esm({
   "front/src/views/p_homelogin.ts"() {
     "use strict";
     init_router();
+    init_p_chat();
   }
 });
 
@@ -4743,11 +4843,13 @@ var init_logout = __esm({
   "front/src/views/logout.ts"() {
     "use strict";
     init_router();
+    init_p_chat();
     initLogout = async () => {
       await fetch("/api/logout", {
         method: "GET",
         credentials: "include"
       });
+      chatnet.disconnect();
       navigateTo("/login");
     };
   }
@@ -5469,6 +5571,8 @@ async function router() {
     loadHeader15(auth);
     if (publicPath.includes(location.pathname) && auth.logged)
       navigateTo("/home");
+    if (!publicPath.includes(location.pathname) && !auth.logged)
+      navigateTo("/");
   }
   const { route, params } = match;
   document.querySelector("#header-container").innerHTML;
