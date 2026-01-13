@@ -66,6 +66,8 @@ export interface PseudoHeaderResponse {
 	avatar: string;
 	web_status: string;
 	notif: boolean;
+	xp: number;
+	lvl: number;
 }
 
 export type LogStatusAndInfo = { 
@@ -94,7 +96,7 @@ export async function checkLogStatus(): Promise<LogStatusAndInfo> {
 			return { status: "error", logged: false, user: null }			
 		}
 		if (result.loggedIn === true)
-			return { status: "logged", logged: true, user: { pseudo: result.pseudo, avatar: result.avatar, web_status: result.status, notif: result.notif} };
+			return { status: "logged", logged: true, user: { pseudo: result.user.pseudo, avatar: result.user.avatar, web_status: result.user.status, notif: result.user.notif, xp: result.user.xp, lvl: result.user.lvl} };
 		return { status: "not_logged", logged: false, user: null };
 	} catch {
 		return { status: "error", logged: false, user: null };
@@ -137,6 +139,29 @@ function matchRoute(pathname: string) {
 	return null;
 }
 
+function initSwitch()
+{
+	const root = document.documentElement;
+	const switchInput = document.getElementById('theme-switch') as HTMLInputElement;
+	if ( localStorage.theme === 'dark' || (!localStorage.theme && window.matchMedia('(prefers-color-scheme: dark)').matches))
+	{
+		root.classList.add('dark');
+		switchInput.checked = true;
+	}
+	switchInput.addEventListener('change', () => {
+		if (switchInput.checked)
+		{
+			root.classList.add('dark');
+			localStorage.theme = 'dark';
+		}
+		else
+		{
+			root.classList.remove('dark');
+			localStorage.theme = 'light';
+		}
+	});
+}
+
 export async function loadHeader(auth: LogStatusAndInfo) {
 
 	const container = document.getElementById("header-container");
@@ -146,10 +171,14 @@ export async function loadHeader(auth: LogStatusAndInfo) {
 	const clone = template.content.cloneNode(true);
 	container!.appendChild(clone);
 	if (auth.logged)
+	{
 		displayPseudoHeader(auth.user!);
+		initSwitch();
+	}	
 }
 
-export function displayPseudoHeader(result: PseudoHeaderResponse) {
+export function displayPseudoHeader(result: PseudoHeaderResponse)
+{
 	document.getElementById("pseudo-header")!.textContent = result.pseudo;
 	const avatar = document.getElementById("header-avatar") as HTMLImageElement;
 	const status = document.getElementById("status") as HTMLImageElement;
@@ -159,7 +188,13 @@ export function displayPseudoHeader(result: PseudoHeaderResponse) {
 	notification.classList.add("hidden");
 	if (result.notif === true)
 		notification.classList.remove("hidden");
-	return true;
+	setTimeout(() => {
+			const bar = document.getElementById("progress-xp") as HTMLDivElement;
+			const progress = (result.xp / 20000) * 100;
+			bar.style.width = `${progress}%`;
+		}, 50);
+	
+	(document.getElementById("lvl-header") as HTMLSpanElement).textContent = result.lvl.toString();
 }
 
 export function displayStatus(info: any, status: HTMLImageElement): void {

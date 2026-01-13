@@ -77,5 +77,5 @@ export async function initRegister() {
 }
 
 export function RegisterValidView(): string {
-	return (document.getElementById("registerok") as HTMLFormElement).innerHTML;
+	return (document.getElementById("registerok") as HTMLTemplateElement).innerHTML;
 }

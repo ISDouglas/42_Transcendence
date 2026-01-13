@@ -15,6 +15,8 @@ export type UserJWT = {
     pseudo: string;
     avatar: string;
     status: string;
+	xp: number;
+	lvl: number;
 } | {
     user_id: null;
     error?: string;
@@ -56,7 +58,7 @@ export const tokenOK = async (request: FastifyRequest, reply: FastifyReply): Pro
 	}
 	//reply.code(200);
 	// console.log("user_loged ", user_loged);
-	return { user_id: user_loged.user_id, pseudo: user_loged.pseudo, avatar: user_loged.avatar, status: user_loged.status };
+	return { user_id: user_loged.user_id, pseudo: user_loged.pseudo, avatar: user_loged.avatar, status: user_loged.status, xp: user_loged.xp, lvl: user_loged.lvl };
 }
 
 export async function socketTokenOk(token: string): Promise <IUsers | null>{

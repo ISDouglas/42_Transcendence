@@ -108,13 +108,12 @@ fastify.addHook("onRequest", async(request: FastifyRequest, reply: FastifyReply)
 	request.user = user;
 })
 
-
 fastify.get("/api/checkLogin", async (request, reply) => {
 
 	// const user = await tokenOK(request, reply);
 	if (!request.user || request.user.user_id === null)
 		return reply.send({ loggedIn: false, error: request.user?.error });
-	reply.send({ loggedIn: true, user: {id: request.user.user_id, pseudo: request.user.pseudo, avatar: request.user.avatar, status: request.user.status, notif: globalThis.notif }});
+	reply.send({ loggedIn: true, user: {id: request.user.user_id, pseudo: request.user.pseudo, avatar: request.user.avatar, status: request.user.status, notif: globalThis.notif, xp: request.user.xp, lvl: request.user.lvl }});
 });
 
 fastify.get("/api/auth/status", async (request: FastifyRequest, reply: FastifyReply) => {
@@ -320,7 +319,7 @@ const start = async () => {
 		// users.addUser("b", "e@g.c", hashedPassword, 700);
 		// users.addUser("c", "e@g.c", hashedPassword, 1500);
 		// users.addUser("d", "e@g.c", hashedPassword,2300);
-		// users.addUser("42", "42", hashedPassword, 2800);
+		// users.addUser("42", "42", hashedPassword, 2800); 
 		// users.addUser("42", "42", hashedPassword);
 		// friends.addFriendship(5, 6);
 		// friends.addFriendship(4, 5);

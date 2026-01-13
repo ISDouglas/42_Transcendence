@@ -9,10 +9,10 @@
 	<body>
 	<img src="/src/image/bg-croissant-white.jpg" 
 		alt="bgcroissant"
-		class="fixed inset-0 block dark:hidden -z-10 object-cover w-full h-screen">
+		class="fixed inset-0 block dark:hidden -z-10 duration-300 object-cover w-full h-screen">
 	<img src="/src/image/bg-croissant-black.jpg" 
 		alt="bgcroissant"
-		class="fixed inset-0 -z-10 hidden dark:block object-cover w-full h-screen">
+		class="fixed inset-0 -z-10 hidden dark:block duration-300 object-cover w-full h-screen">
 	<header id="header-container" ></header>
 	<main id="app"></main>
 	<div id="chat-container" class="fixed bottom-5 right-5 flex flex-col items-end"></div>
@@ -35,16 +35,16 @@
 	</template>
 
 	<template id="headerconnect">
-		<header id="header" class="relative z-9999 flex w-full pb-2 justify-between h-28 bg-gray-200/20 backdrop-blur-sm shadow-md">
+		<header id="header" class="relative z-9999 flex w-full pb-2 justify-between h-28 bg-gray-200/20 dark:bg-gray-700/20 backdrop-blur-sm shadow-md">
 			<div class="flex items-center space-x-4">
-			<a href="/home" data-link class="block dark:hidden ml-4">
-				<img src="/src/image/croissant-white.png" alt="croissantw"
-				class="w-24 duration-200 hover:-translate-y-1 rounded-full mt-3">
-			</a>
-			<a href="/home" data-link class="hidden dark:block ml-4">
-				<img src="/src/image/croissant-black.png" alt="croissantd"
-				class="w-24 duration-200 hover:-translate-y-1 rounded-full mt-3">
-			</a>
+				<a href="/home" data-link class="block dark:hidden ml-4">
+					<img src="/src/image/croissant-white.png" alt="croissantw"
+					class="w-24 duration-200 hover:-translate-y-1 rounded-full mt-3">
+				</a>
+				<a href="/home" data-link class="hidden dark:block ml-4">
+					<img src="/src/image/croissant-black.png" alt="croissantd"
+					class="w-24 duration-200 hover:-translate-y-1 rounded-full mt-3">
+				</a>
 			</div>
 
 			<!-- Menu Deroulent -->
@@ -56,14 +56,26 @@
 				<input type="checkbox" id="burger" class="peer hidden">
 				<label for="burger" class="cursor-pointer select-none">
 				<div class="flex flex-row">
-					<h1 class="mr-6 text-2xl my-auto" id="pseudo-header"></h1>
+					<div class="flex flex-row items-center mr-2">
+						<span class="w-12 h-12 mr-4 bg-linear-to-br from-amber-500 to-orange-500 rounded-full flex items-center font-bold text-4xl justify-center text-white" id="lvl-header"></span>
+						<div class="w-40 mr-4s">
+							<h1 class="text-2xl my-auto font-medium text-center text-amber-900 dark:text-white" id="pseudo-header"></h1>
+							<div class="w-full h-3 mt-5 bg-amber-50 ring-1 ring-amber-900 dark:ring-white rounded-full overflow-hidden">
+								<div
+									id="progress-xp"
+									class="h-full w-0 rounded-full
+									transition-all duration-700 bg-amber-500 ease-out">
+								</div>
+							</div>
+						</div>
+					</div>
 					<div>
 						<span id="status" class="absolute w-4 h-4 rounded-full border-2 border-white"></span>
 						<img class="rounded-full w-20 h-20" id="header-avatar" src="" alt="Your avatar" width="70"/>
 					</div>
 				</div>
 				</label>
-				<nav class="absolute top-28 right-0 bg-white/90 dark:bg-gray-800/90 shadow-lg w-48 rounded-lg p-4 
+				<nav class="absolute top-28 right-0 bg-white/90 dark:bg-gray-800/90 dark:text-white shadow-lg w-48 rounded-lg p-4 
 						hidden flex-col space-y-3 text-lg font-medium mr-6
 						peer-checked:flex md:hidden duration-300">
 					<a href="/profile" data-link class="hover:text-amber-700 mx-auto w-36">Profile</a>
@@ -71,6 +83,19 @@
 					<a href="/friends" data-link class="hover:text-amber-700 mx-auto w-36">Friends</a>
 					<a href="/leaderboard" data-link class="hover:text-amber-700 mx-auto w-36">Leaderboard</a>
 					<a href="/logout" data-link class="hover:text-amber-700 mx-auto w-36">Logout</a>
+					<div class="flex flex-row mx-auto">
+						<img class="mr-2 size-5 dark:invert" src="src/image/soleil.png" alt="light">
+						<label class="relative inline-flex items-center cursor-pointer">
+							<input type="checkbox" id="theme-switch" class="sr-only peer" />
+							<div
+								class="w-11 h-6 bg-amber-500 rounded-full peer-checked:bg-gray-800 transition-colors"
+							></div>
+							<div
+								class="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-5"
+							></div>
+						</label>
+						<img class="ml-2 size-5 dark:invert" src="src/image/lune.png" alt="dark">
+					</div>
 				</nav>
 			</div>
 		</header>
@@ -94,37 +119,47 @@
 		</main>
 	</template>
 
-	
 	<template id="loginhtml">
-		<form id="login-form" class="flex flex-col rounded-lg text-center bg-white ring-4 ring-amber-300 dark:bg-black/20 backdrop-blur-lg shadow-lg mt-40 w-100 min-h-80 mx-auto">
-	 		<h1 class="mt-4 text-amber-900 dark:text-white font-bold text-xl">Welcome Back</h1>
-			<div class="flex flex-col mx-10">
-				<div class="items-start text-start">
-					<h2 class="text-sm text-amber-900 dark:text-white mt-3 mb-0.5">Username</h2>
-					<input class="input" 
-						id="username" name="username" placeholder="Enter your username" required />
-					<p class="text-red-600 text-xs mt-1 text-left block" id="username-loginmsg"></p>
+		<div class="min-h-screen flex items-start justify-center px-4">
+			<form id="login-form" class="mt-40 w-full max-w-md min-h-80 flex flex-col rounded-lg text-center ring-4 ring-amber-300
+				 bg-white dark:bg-black/20 backdrop-blur-lg shadow-lg px-8 py-6" >
+				<h1 class="text-xl font-bold text-amber-900 dark:text-white mb-6">
+					Welcome Back
+				</h1>
+				<div class="flex flex-col mx-auto gap-4">
+					<div class="flex flex-col text-left">
+						<label for="username" class="text-sm text-amber-900 dark:text-white mb-1">
+							Username
+						</label>
+						<input id="username" name="username" class="input" placeholder="Enter your username" required />
+						<p id="username-loginmsg" class="text-xs text-red-600 mt-1" ></p>
+					</div>
+					<div class="flex flex-col text-left">
+						<label for="password" class="text-sm text-amber-900 dark:text-white mb-1">
+							Password
+						</label>
+						<input id="password" type="password" name="password" class="input" placeholder="••••••••" required />
+						<p id="password-loginmsg" class="text-xs text-red-600 mt-1" ></p>
+					</div>
 				</div>
-				<div class="items-start text-start">
-					<h2 class="text-sm text-amber-900 dark:text-white mt-3 mb-0.5">Password</h2>
-					<input class="input" 
-						id="password" type="password" name="password" placeholder="••••••••" required />
-					<p class="text-red-600 text-xs mt-1 text-left block" id="password-loginmsg"></p>
+				<button type="submit" class="btn mx-auto mt-6 w-40" >
+					Log in
+				</button>
+				<a href="/register" data-link class="mt-2 text-sm text-amber-900 dark:text-white hover:underline" >
+					Create account ?
+				</a>
+				<div class="flex items-center gap-2 my-4 text-sm text-gray-500">
+					<hr class="flex-1 border-gray-300 dark:border-gray-600" />
+					<span>or</span>
+					<hr class="flex-1 border-gray-300 dark:border-gray-600" />
 				</div>
-			</div>
-			<button type="submit" class="btn mx-auto w-40 justify-end">Log in</button>
-			<a class="mt-1 text-amber-900 dark:text-white hover:underline text-sm" href="/register" data-link>Create account ?</a>
-			<div class="flex items-center gap-2 mx-10 my-2 text-sm text-gray-500">
-				<hr class="flex-1 border-gray-300" />
-				<span>or</span>
-				<hr class="flex-1 border-gray-300" />
-			</div>
-			<button type="button" id="google-login-btn" class="flex items-center justify-center mx-auto w-60 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-black/30">
-				<img src="/src/image/google-icon.svg" class="h-10" />
-			</button>
-		</form>
+				<button type="button" id="google-login-btn" class="mx-auto w-full max-w-xs flex items-center justify-center gap-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-black/30">
+					<img src="/src/image/google-icon.svg" alt="Google login" class="h-10" />
+				</button>
+			</form>
+		</div>
 	</template>
-		
+
 	<template id="twofahtml">
 		<form id="twofa-form" class="flex flex-col rounded-lg text-center bg-white ring-4 ring-amber-300 dark:bg-black/20 backdrop-blur-lg shadow-lg mt-40 w-100 h-52 mx-auto">
 			<div class="mx-10">
@@ -174,7 +209,7 @@
 						<input class="input" type="password" name="confirm-password" placeholder="••••••••" required />
 						<p id="confirm-password-message" class="text-xs text-red-600 mt-1"></p>
 					</div>
-					<div class="flex items-start gap-2 text-xs text-gray-700 mt-2">
+					<div class="flex items-start gap-2 text-xs text-gray-700 dark:text-white mt-2">
 						<input type="checkbox" id="accept-terms" name="accept-terms" required class="mt-0.5" />
 						<label for="accept-terms">
 							I agree to the
@@ -195,10 +230,7 @@
 				Already registered ?
 				</a>
 			</form>
-			<p
-				id="rules-password"
-				class="mt-4 max-w-md text-center text-xs text-amber-900 dark:text-white opacity-50 px-4"
-			>
+			<p id="rules-password" class="mt-4 max-w-md text-center text-xs text-amber-900 dark:text-white opacity-50 px-4">
 				Password rules :<br>
 				- The password must contain at least 12 characters.<br>
 				- It must include at least one uppercase letter (A-Z), one lowercase letter (a-z) and one digit (0-9).<br>
@@ -662,7 +694,6 @@
 		</div>
 	</template>
 
-
 	<template id="homehtml">
 		<div class="w-full h-[calc(100vh-112px)]">
 			<main class="w-[60%] ml-[5%] mt-40 text-center">
@@ -672,14 +703,14 @@
 						hover:bg-linear-to-r hover:from-orange-500 hover:via-amber-800 hover:to-amber-600
 						animate-pulse w-fit">Welcome in Croiscendence</h1>
 				<p class="mt-10 text-base md:text-lg lg:text-xl opacity-50
-		  				 max-w-md mx-auto">
+		  				 max-w-md mx-auto duration-300 dark:text-white">
 					You can start playing by clicking the button below,
 					and view your profile information by clicking 
 					your avatar in the top-right corner.</p>
 				<button class="btn w-40 mx-auto mt-20 block" id="scroll-button">Start playing !</button>
 				<!-- <div id="chat-container"></div> -->
 			</main>
-			<footer class="absolute bottom-4 w-full text-center text-sm opacity-60">
+			<footer class="absolute bottom-4 w-full dark:text-white duration-300 text-center text-sm opacity-60">
 				<a href="/termsofservice" data-link class="hover:underline">Terms of Service</a>
 				<span>|</span>
 				<a href="/privacypolicy" data-link class="hover:underline">Privacy Policy</a>
@@ -688,20 +719,41 @@
 		<div id="gamepage" class="-mt-40">
 			<img src="/src/image/gamepage.jpg"
 				alt="gamepage"
-				class="absolute block dark:hidden -z-10 object-cover w-full h-screen">
+				class="absolute block -z-10 object-cover w-full h-screen">
 			<section class="flex flex-col items-end mr-60 text-center">
 				<ul>
-					<li class="mt-20">
-						<h1 class="text-2xl">Local</h1>
-						<a href="/gamelocal" data-link class="btn w-48">Player or AI</a>
+					<li class="flex flex-col items-center mt-20">
+						<h1 class="text-2xl font-semibold tracking-wide">
+							Local
+						</h1>
+						<p class="text-sm opacity-60 text-center">
+							Play against a friend or an AI
+						</p>
+						<a href="/gamelocal" data-link class="btn w-48">
+							Player or AI
+						</a>
 					</li>
-					<li class="mt-20">
-						<h1 class="text-2xl">Online</h1>
-						<a href="/gameonline" data-link class="btn w-48">1 VS 1</a>
+					<li class="flex flex-col items-center mt-20">
+						<h1 class="text-2xl font-semibold tracking-wide">
+							Online
+						</h1>
+						<p class="text-sm opacity-60 text-center">
+							Competitive online matches
+						</p>
+						<a href="/gameonline" data-link class="btn w-48">
+							1 VS 1
+						</a>
 					</li>
-					<li class="mt-20">
-						<h1 class="text-2xl">Tournament</h1>
-						<a href="/tournament" data-link class="btn w-48">4 Players</a>
+					<li class="flex flex-col items-center mt-20">
+						<h1 class="text-2xl font-semibold tracking-wide">
+							Tournament
+						</h1>
+						<p class="text-sm opacity-60 text-center">
+							4 players elimination bracket
+						</p>
+						<a href="/tournament" data-link class="btn w-48">
+							4 Players
+						</a>
 					</li>
 				</ul>
 			</section>
@@ -1329,7 +1381,6 @@
 	</div>
 	</template>
 
-
 	<template id="bracketshtml">
 		<div id="header-container"></div>
 		<h1 class="text-3xl font-bold text-center mt-6">Brackets</h1>
@@ -1391,7 +1442,6 @@
 	</div>
 	</template>
 
-
 	<template id="dashboardhtml">
 		<div class="flex flex-row">
 			<section class="bg-amber-100/80 mt-5 ml-2 w-[50%] h-[80vh] flex flex-col ring-2 ring-amber-400 items-center rounded-lg">	<h1 class="font-bold text-xl mb-1 text-amber-900">History - 20 last games :</h1>
@@ -1420,8 +1470,8 @@
 				</section>
 				<section class="flex flex-row h-[70%]">
 					<div class="flex flex-col w-[50%] h-[95%] mx-4 text-center mt-4">
-						<p class="stat">Games Wins <br><span class="text-6xl" id="win"></span></p>
-						<p class="stat">Games Losses <br><span class="text-6xl" id="loose"></span></p>
+						<p class="stat">Wins <br><span class="text-6xl" id="win"></span></p>
+						<p class="stat">Losses <br><span class="text-6xl" id="loose"></span></p>
 						<p class="stat">Winrate <br><span class="text-6xl" id="winrate"></span></p>
 					</div>
 					<div class="flex flex-col w-[50%] h-[95%] mx-4 text-center mt-4">
@@ -1485,5 +1535,4 @@
 		</div>
 	</template>
 
-	
 </html>
