@@ -298,7 +298,7 @@ const start = async () => {
 		await fastify.listen({ port: PORT, host: "0.0.0.0" });
 		console.log(`Server running on port ${PORT}`);
 		await db.connect();
-		// await users.deleteUserTable();
+		await users.deleteUserTable();
 		// await gameInfo.deleteGameInfoTable();
 		// await friends.deleteFriendTable();
 		await users.createUserTable();
@@ -313,14 +313,14 @@ const start = async () => {
 		await generalChat.createChatTable();
 		// const hashedPasswor= await bcrypt.hash("42", 12);
 		// let hashedPassword = await bcrypt.hash("a", 12);
-		// const hashedPassword = await bcrypt.hash("42", 12);
+		const hashedPassword = await bcrypt.hash("42", 12);
 		// users.addUser("a", "e@g.c", hashedPassword, 200);
 		// users.addUser("new", "e@g.c", hashedPassword, 300);
 		// users.addUser("ok", "e@g.c", hashedPassword, 500);
 		// users.addUser("b", "e@g.c", hashedPassword, 700);
 		// users.addUser("c", "e@g.c", hashedPassword, 1500);
 		// users.addUser("d", "e@g.c", hashedPassword,2300);
-		// users.addUser("42", "42", hashedPassword, 2800); 
+		users.addUser("42", "42", hashedPassword, 2800); 
 		// users.addUser("42", "42", hashedPassword);
 		// friends.addFriendship(5, 6);
 		// friends.addFriendship(4, 5);
