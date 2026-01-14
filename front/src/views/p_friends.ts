@@ -8,6 +8,7 @@ import { IFriendsAndNot } from "../../../back/routes/friends/friends";
 import { linearBuckets } from "prom-client";
 
 const times = [
+	{ max: 1, div: 1, units: " now" },
 	{ max: 60, div: 1, units: " secondes ago" },
 	{ max: 120, div: 60, units: " minute ago"},
 	{ max: 3600, div: 60, units: " minutes ago"},

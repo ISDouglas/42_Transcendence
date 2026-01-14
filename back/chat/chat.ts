@@ -25,7 +25,7 @@ export async function handleGeneralChatSocket(io: Server, socket: Socket) {
 			if (message.length === 0)
 				return socket.emit("chatError", {error: "empty message"});
 			const pseudo = socket.data.user.pseudo;
-			const date = new Date().toISOString().replace("T", " ").split(".")[0];
+			const date = new Date().toISOString();
 			await generalChat.addMessageChat(socket.data.user.id, pseudo, message, date);
 			socket.emit("generalChatMessage", {
 				pseudo,
