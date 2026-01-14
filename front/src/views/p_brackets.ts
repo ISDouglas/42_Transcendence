@@ -61,6 +61,10 @@ export async function initBrackets(params?: any) {
 		navigateTo(`/pongmatch/${gameId}?tournamentId=${tournamentId}`);
 	});
 
+	net.onHostDisconnected(() => {
+		net?.changeHost();
+	});
+
 	function updatePseudo() {
 		if (currentTournament)
 		{

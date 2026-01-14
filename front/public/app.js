@@ -4607,6 +4607,9 @@ var init_tournamentNetwork = __esm({
         this.socket.on("setWinner", (winner, loser) => {
           this.onsetWinnerCallback?.(winner, loser);
         });
+        this.socket.on("hostDisconnected", () => {
+          this.onHostDisconnectedCallback?.();
+        });
         this.socket.on("disconnection", () => {
           this.onDisconnectionCallback?.();
         });
@@ -4635,8 +4638,14 @@ var init_tournamentNetwork = __esm({
       onJoinTournamentGame(cb) {
         this.onjoinTournamentGameCallback = cb;
       }
+      onHostDisconnected(cb) {
+        this.onHostDisconnectedCallback = cb;
+      }
       startTournament() {
         this.socket.emit("startTournament");
+      }
+      changeHost() {
+        this.socket.emit("resetHost");
       }
       join(tournamentId) {
         this.socket.emit("joinTournament", tournamentId);
@@ -4694,6 +4703,9 @@ async function initBrackets(params) {
   });
   net2.onJoinTournamentGame(async (gameId, tournamentId) => {
     navigateTo(`/pongmatch/${gameId}?tournamentId=${tournamentId}`);
+  });
+  net2.onHostDisconnected(() => {
+    net2?.changeHost();
   });
   function updatePseudo() {
     if (currentTournament) {

@@ -27,7 +27,7 @@ export function handleTournamentSocket(io: Server, socket: Socket)
 	
 		//emit to display start button for tournament creator
 		if (playerId == tournament.idPlayers[0] && tournament.state.status === "waiting")
-			io.to(socket.id).emit("hostTournament", tournamentId);
+			io.to(socket.id).emit("hostTournament");
 	});
 
 	socket.on("disconnect", () => {
@@ -40,7 +40,7 @@ export function handleTournamentSocket(io: Server, socket: Socket)
 		{
 			io.to(`tournament-${tournamentId}`).emit("state", updateStateTournament(tournament.state));
 			console.log("Client disconnected:", socket.id);
-			let countdown = 30;
+			let countdown = 10;
 			let interval = setInterval(() => {
 				countdown--;
 				if (countdown < 0) {
@@ -50,6 +50,23 @@ export function handleTournamentSocket(io: Server, socket: Socket)
 				}
 			}, 1000);
 		}
+		else if (tournament.state.status === "waiting")
+		{
+			console.log("Client disconnected:", socket.id);
+			removeSocketTournament(tournament, socket);
+			io.to(`tournament-${tournamentId}`).emit("state", updateStateTournament(tournament.state));
+			io.to(`tournament-${tournamentId}`).emit("hostDisconnected");
+		}
+	});
+
+	socket.on("resetHost", () => {
+		let tournament = tournaments_map.get(socket.data.tournamentId);
+		const playerId = socket.data.user.id;
+	
+		if (!tournament || playerId === undefined)
+			return;
+		if (playerId == tournament.idPlayers[0] && tournament.state.status === "waiting")
+			io.to(socket.id).emit("hostTournament");
 	});
 
 	socket.on("startTournament", () => {
@@ -316,27 +333,61 @@ function fillSocketTournament(playerId: Number, tournament: serverTournament, so
 
 function removeSocketTournament(tournament: serverTournament, socket: Socket)
 {
-	if (tournament.sockets.player1 === socket.id)
+	//if creator of the tournament, find someone to replace
+	if (tournament.sockets.player1 === socket.data.user.id)
 	{
-		tournament.sockets.player1 = null;
-		tournament.state.pseudo.player1 = "Waiting for reconnection...";
+		if (tournament.sockets.player2)
+		{
+			tournament.sockets.player1 = tournament.sockets.player2;
+			tournament.state.pseudo.player1 = tournament.state.pseudo.player2;
+			tournament.idPlayers[0] = tournament.idPlayers[1];
+			tournament.idPlayers[1] = -1;
+			tournament.state.pseudo.player2 = "Waiting for player...";
+			tournament.sockets.player2 = null;
+		}
+		else if (tournament.sockets.player3)
+		{
+			tournament.sockets.player1 = tournament.sockets.player3;
+			tournament.state.pseudo.player1 = tournament.state.pseudo.player3;
+			tournament.idPlayers[0] = tournament.idPlayers[2];
+			tournament.idPlayers[2] = -1;
+			tournament.state.pseudo.player3 = "Waiting for player...";
+			tournament.sockets.player3 = null;
+		}
+		else if (tournament.sockets.player4)
+		{
+			tournament.sockets.player1 = tournament.sockets.player4;
+			tournament.state.pseudo.player1 = tournament.state.pseudo.player4;
+			tournament.idPlayers[0] = tournament.idPlayers[3];
+			tournament.idPlayers[3] = -1;
+			tournament.state.pseudo.player4 = "Waiting for player...";
+			tournament.sockets.player4 = null;
+		}
+		else
+		{
+			tournaments_map.delete(socket.data.tournamentId);
+			console.log("Tournament deleted :", socket.data.tournamentId);
+		}
 	}
 
-	if (tournament.sockets.player2 === socket.id)
+	if (tournament.sockets.player2 === socket.data.user.id)
 	{
+		tournament.idPlayers[1] = -1;
+		tournament.state.pseudo.player2 = "Waiting for player...";
 		tournament.sockets.player2 = null;
-		tournament.state.pseudo.player2 = "Waiting for reconnection...";
 	}
 
-	if (tournament.sockets.player3 === socket.id)
+	if (tournament.sockets.player3 === socket.data.user.id)
 	{
+		tournament.idPlayers[2] = -1;
+		tournament.state.pseudo.player3 = "Waiting for player...";
 		tournament.sockets.player3 = null;
-		tournament.state.pseudo.player3 = "Waiting for reconnection...";
 	}
 
-	if (tournament.sockets.player4 === socket.id)
+	if (tournament.sockets.player4 === socket.data.user.id)
 	{
+		tournament.idPlayers[3] = -1;
+		tournament.state.pseudo.player4 = "Waiting for player...";
 		tournament.sockets.player4 = null;
-		tournament.state.pseudo.player4 = "Waiting for reconnection...";
 	}
 }

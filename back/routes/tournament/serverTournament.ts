@@ -16,7 +16,6 @@ export class serverTournament {
 	sockets: { player1: string | null, player2: string | null, player3: string | null, player4: string | null };
 	semi_index: number[];
 	final_arr: number[];
-	index: number;
 	private io?: Server;
 	disconnectTimer: NodeJS.Timeout | null;
 	state: TournamentState;
@@ -29,7 +28,6 @@ export class serverTournament {
 		this.io = io;
 		this.semi_index = [0, 2, 1, 3];
 		this.final_arr = [0, 0];
-		this.index = 0;
 		this.disconnectTimer = null;
 		this.state = {
 			status: "waiting",
@@ -100,8 +98,7 @@ export function joinTournament(playerId: number, tournamentId: number)
 		if (tournament.idPlayers.includes(playerId))
 			return;
 
-		let i = tournament.index;
-		for (i; i < 4; i++)
+		for (let i = 0; i < 4; i++)
 		{
 			if (tournament.idPlayers[tournament.semi_index[i]] == -1)
 			{
@@ -122,9 +119,11 @@ export function createTournamentGame(PlayerId: number, isLocal: boolean, type: "
 		id += gameId;
 		const game = new ServerGame(id, isLocal);
 		game.idPlayer1 = PlayerId;
+		console.log("game.idPlayer1", game.idPlayer1);
 		game.type = type;
 		if (vsAI)
 			game.idPlayer2 = -1;
+		console.log("game.idPlayer2", game.idPlayer2);
 		tournament.games.set(id, game);
 		return id;
 	}
