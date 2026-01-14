@@ -19,7 +19,7 @@ export async function handleGeneralChatSocket(io: Server, socket: Socket) {
 			if (message.length === 0)
 				return socket.emit("chatError", {error: "empty message"});
 			const pseudo = socket.data.user.pseudo;
-			const date = new Date().toISOString();
+			const date = new Date().toISOString().replace("T", " ").split(".")[0];
 			await generalChat.addMessageChat(socket.data.user.id, pseudo, message, date)
 			io.to("general-chat").emit("generalChatMessage", {
 				pseudo: pseudo,
@@ -31,4 +31,6 @@ export async function handleGeneralChatSocket(io: Server, socket: Socket) {
 	})
 	socket.data.isitlogged = false;
 }
+
+// function 
 

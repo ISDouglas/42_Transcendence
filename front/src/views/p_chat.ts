@@ -14,37 +14,21 @@ export async function displayChat() {
 	const chatBar = clone.querySelector(".chat-bar") as HTMLElement;
 	
 	document.getElementById("chat-container")!.appendChild(clone);
-	// const chatBar = document.getElementById("chat-bar") as HTMLElement;
-	// const chatWindow = document.getElementById("chat-window");
-
 	chatBar.addEventListener("click", () => {
-	    chatWindow.classList.toggle("hidden");
+		chatWindow.classList.toggle("hidden");
 	
-	    if (!chatWindow.classList.contains("hidden")) {
-	        setTimeout(() => {
-	            chatBox.scrollTop = chatBox.scrollHeight;
-	        }, 0);
-	    }
+		if (!chatWindow.classList.contains("hidden")) {
+			setTimeout(() => {
+				chatBox.scrollTop = chatBox.scrollHeight;
+			}, 0);
+		}
 	});
-
-
-	// const form = document.getElementById("chat-form");
-	// const input = document.getElementById("chat-input") as HTMLInputElement;
 	
 	chatnet.receiveHistory((messages) => {
 		messages.forEach(msg => addMessageGeneral(msg, chatBox));
-
-		// const chatWindow = document.getElementById("chat-window"); 
-		// const chatBox = document.getElementById("chat-box");
-		// chatWindow!.classList.remove("hidden");
-
-		// const chatBox = document.getElementById("chat-box");
 		setTimeout(() => {
 			chatBox!.scrollTop = chatBox!.scrollHeight;
 		}, 0);
-		// requestAnimationFrame(() => {
-		// 	chatBox!.scrollTop = chatBox!.scrollHeight;
-		// });
 	});
 
 	chatnet.receiveMessage((data) => {
@@ -65,8 +49,6 @@ export async function displayChat() {
 }
 
 function addMessageGeneral(data: dataChat, box: HTMLElement) {
-	// const box = document.getElementById("chat-box");
-
 	const div = document.createElement("div");
 	div.className = "bg-amber-100/90 p-2 rounded-lg break-words max-w-full";
 
@@ -83,10 +65,8 @@ function addMessageGeneral(data: dataChat, box: HTMLElement) {
 }
 
 function displayError(message: string, input: HTMLInputElement) {
-	// const input = document.getElementById("chat-input") as HTMLInputElement;
 	const oldPlaceholder = input.placeholder;
 	input.style.border = "2px solid red";
-	// input.style.backgroundColor = "rgba(255, 0, 0, 0.1)";
 	input.placeholder = message;
 
 	setTimeout(() => {
@@ -95,8 +75,6 @@ function displayError(message: string, input: HTMLInputElement) {
 		input.style.border = "";
 	}, 1500);
 }
-
-
 
 export function setFirstLogin(value: boolean) {
 	console.log("dans setfirslogin", value);

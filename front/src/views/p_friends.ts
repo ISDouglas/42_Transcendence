@@ -49,7 +49,7 @@ async function myFriends(acceptedFriends: IMyFriends[]) {
 		pseudo.textContent = friend.pseudo;
   		avatar.src =  friend.avatar;
 		avatar.alt = `${friend.pseudo}'s avatar`;
-		date.textContent = "friend since " + new Date(friend.friendship_date).toLocaleDateString();		
+		date.textContent = "friend since " + new Date(friend.friendship_date).toLocaleDateString();
 		displayStatus(friend, status);
 		toDeleteFriend(friend.id, clone);
 		item.appendChild(clone);
