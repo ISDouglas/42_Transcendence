@@ -5,7 +5,7 @@ export interface IMyFriends {
 	avatar: string;
 	pseudo: string;
 	web_status: "online" | "offline" | "busy";
-	friendship_date: Date;
+	friendship_date: string;
 	friendship_status: "pending" | "accepted";
 	asked_by: number;
 }

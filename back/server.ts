@@ -301,10 +301,10 @@ const start = async () => {
 		// await users.deleteUserTable();
 		// await gameInfo.deleteGameInfoTable();
 		// await friends.deleteFriendTable();
-		await generalChat.deleteChatTableAndTrigger()
+		// await generalChat.deleteChatTableAndTrigger()
 		await users.createUserTable();
 		await generalChat.createChatTable();
-		await generalChat.limitChatMessage();
+		// await generalChat.limitChatMessage();
 		// await users.migrateUsersTable();
 		
 		await friends.createFriendTable();
