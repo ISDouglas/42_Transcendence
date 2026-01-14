@@ -27,7 +27,7 @@ export async function initProfile() {
 			console.log("Status changed :", status);
   		});
 	}
-  (document.getElementById("profile-money") as HTMLParagraphElement).textContent = profile.money.toString();
+//   (document.getElementById("profile-money") as HTMLParagraphElement).textContent = profile.money.toString();
   (document.getElementById("profile-elo") as HTMLParagraphElement).textContent = profile.elo.toString();
 
 

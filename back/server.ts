@@ -313,7 +313,7 @@ const start = async () => {
 		await generalChat.createChatTable();
 		// const hashedPasswor= await bcrypt.hash("42", 12);
 		// let hashedPassword = await bcrypt.hash("a", 12);
-		const hashedPassword = await bcrypt.hash("42", 12);
+		// const hashedPassword = await bcrypt.hash("42", 12);
 		// users.addUser("a", "e@g.c", hashedPassword, 200);
 		// users.addUser("new", "e@g.c", hashedPassword, 300);
 		// users.addUser("ok", "e@g.c", hashedPassword, 500);

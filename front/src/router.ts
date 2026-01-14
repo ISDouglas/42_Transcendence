@@ -236,7 +236,6 @@ export async function router() {
 			return;
 		}
 
-		console.log(history.state?.from);
 		if ((isReloaded || (window.location.pathname === "/home" && (!history.state || (publicPath.includes(history.state.from)))))) {
 			chatnet.connect( () => {
 				displayChat()
