@@ -46,7 +46,7 @@ export class GameRenderer {
 		this.ctx.font = "30px Arial";
 		this.ctx.fillStyle = "white";
 		this.ctx.textAlign = "center";
-		const text = "A player has been disconnected,\nwaiting for reconnection...";
+		const text = "A player has been disconnected,\nwaiting a few seconds for reconnection...\n";
 
 		const lines = text.split("\n");
 		const lineHeight = 24;

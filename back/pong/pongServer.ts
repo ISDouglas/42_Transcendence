@@ -87,12 +87,6 @@ export function handleGameSocket(io: Server, socket: Socket) {
 
 		console.log("Client disconnected:", socket.id);
 
-		if (game!.sockets.player1 === socket.id)
-			game!.sockets.player1 = null;
-
-		if (game!.sockets.player2 === socket.id)
-			game!.sockets.player2 = null;
-
 		game.status = "disconnected";
 		io.to(`game-${gameId}`).emit("state", updateStateGame(game.state, game.status, game.type));
 		io.to(`game-${game.id}`).emit("disconnection", updateStateGame(game.state, game.status, game.type));
@@ -101,12 +95,11 @@ export function handleGameSocket(io: Server, socket: Socket) {
 			game.disconnectTimer = setTimeout(() => {
 				console.log("Timeout disconnected game : ", gameId);
 				io.to(`game-${game.id}`).emit("noReconnection");
-				games_map.delete(gameId);
-			}, 5 * 60 * 1000);
+				game.status = "playing";
+				io.to(`game-${gameId}`).emit("state", updateStateGame(game.state, game.status, game.type));
+			}, 1 * 15 * 1000);
 		}
 	});
-
-	
 }
 
 export function checkForWinner(game: ServerGame, io: Server)

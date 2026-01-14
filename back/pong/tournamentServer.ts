@@ -126,8 +126,15 @@ export function handleTournamentSocket(io: Server, socket: Socket)
 					}
 					else
 					{
-						gameId = joinTournamentGame(socket.data.user.id, gameId, tournamentId);
-						io.to(socket.id).emit("joinTournamentGame", gameId, tournamentId);
+						let countdown = 5;
+						let interval = setInterval(() => {
+							countdown--;
+							if (countdown < 0) {
+								clearInterval(interval);
+								gameId = joinTournamentGame(socket.data.user.id, gameId, tournamentId);
+								io.to(socket.id).emit("joinTournamentGame", gameId, tournamentId);
+							}
+						}, 1000);
 					}
 				}
 			}
