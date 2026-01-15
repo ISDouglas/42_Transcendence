@@ -331,6 +331,7 @@ async function lunchDB()
 	users_stats.addUser((await users.getPseudoUser("42")).user_id);
 	users_stats.addUser((await users.getPseudoUser("43")).user_id);
 	
+	await users_achivements.deleteTable();
 	await users_achivements.createUserAchievementsTable();
 }
 

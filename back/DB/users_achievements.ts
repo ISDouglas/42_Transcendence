@@ -1,3 +1,4 @@
+import { Program } from "typescript";
 import { ManageDB } from "./manageDB";
 
 export class UserAchievements {
@@ -22,6 +23,27 @@ export class UserAchievements {
             );
         `);
     }
+
+	async deleteTable()
+	{
+		const query = `DROP TABLE IF EXISTS user_achievements`
+		await this._db.execute(query, []);
+	}
+
+	async getAllAchievmentUnlocked(userId: number)
+	{
+		return await this._db.query(`
+			SELECT achievement_id, unlocked_at
+			FROM user_achievements
+			WHERE user_id = ?;
+		`, [userId]);
+	}
+
+	async checkSecretAllAchievement(userId: number): Promise<number>
+	{
+		const allUnluck = await this.getAllAchievmentUnlocked(userId);
+		return allUnluck.length
+	}
 
     async unlockAchievement(userId: number, achievementId: number)
 	{

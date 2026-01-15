@@ -75,6 +75,7 @@ export class Achievements {
 		const level = await users.getLvlFromID(userId);
 		console.log(level);
 		const achievements = await this.getLockedAchievements(userId);
+		const unlocked = await users_achivements.checkSecretAllAchievement(userId);
 
 		for (const achievement of achievements) {
 
@@ -96,6 +97,13 @@ export class Achievements {
 				case "LEVEL_50":
 					isUnlocked = level >= achievement.target;
 					break;
+				
+				case "SECRET_MASTER":
+					isUnlocked = unlocked >= 7;
+					break;
+				
+				case "NO_DEFEAT":
+					isUnlocked = stats.wins_streak >= achievement.target;
 			}
 
 			if (isUnlocked) {
@@ -118,11 +126,7 @@ export class Achievements {
 			ORDER BY achievement_id ASC;
 		`);
 
-		const unlockedRows = await this._db.query(`
-			SELECT achievement_id, unlocked_at
-			FROM user_achievements
-			WHERE user_id = ?;
-		`, [userId]);
+		const unlockedRows = await users_achivements.getAllAchievmentUnlocked(userId);
 
 		const unlockedSet = new Map<number, string>();
 		unlockedRows.forEach((row: any) => unlockedSet.set(row.achievement_id, row.unlocked_at));

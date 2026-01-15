@@ -4,6 +4,7 @@ export interface IUserStats {
     user_id: number;
     games_played: number;
     online_wins: number;
+	wins_streak: number;
 }
 
 
@@ -22,7 +23,8 @@ export class UserStats {
 			CREATE TABLE IF NOT EXISTS user_stats (
 				user_id INTEGER PRIMARY KEY,
 				games_played INTEGER DEFAULT 0,
-				online_wins INTEGER DEFAULT 0
+				online_wins INTEGER DEFAULT 0,
+				wins_streak INTEGER DEFAULT 0
 			);
 		`);
 	}
@@ -36,8 +38,8 @@ export class UserStats {
 	async addUser(userId: number)
 	{
 		await this._db.execute(`
-			INSERT OR IGNORE INTO user_stats (user_id, games_played, online_wins)
-			VALUES (?, 0, 0);
+			INSERT OR IGNORE INTO user_stats (user_id, games_played, online_wins, wins_streak)
+			VALUES (?, 0, 0, 0);
 		`, [userId]);
 	}
 
@@ -57,8 +59,14 @@ export class UserStats {
 		{
 			fields.push("games_played = games_played + 1");
 		}
-		if (online_wins === true) {
-			fields.push("online_wins = online_wins + 1");
+		if (online_wins === true)
+		{
+			fields.push("online_wins = online_wins + 10");
+			fields.push("wins_streak = wins_streak + 10");
+		}
+		if (online_wins === false)
+		{
+			fields.push("wins_streak = 0");
 		}
 		if (fields.length === 0) return;
 

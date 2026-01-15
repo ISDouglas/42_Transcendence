@@ -74,16 +74,23 @@ export async function initAchievement()
 
 
 			const node = template.content.cloneNode(true) as DocumentFragment;
-			
+
+			const isUnlocked = unlockedMap.has(code);
+
+			if (achievement.rarity === "Secret" && isUnlocked)
+			{
+				(node.getElementById("unlock") as HTMLElement).textContent = "UNLOCKED";
+				(node.getElementById("img") as HTMLImageElement).src = "/src/image/coupe.png";
+			}
 			const title = node.getElementById("title") as HTMLElement;
 			const description = node.getElementById("description") as HTMLElement;
 			const rarity = node.getElementById("rarity") as HTMLElement;
 			const effect = node.getElementById("effect") as HTMLElement;
-			console.log(effect);
-			title.textContent = achievement.rarity !== "Secret" ? achievement.title : "???";
-			description.textContent = achievement.rarity !== "Secret" ? achievement.description : "A secret achievement";
+
+			title.textContent = achievement.rarity === "Secret" && !isUnlocked ? "???" : achievement.title;
+			description.textContent = achievement.rarity === "Secret"  && !isUnlocked ? "A secret achievement" : achievement.description;
 			rarity.textContent = achievement.rarity;
-			console.log(achievement.rarity);
+
 			effect.classList.add(...rarityBackground[achievement.rarity]);
 
 			(i <= 4 ? container1 : container2).appendChild(node);

@@ -1,7 +1,7 @@
 import { View, init } from "./views/home";
 import { LoginView, initLogin } from "./views/login";
 import { DashboardView, initDashboard } from "./views/p_dashboard";
-import { RegisterValidView, RegisterView, initRegister } from "./views/register";
+import { RegisterView, initRegister } from "./views/register";
 import { GameOnlineView, GameOnlineinit} from "./views/p_gameonline";
 import { GameLocalView, GameLocalinit} from "./views/p_gamelocal";
 import { PongMatchView, initPongMatch, stopGame} from "./views/p_pongmatch";
@@ -36,7 +36,6 @@ const routes = [
   { path: "/twofa", view: towfaView, init: initTowfa},
   { path: "/logout", init: initLogout},
   { path: "/register", view: RegisterView, init: initRegister},
-  { path: "/registerok", view: RegisterValidView},
   { path: "/termsofservice", view: TermsOfServiceView, init: InitTermsOfService},
   { path: "/privacypolicy", view: PriavacyPolicyView, init: InitPrivacyPolicy},
   { path: "/home", view: homeView, init: initHomePage},

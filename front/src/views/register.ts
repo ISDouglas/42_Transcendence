@@ -1,6 +1,7 @@
 import { register } from "module";
 import { navigateTo } from "../router";
 import { loadHeader } from "../router";
+import { showToast } from "./show_toast";
 
 
 export function RegisterView(): string {
@@ -30,7 +31,10 @@ export async function initRegister() {
 			});
 			const result = await res.json();
 			if (result.ok == true)
-				navigateTo("/registerok")
+			{
+				showToast(`Your account have been created succesfully`, "success", 2000);
+				navigateTo("/login")
+			}
 			else
 			{
 				const usernameInput = form.querySelector("input[name='username']") as HTMLInputElement;
@@ -74,8 +78,4 @@ export async function initRegister() {
 			console.error(err);
 		}
 	});
-}
-
-export function RegisterValidView(): string {
-	return (document.getElementById("registerok") as HTMLTemplateElement).innerHTML;
 }
