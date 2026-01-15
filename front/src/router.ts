@@ -27,6 +27,8 @@ import { InitTermsOfService, TermsOfServiceView } from "./views/terms_of_service
 import { InitPrivacyPolicy, PriavacyPolicyView } from "./views/privacypolicy";
 import { IUsers } from "../../back/DB/users";
 import { InitLeaderboard, LeaderboardView } from "./views/p_leaderboard";
+import { chatnet, displayChat, firstLogin } from "./views/p_chat";
+import { showToast } from "./views/show_toast";
 
 const routes = [
   { path: "/", view: View, init: init},
@@ -56,7 +58,7 @@ const routes = [
   { path: "/oauth/callback", init: initOAuthCallback },
 ];
 
-const publicPath = ["/", "/login", "/register", "/logout"];
+const publicPath = ["/", "/login", "/register", "/logout", "/registerok", "/oauth/callback", "/twofa"];
 
 let currentRoute: any = null;
 let currentPath: string;
@@ -66,6 +68,8 @@ export interface PseudoHeaderResponse {
 	avatar: string;
 	web_status: string;
 	notif: boolean;
+	xp: number;
+	lvl: number;
 }
 
 export type LogStatusAndInfo = { 
@@ -73,6 +77,13 @@ export type LogStatusAndInfo = {
 	logged: boolean;
 	user: PseudoHeaderResponse | null;
 }
+
+let isReloaded = false;
+const nav = performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming;
+if (nav && nav.type === "reload")
+	isReloaded = true;
+
+
 
 export function navigateTo(url: string) {
 	const state = { from: window.location.pathname };
@@ -94,7 +105,7 @@ export async function checkLogStatus(): Promise<LogStatusAndInfo> {
 			return { status: "error", logged: false, user: null }			
 		}
 		if (result.loggedIn === true)
-			return { status: "logged", logged: true, user: { pseudo: result.pseudo, avatar: result.avatar, web_status: result.status, notif: result.notif} };
+			return { status: "logged", logged: true, user: { pseudo: result.user.pseudo, avatar: result.user.avatar, web_status: result.user.status, notif: result.user.notif, xp: result.user.xp, lvl: result.user.lvl} };
 		return { status: "not_logged", logged: false, user: null };
 	} catch {
 		return { status: "error", logged: false, user: null };
@@ -108,15 +119,12 @@ export async function genericFetch(url: string, options: RequestInit = {})
 	credentials: "include"
 })
 	const result = await res.json();
-// 	if (result.error) {
-// 		if (result.error === "TokenExpiredError")
-// 			alert("Session expired, please login")
-// 		navigateTo("/logout");
-// 		throw new Error(result.error || result.message || "Unknown error");
-// }
-// 	if (!res.ok){
-// 		throw new Error(result.error || result.message || "Unknown error");
-// }
+	if (result.error) {
+		throw new Error(result.error || result.message || "Unknown error");
+	}	
+	if (!res.ok){
+		throw new Error(result.error || result.message || "Unknown error");
+	}
 	return result;
 }
 
@@ -137,6 +145,29 @@ function matchRoute(pathname: string) {
 	return null;
 }
 
+function initSwitch()
+{
+	const root = document.documentElement;
+	const switchInput = document.getElementById('theme-switch') as HTMLInputElement;
+	if ( localStorage.theme === 'dark' || (!localStorage.theme && window.matchMedia('(prefers-color-scheme: dark)').matches))
+	{
+		root.classList.add('dark');
+		switchInput.checked = true;
+	}
+	switchInput.addEventListener('change', () => {
+		if (switchInput.checked)
+		{
+			root.classList.add('dark');
+			localStorage.theme = 'dark';
+		}
+		else
+		{
+			root.classList.remove('dark');
+			localStorage.theme = 'light';
+		}
+	});
+}
+
 export async function loadHeader(auth: LogStatusAndInfo) {
 
 	const container = document.getElementById("header-container");
@@ -146,10 +177,14 @@ export async function loadHeader(auth: LogStatusAndInfo) {
 	const clone = template.content.cloneNode(true);
 	container!.appendChild(clone);
 	if (auth.logged)
+	{
 		displayPseudoHeader(auth.user!);
+		initSwitch();
+	}	
 }
 
-export function displayPseudoHeader(result: PseudoHeaderResponse) {
+export function displayPseudoHeader(result: PseudoHeaderResponse)
+{
 	document.getElementById("pseudo-header")!.textContent = result.pseudo;
 	const avatar = document.getElementById("header-avatar") as HTMLImageElement;
 	const status = document.getElementById("status") as HTMLImageElement;
@@ -159,10 +194,16 @@ export function displayPseudoHeader(result: PseudoHeaderResponse) {
 	notification.classList.add("hidden");
 	if (result.notif === true)
 		notification.classList.remove("hidden");
-	return true;
+	setTimeout(() => {
+			const bar = document.getElementById("progress-xp") as HTMLDivElement;
+			const progress = (result.xp / 20000) * 100;
+			bar.style.width = `${progress}%`;
+		}, 50);
+	
+	(document.getElementById("lvl-header") as HTMLSpanElement).textContent = result.lvl.toString();
 }
 
-export function displayStatus(info: any, status: HTMLImageElement): void {
+export function displayStatus(info: any, status: HTMLSpanElement): void {
 	switch (info.web_status)
 	{
 		case "online": status.classList.add("bg-green-500");
@@ -190,15 +231,28 @@ export async function router() {
 	if (location.pathname !== "/logout") {
 		const auth: LogStatusAndInfo = await checkLogStatus();
 		if (auth.status === "expired" || auth.status === "error") {
-			if (auth.status === "expired")
-				alert("Session expired, please login")
-			navigateTo("/logout");
-			return;
+			if (auth.status === "expired") {
+				showToast("Session expired. Please log in again.", "warning", 2000);
+				setTimeout(() => navigateTo("/logout"), 300);
+				return;
+			}	  
+			if (auth.status === "error") {
+				showToast("Authentication error. Please log in again.", "error", 2000);
+				setTimeout(() => navigateTo("/logout"), 300);
+				return;
+			}
+		}
+		console.log("from ", history.state?.from, " in ", window.location.pathname);
+		if ((isReloaded || (window.location.pathname === "/home" && (!history.state || (publicPath.includes(history.state.from)))))) {
+			chatnet.connect( () => {
+				displayChat()
+			});
+			isReloaded = false;
 		}
 		loadHeader(auth);
 		if (publicPath.includes(location.pathname) && auth.logged)
 			navigateTo("/home");
-		if (!publicPath.includes(location.pathname) && !auth.logged)
+		if (!publicPath.includes(location.pathname) && !auth.logged && location.pathname !== "/termsofservice" && location.pathname !== "/privacypolicy")
 			navigateTo("/");
 	}
 

@@ -10,10 +10,11 @@ export interface IUsers {
 	status: string;
 	creation_date: Date;
 	modification_date: Date;
-	money: number;
 	elo: number;
 	twofa_secret: string;
 	twofa_enabled: number;
+	lvl: number;
+	xp: number;
 }
 
 export class Users
@@ -30,26 +31,27 @@ export class Users
 		await this._db.execute(`
 			CREATE TABLE IF NOT EXISTS Users (
 				user_id INTEGER PRIMARY KEY AUTOINCREMENT,
-                pseudo TEXT NOT NULL,
-                email TEXT NOT NULL,
+                pseudo TEXT NOT NULL UNIQUE,
+                email TEXT NOT NULL UNIQUE,
                 password TEXT NOT NULL,
 				avatar TEXT NOT NULL,
                 status TEXT NOT NULL,
                 creation_date TEXT NOT NULL,
 				modification_date TEXT NOT NULL,
-                money INTEGER DEFAULT 0,
 				twofa_secret TEXT,
 				twofa_enabled INTEGER DEFAULT 0,
-                elo INTEGER DEFAULT 0
+                elo INTEGER DEFAULT 0,
+				lvl INTEGER DEFAULT 1,
+				xp INTEGER DEFAULT 0
 			)
 		`);
 	}
 
-	async addUser(pseudo:string, email: string, password: string, elo:number):Promise<void>
+	async addUser(pseudo:string, email: string, password: string, elo:number=500):Promise<void>
 	{
 		const query = `
-			INSERT INTO Users (pseudo, email, password, avatar, status, creation_date, modification_date, money, twofa_secret, twofa_enabled, elo)
-			VALUES (?,?,?,?,?,?,?,?,?,?,?)
+			INSERT INTO Users (pseudo, email, password, avatar, status, creation_date, modification_date, twofa_secret, twofa_enabled, elo, lvl, xp)
+			VALUES (?,?,?,?,?,?,?,?,?,?,?,?)
 		`;
 		const parameters = [
 		pseudo,
@@ -59,10 +61,11 @@ export class Users
 		"online",
 		new Date().toISOString().replace("T", " ").split(".")[0],
 		new Date().toISOString().replace("T", " ").split(".")[0],
-		0,
 		"",
 		0,
-		elo
+		elo,
+		1,
+		0
 		];
 		await this._db.execute(query, parameters);
 	}
@@ -70,8 +73,8 @@ export class Users
 	async CreateUserIA()
 	{
 		const query = `
-			INSERT INTO Users (user_id, pseudo, email, password, avatar, status, creation_date, modification_date, money, twofa_secret, twofa_enabled, elo)
-			VALUES (?,?,?,?,?,?,?,?,?,?,?,?)
+			INSERT INTO Users (user_id, pseudo, email, password, avatar, status, creation_date, modification_date, twofa_secret, twofa_enabled, elo)
+			VALUES (?,?,?,?,?,?,?,?,?,?,?)
 			ON CONFLICT(user_id) DO NOTHING
 		`;
 		const parameters = [
@@ -83,7 +86,6 @@ export class Users
 		"online",
 		new Date().toISOString().replace("T", " ").split(".")[0],
 		new Date().toISOString().replace("T", " ").split(".")[0],
-		0,
 		"",
 		0,
 		1000
@@ -94,8 +96,8 @@ export class Users
 	async CreateUserGuest()
 	{
 		const query = `
-			INSERT INTO Users (user_id, pseudo, email, password, avatar, status, creation_date, modification_date, money, twofa_secret, twofa_enabled, elo)
-			VALUES (?,?,?,?,?,?,?,?,?,?,?,?)
+			INSERT INTO Users (user_id, pseudo, email, password, avatar, status, creation_date, modification_date, twofa_secret, twofa_enabled, elo)
+			VALUES (?,?,?,?,?,?,?,?,?,?,?)
 			ON CONFLICT(user_id) DO NOTHING
 		`;
 		const parameters = [
@@ -107,7 +109,6 @@ export class Users
 		"online",
 		new Date().toISOString().replace("T", " ").split(".")[0],
 		new Date().toISOString().replace("T", " ").split(".")[0],
-		0,
 		"",
 		0,
 		1000
@@ -195,8 +196,15 @@ export class Users
 	async getEloFromID(id: number) : Promise<number>
 	{
 		const result = await this._db.query(`SELECT elo FROM Users WHERE user_id = ?`, [id]);
-		console.log(result[0].elo);
 		return result[0].elo as number;
+		
+	}
+
+	async getXpFromID(id: number) : Promise<number>
+	{
+		const result = await this._db.query(`SELECT xp FROM Users WHERE user_id = ?`, [id]);
+		console.log(result[0].xp);
+		return result[0].xp as number;
 		
 	}
 
@@ -256,17 +264,41 @@ export class Users
 		return eloChange;
 	}
 
-	async updateElo(id_win: number, id_loose: number, score_win: number, score_loose: number)
+	async updateElo(id_win: number, id_lose: number, score_win: number, score_lose: number)
 	{
 		const eloWin: number = await this.getEloFromID(id_win);
-		const eloLoose: number = await this.getEloFromID(id_loose);
-		await this._db.execute(`UPDATE Users SET elo = elo + ? WHERE user_id = ?`, [this.calculateElo(eloLoose, eloWin, score_win, score_loose) , id_win]);
-		await this._db.execute(`UPDATE Users SET elo = elo + ? WHERE user_id = ?`, [this.calculateElo(eloWin, eloLoose, score_loose, score_win) , id_loose]);
+		const eloLose: number = await this.getEloFromID(id_lose);
+		await this._db.execute(`UPDATE Users SET elo = elo + ? WHERE user_id = ?`, [this.calculateElo(eloLose, eloWin, score_win, score_lose) , id_win]);
+		await this._db.execute(`UPDATE Users SET elo = elo + ? WHERE user_id = ?`, [this.calculateElo(eloWin, eloLose, score_lose, score_win) , id_lose]);
 	}
 
 	async addElo(id: number)
 	{
 		await this._db.execute(`UPDATE Users SET elo = elo + ? WHERE user_id = ?`, [416 , id]);
+	}
+
+	async addLvl(id: number)
+	{
+		await this._db.execute(`UPDATE Users SET lvl = lvl + ? WHERE user_id = ?`, [1 , id]);
+	}
+
+	calculateXp(xp: number, score: number, id: number): number
+	{
+		const xptotal: number = xp + (score * 100);
+		if (xptotal > 20000)
+		{
+			this.addLvl(id);
+			return xptotal - 20000;
+		}
+		return xptotal;
+	}
+
+	async updateXp(id_win: number, id_lose: number, score_win: number, score_lose: number)
+	{
+		const xpWinner: number = await this.getXpFromID(id_win);
+		const xpLooser: number = await this.getXpFromID(id_lose);
+		await this._db.execute(`UPDATE Users SET xp = ? WHERE user_id = ?`, [this.calculateXp(xpWinner, score_win + 20, id_win), id_win]);
+		await this._db.execute(`UPDATE Users SET xp = ? WHERE user_id = ?`, [this.calculateXp(xpLooser, score_lose + 10, id_lose), id_lose]);
 	}
 
 	async searchMember(pseudo: string, id: number): Promise<IUsers[]> {

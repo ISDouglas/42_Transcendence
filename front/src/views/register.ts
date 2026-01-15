@@ -1,7 +1,7 @@
 import { register } from "module";
 import { navigateTo } from "../router";
 import { loadHeader } from "../router";
-
+import { showToast } from "./show_toast";
 
 export function RegisterView(): string {
 	 	return (document.getElementById("registerhtml") as HTMLTemplateElement).innerHTML;
@@ -72,10 +72,11 @@ export async function initRegister() {
 		catch (err) 
 		{
 			console.error(err);
+			showToast(err, "error", 3000, "Registration failed:");
 		}
 	});
 }
 
 export function RegisterValidView(): string {
-	return (document.getElementById("registerok") as HTMLFormElement).innerHTML;
+	return (document.getElementById("registerok") as HTMLTemplateElement).innerHTML;
 }

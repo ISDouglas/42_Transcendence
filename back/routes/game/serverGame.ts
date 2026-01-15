@@ -157,6 +157,9 @@ export async function endGame(winner_id: number, loser_id: number, winner_score:
 	const gameDate: any = getDate(Number(gameid));
 	await gameInfo.finishGame(winner_id, loser_id, winner_score, loser_score, duration_game, gameDate, type);
 	if (type === "Online")
+	{
 		users.updateElo(winner_id, loser_id, winner_score, loser_score);
+		users.updateXp(winner_id, loser_id, winner_score, loser_score);
+	}	
 	games_map.delete(gameid);
 }

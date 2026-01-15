@@ -1,10 +1,17 @@
 import { userInfo } from "os";
 import { Server, Socket } from "socket.io";
 import { generalChat } from "../server";
+import { dataChat } from "../../front/src/chat/chatNetwork";
 
 export async function handleGeneralChatSocket(io: Server, socket: Socket) {
-	socket.emit("chatHistory", await generalChat.displayHistoryMessage());
-
+	const history = await generalChat.displayHistoryMessage();
+	if (history) {
+		const historyAndMe: dataChat[] = history.map((info: any) => ({
+			...info,
+			me: info.pseudo === socket.data.user.pseudo
+  		}));
+		socket.emit("chatHistory", historyAndMe);
+	}
 	socket.join("general-chat");
 
 	socket.on("generalChatMessage", async (message: string) => {
@@ -19,20 +26,24 @@ export async function handleGeneralChatSocket(io: Server, socket: Socket) {
 				return socket.emit("chatError", {error: "empty message"});
 			const pseudo = socket.data.user.pseudo;
 			const date = new Date().toISOString();
-			await generalChat.addMessageChat(socket.data.user.id, pseudo, message, date)
-			io.to("general-chat").emit("generalChatMessage", {
+			await generalChat.addMessageChat(socket.data.user.id, pseudo, message, date);
+			socket.emit("generalChatMessage", {
+				pseudo,
+				message,
+				date,
+				me: true
+			});
+			socket.to("general-chat").emit("generalChatMessage", {
 				pseudo: pseudo,
 				message: message,
-				date: date, 
+				date: date,
+				me: false
 			});
 		} catch (err) {
-	}
+		}
 	})
-
-	// socket.on("requestHistory", async () => {
-    // const history = await generalChat.displayHistoryMessage();
-    // socket.emit("chatHistory", history);
-	// });
-
+	socket.data.isitlogged = false;
 }
+
+// function 
 

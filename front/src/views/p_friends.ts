@@ -1,11 +1,33 @@
 import { IMyFriends } from "../../../back/DB/friend";
-import { friends } from "../../../back/server";
 import { displayStatus, genericFetch, loadHeader, navigateTo } from "../router";
 import { IUsers } from "../../../back/DB/users";
-import { request } from "http";
-import { stat } from "fs";
 import { IFriendsAndNot } from "../../../back/routes/friends/friends";
-import { linearBuckets } from "prom-client";
+import { showToast } from "./show_toast";
+
+
+const times = [
+	{ max: 1, div: 1, units: " now" },
+	{ max: 60, div: 1, units: " secondes ago" },
+	{ max: 120, div: 60, units: " minute ago"},
+	{ max: 3600, div: 60, units: " minutes ago"},
+	{ max: 7200, div: 3600,  units: " hour ago" },
+	{ max: 86400, div: 3600,  units: " hours ago" },
+	{ max: 172800, div: 86400, units: " day ago" },
+	{ max: 259200, div: 86400, units: " days ago" }
+];
+
+function getTimeInvit(date: string): string {
+	const now = Date.now();
+	const dateDiff = (now - new Date(date).getTime()) / 1000;
+	for (const time of times)
+	{
+		if (dateDiff < time.max) {
+			const diff: string = Math.floor(dateDiff / time.div).toString();
+			return (diff + time.units);
+		}
+	}
+	return new Date(date).toLocaleDateString();
+}
 
 export function FriendsView(): string {
 	return (document.getElementById("friendshtml") as HTMLTemplateElement).innerHTML;
@@ -26,6 +48,7 @@ export async function initFriends() {
 	}
 	catch (err) {
 		console.log(err);
+		showToast("Loading failed. Please try again later.", "error", 3000);
 	}
 }
 
@@ -45,11 +68,12 @@ async function myFriends(acceptedFriends: IMyFriends[]) {
 		const avatar = clone.getElementById("avatar") as HTMLImageElement;
 		const pseudo = clone.getElementById("pseudo") as HTMLParagraphElement;
 		const date = clone.getElementById("date-friendship") as HTMLParagraphElement;
-		const status = clone.getElementById("f_status") as HTMLImageElement;
+		const status = clone.getElementById("f_status") as HTMLSpanElement;
 		pseudo.textContent = friend.pseudo;
   		avatar.src =  friend.avatar;
 		avatar.alt = `${friend.pseudo}'s avatar`;
-		date.textContent = "friend since " + new Date(friend.friendship_date).toLocaleDateString();		
+		
+		date.textContent = "friend since " + getTimeInvit(friend.friendship_date);
 		displayStatus(friend, status);
 		toDeleteFriend(friend.id, clone);
 		item.appendChild(clone);
@@ -113,6 +137,7 @@ async function search(memberSearched: string, myfriends: IMyFriends[]) {
 	}
 	catch (error) {
 		console.log(error);
+		showToast(error, "error", 3000);
 	}
 }
 
@@ -135,6 +160,7 @@ function toAddFriend(id: number, li: DocumentFragment)
 		catch (err) {
 			console.log(err);
 			button.disabled = false;
+			showToast(err, "error", 3000);
 		}
 	})
 }
@@ -163,6 +189,7 @@ function toAcceptFriend(friend: IMyFriends,li: DocumentFragment ) {
 		catch (err) {
 			console.log(err);
 			button.disabled = false;
+			showToast(err, "error", 3000);
 		}
 	})
 }
@@ -185,6 +212,7 @@ function toDeleteFriend(id: number, li: DocumentFragment) {
 		catch (err) {
 			console.log(err);
 			button.disabled = false;
+			showToast(err, "error", 3000);
 		}
 	})
 }
@@ -209,7 +237,7 @@ function pendingFr(pendingFriends: IMyFriends[]) {
 		pseudo.textContent = friend.pseudo;
   		avatar.src =  friend.avatar;
 		avatar.alt = `${friend.pseudo}'s avatar`;
-		date.textContent = "pending since " + new Date(friend.friendship_date).toLocaleDateString();		
+		date.textContent = "pending since " + getTimeInvit(friend.friendship_date);
 		toAcceptFriend(friend, clone);
 		item.appendChild(clone);
 		container.appendChild(item);

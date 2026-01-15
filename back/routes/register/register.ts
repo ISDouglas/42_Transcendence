@@ -12,7 +12,7 @@ export async function manageRegister(pseudo: string, email: string, password: st
 		await checkEmail(email);
 		await checkPassword(password, confirm);
 		const hashedPassword = await bcrypt.hash(password, 12);
-		users.addUser(pseudo, email, hashedPassword);
+		users.addUser(pseudo, email, hashedPassword, 500);
 		reply.status(200).send({ ok:true, message: "You have been register successfully."})
 	}
 	catch (err)

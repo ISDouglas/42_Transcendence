@@ -3,20 +3,40 @@ import { io, Socket } from "socket.io-client";
 export type dataChat = {
 	pseudo: string,
 	message : string, 
-	date: string
+	date: string,
+	me?: boolean
 }
 
 export class chatNetwork {
 	private socket: Socket;
 
+	// constructor() {
+	// 	const serverUrl = window.location.host;
+	// 	this.socket = io(serverUrl, {
+	// 		transports: ["websocket"],
+	// 		withCredentials: true,
+	// 	});
+	// 	console.log("DANS CHATNETWORK");
+	// 	// this.socket.on("connect", () => {
+	// 	// 	this.requestHistory();
+	// 	// });
+	// }
+
 	constructor() {
+	this.socket = null as any;
+}
+
+	connect(callback: () => void) {
 		const serverUrl = window.location.host;
 		this.socket = io(serverUrl, {
 			transports: ["websocket"],
 			withCredentials: true,
 		});
+		if (this.socket.connected)
+			callback();
+		else
+			this.socket.once("connect", callback);
 	}
-
 
 	sendMessage(message: string) {
 		this.socket.emit("generalChatMessage", message)
@@ -34,12 +54,7 @@ export class chatNetwork {
 		this.socket.on("chatError", callback);
 	}
 
-	disconnect() { 
-		this.socket.disconnect();
+	disconnect() {
+		this.socket?.disconnect();
 	}
-
-	// requestHistory() {
-	// 	this.socket.emit("requestHistory");
-	// }
-
 }

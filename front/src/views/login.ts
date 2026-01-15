@@ -1,6 +1,5 @@
 import { loadHeader, navigateTo} from "../router";
-import { displayChat } from "./p_chat";
-
+import { showToast } from "./show_toast";
 
 export function LoginView(): string {
 	return (document.getElementById("loginhtml") as HTMLFormElement).innerHTML;
@@ -48,14 +47,14 @@ export async function login(username: string, password: string, form: HTMLFormEl
 			}
 			return 0;
 		}
-		localStorage.setItem("token", result.token);
+		// localStorage.setItem("token", result.token);
 		/*ajouter localstorage pour que cela fonctionne*/
 		if (result.ok && result.twofa === true)
 			return 2;
 		return 1;
 	} catch (err) {
-		// console.error(err);
-		return 0;     
+		showToast("Network error, please try again later", "error", 2000);
+		return 0; 
 	}
 }
 

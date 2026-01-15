@@ -55,7 +55,7 @@ export async function callbackGoogle(request: FastifyRequest, reply: FastifyRepl
       // 5. check/create user 
       let user = await users.getEmailUser(email!);
       if (!user || user.length === 0) {
-        await users.addUser(name!, email!, GOOGLE_PASSWORD_PLACEHOLDER);
+        await users.addUser(name!, email!, GOOGLE_PASSWORD_PLACEHOLDER, 500);
         user = await users.getEmailUser(email!);
       }
 
