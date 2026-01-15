@@ -19,7 +19,7 @@ export async function displayChat() {
 	chatBar!.addEventListener("click", () => {
 		chatWindow!.classList.toggle("hidden");
 		if (!chatWindow?.classList.contains("hidden")) {
-			chatBar!.classList = "bg-amber-100 hover:bg-amber-800 text-amber-900 px-4 py-2 rounded-lg shadow cursor-pointer w-32 text-center";
+			chatBar!.classList = "dark:bg-amber-800 dark:text-amber-100 bg-amber-100 hover:bg-amber-800 text-amber-100 px-4 py-2 rounded-lg shadow cursor-pointer w-32 text-center";
 			setTimeout(() => {
 				chatBox!.scrollTop = chatBox!.scrollHeight;
 			}, 0);
@@ -62,6 +62,7 @@ function addMessageGeneral(data: dataChat, box: HTMLElement, container: HTMLDivE
 	const message = clone.getElementById("message") as HTMLDivElement;
 	pseudo.textContent = data.pseudo;
 	date.textContent = selectDate(data.date);
+	console.log("date =", date.textContent);
 	message.innerHTML = data.message;
 	item.appendChild(clone);
 	box!.appendChild(item);
@@ -74,7 +75,7 @@ function selectDate(date: string): string {
 	const now = new Date().toLocaleDateString();
 	const yesterday = new Date(new Date().setDate(new Date().getDate() - 1)).toLocaleDateString();
 
-	if (theDate === new Date().toLocaleDateString())
+	if (theDate === now)
 		return "today, " + new Date(date).toLocaleTimeString();
 	if (theDate === yesterday)
 		return "yesterday, " + new Date(date).toLocaleTimeString();
