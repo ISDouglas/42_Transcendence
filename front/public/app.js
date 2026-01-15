@@ -4527,8 +4527,8 @@ async function initProfile() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status })
       });
+      navigateTo("/profile");
       showToast(`Status updated successfully to << ${status} >>`, "success", 2e3);
-      setTimeout(() => navigateTo("/profile"), 2100);
     });
   }
   document.getElementById("profile-elo").textContent = profile.elo.toString();
@@ -5057,6 +5057,8 @@ function getTimeInvit(date) {
   const dateDiff = (now - new Date(date).getTime()) / 1e3;
   for (const time of times) {
     if (dateDiff < time.max) {
+      if (time.max === 1)
+        return time.units;
       const diff = Math.floor(dateDiff / time.div).toString();
       return diff + time.units;
     }
