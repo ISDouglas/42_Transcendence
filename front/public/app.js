@@ -357,7 +357,15 @@ async function initRegister() {
       });
       const result = await res.json();
       if (result.ok == true) {
+<<<<<<< HEAD
+<<<<<<< HEAD
         showToast(`Your account have been created succesfully`, "success", 2e3);
+=======
+        showToast(`Your account have been created succesfully`, "success", 3e3);
+>>>>>>> noah
+=======
+        showToast(`Your account have been created succesfully`, "success", 3e3);
+>>>>>>> noah
         navigateTo("/login");
       } else {
         const usernameInput = form.querySelector("input[name='username']");
@@ -5765,17 +5773,17 @@ async function InitLeaderboard() {
   if (leaderboard.InfoUsers.length > 0) {
     document.getElementById("avatar-1").src = leaderboard.InfoUsers[0].avatar;
     document.getElementById("pseudo-1").textContent = leaderboard.InfoUsers[0].pseudo;
-    document.getElementById("elo-1").textContent = leaderboard.InfoUsers[0].elo.toString();
+    document.getElementById("elo-1").textContent = leaderboard.InfoUsers[0].elo.toString() + " \u{1F950}";
   }
   if (leaderboard.InfoUsers.length > 1) {
     document.getElementById("avatar-2").src = leaderboard.InfoUsers[1].avatar;
     document.getElementById("pseudo-2").textContent = leaderboard.InfoUsers[1].pseudo;
-    document.getElementById("elo-2").textContent = leaderboard.InfoUsers[1].elo.toString();
+    document.getElementById("elo-2").textContent = leaderboard.InfoUsers[1].elo.toString() + " \u{1F950}";
   }
   if (leaderboard.InfoUsers.length > 2) {
     document.getElementById("avatar-3").src = leaderboard.InfoUsers[2].avatar;
     document.getElementById("pseudo-3").textContent = leaderboard.InfoUsers[2].pseudo;
-    document.getElementById("elo-3").textContent = leaderboard.InfoUsers[2].elo.toString();
+    document.getElementById("elo-3").textContent = leaderboard.InfoUsers[2].elo.toString() + " \u{1F950}";
   }
   for (let i = 3; i < 50; i++) {
     const template = document.getElementById("leaderboard-list");
@@ -5783,11 +5791,21 @@ async function InitLeaderboard() {
     if (i < leaderboard.InfoUsers.length) {
       li.getElementById("avatar").src = leaderboard.InfoUsers[i].avatar;
       li.getElementById("pseudo").textContent = leaderboard.InfoUsers[i].pseudo;
-      li.getElementById("elo").textContent = leaderboard.InfoUsers[i].elo.toString();
+      li.getElementById("elo").textContent = leaderboard.InfoUsers[i].elo.toString() + " \u{1F950}";
+      if (leaderboard.user.pseudo === leaderboard.InfoUsers[i].pseudo) {
+        li.getElementById("background").classList.add("bg-linear-to-r", "from-amber-100", "via-orange-100", "to-yellow-100");
+      } else
+        li.getElementById("background").classList.add("bg-linear-to-r", "from-amber-50", "via-orange-50", "to-yellow-50");
     }
     li.getElementById("position").textContent = "#" + (i + 1).toString();
     container.appendChild(li);
   }
+  if (leaderboard.InfoUsers.length >= 50 && leaderboard.user.elo < leaderboard.InfoUsers[49].elo) {
+    document.getElementById("your-avatar").src = leaderboard.user.avatar;
+    document.getElementById("your-pseudo").textContent = leaderboard.user.pseudo;
+    document.getElementById("your-elo").textContent = leaderboard.user.elo.toString() + " \u{1F950}";
+  } else
+    document.getElementById("your-position").classList.add("hidden");
   console.log(leaderboard);
 }
 var init_p_leaderboard = __esm({
