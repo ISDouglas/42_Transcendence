@@ -9,7 +9,7 @@ export function UpdatePasswordView(): string {
 export async function initUpdatePassword() {
   // get pseudo and avatar
   const profile = await genericFetch("/api/private/profile", {
-	  method: "POST",
+	  method: "GET",
 	});
 	const avatar = document.getElementById("profile-avatar") as HTMLImageElement;
 	avatar.src = profile.avatar + "?ts=" + Date.now();
@@ -31,9 +31,8 @@ export async function initUpdatePassword() {
         headers: { "Content-Type": "application/json", },
         body: JSON.stringify({ oldPw, newPw, confirm })
       });
-
+      navigateTo("/logout");
       showToast("Password is updated successfully! Please re-log in!", "success", 2000);
-      setTimeout(() => navigateTo("/logout"), 2100);
 
     } catch (err: any) {
       showToast(err.message, "error", 3000, "Update password");

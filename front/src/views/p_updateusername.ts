@@ -9,7 +9,7 @@ export function UpdateUsernameView(): string {
 export async function initUpdateUsername() {
   // get pseudo and avatar
   const profile = await genericFetch("/api/private/profile", {
-	  method: "POST",
+	  method: "GET",
 	});
 	const avatar = document.getElementById("profile-avatar") as HTMLImageElement;
 	avatar.src = profile.avatar + "?ts=" + Date.now();
@@ -59,8 +59,8 @@ async function updateUsername() {
         body: JSON.stringify({ newUsername, password })
       });
 
+      navigateTo("/profile");
       showToast(`Username updated successfully to << ${response.pseudo} >>`, "success", 2000);
-      setTimeout(() => navigateTo("/profile"), 2100);
 
     } catch (err: any) {
       showToast(err, "error");
