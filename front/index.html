@@ -46,13 +46,8 @@
 					class="w-24 duration-200 hover:-translate-y-1 rounded-full mt-3">
 				</a>
 			</div>
-
 			<!-- Menu Deroulent -->
 			<div class="mr-10 flex items-center">
-				<a href="/friends" id="notification" data-link class="hidden ml-4">
-				<img src="/src/image/notification.png" alt="notification"
-				class="w-16 duration-200 hover:-translate-y-1 rounded-full mt-3">
-				</a>
 				<input type="checkbox" id="burger" class="peer hidden">
 				<label for="burger" class="cursor-pointer select-none">
 				<div class="flex flex-row">
@@ -82,9 +77,10 @@
 					<a href="/dashboard" data-link class="hover:text-amber-700 mx-auto w-36">Dashboard</a>
 					<a href="/friends" data-link class="hover:text-amber-700 mx-auto w-36">Friends</a>
 					<a href="/leaderboard" data-link class="hover:text-amber-700 mx-auto w-36">Leaderboard</a>
+					<a href="/achievement" data-link class="hover:text-amber-700 mx-auto w-36">Achievements</a>
 					<a href="/logout" data-link class="hover:text-amber-700 mx-auto w-36">Logout</a>
 					<div class="flex flex-row mx-auto">
-						<img class="mr-2 size-5 dark:invert" src="src/image/soleil.png" alt="light">
+						<img class="mr-2 size-5 dark:invert" src="/src/image/soleil.png" alt="light">
 						<label class="relative inline-flex items-center cursor-pointer">
 							<input type="checkbox" id="theme-switch" class="sr-only peer" />
 							<div
@@ -94,9 +90,15 @@
 								class="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-5"
 							></div>
 						</label>
-						<img class="ml-2 size-5 dark:invert" src="src/image/lune.png" alt="dark">
+						<img class="ml-2 size-5 dark:invert" src="/src/image/lune.png" alt="dark">
 					</div>
 				</nav>
+				<div class="flex justify-end items-center">
+					<a href="/friends" id="notification" data-link class="hidden ml-4">
+						<img src="/src/image/notification.png" alt="notification"
+						class="w-12 duration-200 hover:-translate-y-1 rounded-full mt-3">
+					</a>
+				</div>
 			</div>
 		</header>
 	</template>
@@ -258,13 +260,6 @@
 				- It must include at least one uppercase letter (A-Z), one lowercase letter (a-z) and one digit (0-9).<br>
 				- It must include at least one special character : !@#$%^&*()_-+=.?.<br>
 			</p>
-		</div>
-	</template>
-
-	<template id="registerok">
-		<div class="flex flex-col justify-center">
-			<h1 class="text-amber-600 mt-40 text-2xl text-center mx-auto block">You have been register Successfully !</h1>
-			<a href="/login" data-link class="btn mx-auto mt-20 w-48">Login</a>
 		</div>
 	</template>
 
@@ -907,13 +902,6 @@
 						</a>
 					</div>
 					<div class="flex items-start shadow-sm text-amber-900 bg-amber-300/20 w-80 ring-1 h-16 pt-1 ring-amber-900 rounded-lg mt-6">
-						<img class="bg-blue-700 shadow-sm my-1 px-1 rounded-lg size-12 invert ml-2 items-start" src="/src/image/euro.png" alt="">
-						<div>
-							<h1 class="ml-2 font-bold">Money</h1>
-							<p id="profile-money" class="ml-2"></p>
-						</div>
-					</div>
-					<div class="flex items-start shadow-sm text-amber-900 bg-amber-300/20 w-80 ring-1 h-16 pt-1 ring-amber-900 rounded-lg mt-6">
 						<img class="bg-blue-700 shadow-sm my-1 px-1 rounded-lg size-12 invert ml-2 items-start" src="/src/image/coupe.png" alt="">
 						<div>
 							<h1 class="ml-2 font-bold">Elo</h1>
@@ -977,23 +965,26 @@
 								w-80 ring-1 ring-amber-900 rounded-lg mt-6 p-3">
 						<h2 class="font-bold mb-2 text-center">Change Email</h2>
 						<form id="change-email-form" class="flex flex-col gap-2">
-							<h2 class="text-sm text-amber-900 dark:text-white mt-3 mb-0.5">New Email</h2>
+							<h2 class="text-sm text-amber-900 mt-3 mb-0.5">New Email</h2>
 							<input
 								class="rounded-md px-2 py-1 ring-1 ring-amber-400"
 								type="text"
 								name="new-email"
 								placeholder="your.new-email@example.com"
 								required />
-							<h2 class="text-sm text-amber-900 dark:text-white mt-3 mb-0.5">Confirm Password</h2>
+							<h2 class="text-sm text-amber-900 mt-3 mb-0.5">Confirm Password</h2>
 							<input
 								class="rounded-md px-2 py-1 ring-1 ring-amber-400"
 								type="password"
 								name="password"
 								placeholder="••••••••••••"
 								required />
+							<p class="text-sm text-amber-900 mt-3 mb-0.5">
+								If you change this email, your Google account (if any) will <strong>no longer be linked</strong>.
+							</p>
 							<button
 								type="submit" 
-								class="btn w-40 mx-auto mt-20 block">
+								class="btn w-40 mx-auto mt-15 block">
 								Update Email
 							</button>
 						</form>
@@ -1007,7 +998,7 @@
 		<div>
 			<br>
 		</div>
-		<footer class="absolute bottom-4 w-full dark:text-white duration-300 text-center text-sm opacity-60">
+		<footer class="dark:text-white text-center text-sm opacity-60">
 			<div><br></div>
 			<div>
 					<a href="/termsofservice" data-link class="hover:underline">Terms of Service</a>
@@ -1054,14 +1045,14 @@
 								w-80 ring-1 ring-amber-900 rounded-lg mt-6 p-3">
 							<h2 class="font-bold mb-2 text-center">Change Username</h2>
 							<form id="change-username-form" class="flex flex-col gap-2">
-								<h2 class="text-sm text-amber-900 dark:text-white mt-3 mb-0.5">New Username</h2>
+								<h2 class="text-sm text-amber-900 mt-3 mb-0.5">New Username</h2>
 								<input
 									class="rounded-md px-2 py-1 ring-1 ring-amber-400"
 									type="text"
 									name="new-username"
 									placeholder="new_user_name"
 									required />
-								<h2 class="text-sm text-amber-900 dark:text-white mt-3 mb-0.5">Confirm Password</h2>
+								<h2 class="text-sm text-amber-900 mt-3 mb-0.5">Confirm Password</h2>
 								<input
 									class="rounded-md px-2 py-1 ring-1 ring-amber-400"
 									type="password"
@@ -1090,21 +1081,21 @@
 								w-80 ring-1 ring-red-900 rounded-lg mt-6 p-3">
 							<h2 class="font-bold mb-2 text-center">🚨  Delete Account</h2>
 							<form id="delete-user-form" class="flex flex-col gap-2">
-								<h2 class="text-sm text-red-600 dark:text-white mt-3 mb-0.5">Write "DELETE" + "your username"</h2>
+								<h2 class="text-sm text-red-600 mt-3 mb-0.5">Write "DELETE" + "your username"</h2>
 								<input
 									class="rounded-md px-2 py-1 ring-1 ring-red-400"
 									type="text"
 									name="confirm-username"
 									placeholder="DELETE username"
 									required />
-								<h2 class="text-sm text-red-600 dark:text-white mt-3 mb-0.5">Confirm Password</h2>
+								<h2 class="text-sm text-red-600 mt-3 mb-0.5">Confirm Password</h2>
 								<input
 									class="rounded-md px-2 py-1 ring-1 ring-red-400"
 									type="password"
 									name="password"
 									placeholder="••••••••••••"
 									required />
-								<p class="text-sm text-red-600 dark:text-white mt-10 mb-0.5">
+								<p class="text-sm text-red-600 mt-10 mb-0.5">
 									If your two‑factor authentication (2FA) is still turned on, you’ll need to <strong>switch it off</strong> first.
 									<br></br>
 									⚠️ Once your account is deleted, it’s <strong>gone for good</strong> and <strong>can’t be restored</strong>, so make sure you’re ready before continuing.
@@ -1164,21 +1155,21 @@
 								w-80 ring-1 ring-amber-900 rounded-lg mt-6 p-3">
 						<h2 class="font-bold mb-2 text-center">Change Password</h2>
 						<form id="change-password-form" class="flex flex-col gap-2">
-							<h2 class="text-sm text-amber-900 dark:text-white mt-3 mb-0.5">Old Password</h2>
+							<h2 class="text-sm text-amber-900 mt-3 mb-0.5">Old Password</h2>
 							<input
 								class="rounded-md px-2 py-1 ring-1 ring-amber-400"
 								type="password"
 								name="old-password"
 								placeholder="••••••••••••"
 								required />
-							<h2 class="text-sm text-amber-900 dark:text-white mt-3 mb-0.5">New Password</h2>
+							<h2 class="text-sm text-amber-900 mt-3 mb-0.5">New Password</h2>
 							<input
 								class="rounded-md px-2 py-1 ring-1 ring-amber-400"
 								type="password"
 								name="new-password"
 								placeholder="••••••••••••"
 								required />
-							<h2 class="text-sm text-amber-900 dark:text-white mt-3 mb-0.5">Confirm New Password</h2>
+							<h2 class="text-sm text-amber-900 mt-3 mb-0.5">Confirm New Password</h2>
 							<input
 								class="rounded-md px-2 py-1 ring-1 ring-amber-400"
 								type="password"
@@ -1239,7 +1230,7 @@
 								w-80 ring-1 ring-amber-900 rounded-lg mt-6 p-3">
 						<h2 class="font-bold mb-2 text-center">Change Avatar</h2>
 						<form id="upload_avatar" method="POST" enctype="multipart/form-data" class="flex flex-col gap-2">
-							<h2 class="text-sm text-amber-900 dark:text-white mt-3 mb-0.5">New Avatar</h2>
+							<h2 class="text-sm text-amber-900 mt-3 mb-0.5">New Avatar</h2>
 							<input
 								class="rounded-md px-2 py-1 ring-1 ring-amber-400"
 								type="file"
@@ -1702,6 +1693,68 @@
 				<span id="chat_date" class="text-xs italic text-gray-200"></span>
 			</div>
 			<div id="message" class="text-amber-900  dark:text-amber-100"></div>
+		</div>
+	</template>
+
+	<template id="achievementhtml">
+		<main class="flex flex-col h-[calc(100vh-112px)] w-full">
+			<section id="part1" class="flex flex-row h-[50%] w-[90%] mx-auto">
+				
+			</section>
+			<section id="part2" class="flex mt-2 flex-row h-[50%] w-[90%] mx-auto">
+			
+			</section>
+		</main>
+	</template>
+
+	<template id="locked-achievement">
+		<div id="effect" class="relative w-1/4 h-full grayscale-100 flex items-center rounded-lg mx-2">
+			<div class="border-4 h-[90%] w-[90%] mx-auto rounded-lg flex flex-col items-center border-gray-700">
+				<h1 id="title" class="text-4xl font-bolt mt-4 text-gray-700"></h1>
+				<img class="size-24 mt-8 invert" src="/src/image/coupe.png" alt="achievement">
+				<p id="description" class="mt-4 text-gray-700"></p>
+				<span class="mt-4 text-2xl text-RED-700">LOCKED</span>
+			</div>
+			<div id="rarity" class="absolute top-3 right-3 px-3 py-1 rounded-full text-sm font-semibold
+				bg-white/30 backdrop-blur text-gray-700 border border-amber-600/30">
+				
+			</div>
+		</div>
+	</template>
+
+	<template id="unlocked-achievement">
+		<div id="effect" class="relative w-1/4 h-full flex items-center rounded-lg mx-2">
+			<div class="border-4 h-[90%] w-[90%] mx-auto rounded-lg flex flex-col items-center border-white">
+				<h1 id="title" class="text-4xl font-bolt mt-4 text-white"></h1>
+				<img class="size-24 mt-8 invert" src="/src/image/coupe.png" alt="achievement">
+				<p id="description" class="mt-4 text-white"></p>
+				<span class="mt-4 text-2xl text-green-700">UNLOCKED</span>
+			</div>
+			<div id="rarity" class="absolute top-3 right-3 px-3 py-1 rounded-full text-sm font-semibold
+				bg-white/30 backdrop-blur text-white border border-amber-600/30">
+				
+			</div>
+			<div class="absolute inset-0 rounded-2xl overflow-hidden pointer-events-none">
+				<div class="absolute inset-0 bg-linear-to-tr from-transparent via-white/20 to-transparent -translate-x-full animate-[shimmer_3s_infinite] "></div>
+			</div>
+		</div>
+	</template>
+
+	<template id="secret-achievement">
+		<div id="effect" class="relative w-1/4 h-full flex items-center rounded-lg mx-2">
+			<div class="border-4 h-[90%] w-[90%] mx-auto rounded-lg flex flex-col items-center border-white/80">
+				<h1 id="title" class="text-4xl font-bold mt-4 text-white"></h1>
+				<img id="img" class="size-24 mt-8 invert opacity-80" src="/src/image/secret.png" alt="achievement">
+				<p id="description" class="mt-4 text-white/80 italic"></p>
+				<span id="unlock" class="mt-4 text-2xl text-violet-300 tracking-widest">SECRET</span>
+			</div>
+			<div id="rarity" class="absolute top-3 right-3 px-3 py-1 rounded-full text-sm font-semibold
+						bg-violet-900/40 backdrop-blur text-violet-200 border border-violet-400/30">
+				
+			</div>
+			<div class="absolute inset-0 rounded-2xl overflow-hidden pointer-events-none opacity-40">
+				<div class="absolute inset-0 bg-linear-to-tr from-transparent via-white/10 to-transparent -translate-x-full animate-[shimmer_5s_infinite]"></div>
+			</div>
 		</div>
 	</template>
 

@@ -1,7 +1,7 @@
 import { View, init } from "./views/home";
 import { LoginView, initLogin } from "./views/login";
 import { DashboardView, initDashboard } from "./views/p_dashboard";
-import { RegisterValidView, RegisterView, initRegister } from "./views/register";
+import { RegisterView, initRegister } from "./views/register";
 import { GameOnlineView, GameOnlineinit} from "./views/p_gameonline";
 import { GameLocalView, GameLocalinit} from "./views/p_gamelocal";
 import { PongMatchView, initPongMatch, stopGame} from "./views/p_pongmatch";
@@ -29,6 +29,7 @@ import { IUsers } from "../../back/DB/users";
 import { InitLeaderboard, LeaderboardView } from "./views/p_leaderboard";
 import { chatnet, displayChat, firstLogin } from "./views/p_chat";
 import { showToast } from "./views/show_toast";
+import { achievementsView, initAchievement } from "./views/p_achievement";
 
 const routes = [
   { path: "/", view: View, init: init},
@@ -36,19 +37,19 @@ const routes = [
   { path: "/twofa", view: towfaView, init: initTowfa},
   { path: "/logout", init: initLogout},
   { path: "/register", view: RegisterView, init: initRegister},
-  { path: "/registerok", view: RegisterValidView},
   { path: "/termsofservice", view: TermsOfServiceView, init: InitTermsOfService},
   { path: "/privacypolicy", view: PriavacyPolicyView, init: InitPrivacyPolicy},
   { path: "/home", view: homeView, init: initHomePage},
   { path: "/dashboard", view: DashboardView, init: initDashboard },
   { path: "/friends", view: FriendsView, init: initFriends },
   { path: "/profile", view: ProfileView, init: initProfile},
-  { path: "/leaderboard", view: LeaderboardView, init: InitLeaderboard},
   { path: "/updateemail", view: UpdateEmailView, init: initUpdateEmail },
   { path: "/updateusername", view: UpdateUsernameView, init: initUpdateUsername },
   { path: "/updatepassword", view: UpdatePasswordView, init: initUpdatePassword },
   { path: "/updateavatar", view: UpdateAvatarView, init: initUpdateAvatar },
   { path: "/update2fa", view:Update2faView, init:initUpdate2fa },
+  { path: "/leaderboard", view: LeaderboardView, init: InitLeaderboard},
+  { path: "/achievement", view: achievementsView, init: initAchievement},
   { path: "/gameonline", view: GameOnlineView, init: GameOnlineinit},
   { path: "/gamelocal", view: GameLocalView, init: GameLocalinit},
   { path: "/pongmatch/:id", view: PongMatchView, init: initPongMatch, cleanup: stopGame },
@@ -63,11 +64,10 @@ const publicPath = ["/", "/login", "/register", "/logout", "/registerok", "/oaut
 let currentRoute: any = null;
 let currentPath: string;
 
-export interface PseudoHeaderResponse {
+export interface headerResponse {
 	pseudo: string;
 	avatar: string;
 	web_status: string;
-	notif: boolean;
 	xp: number;
 	lvl: number;
 }
@@ -75,7 +75,8 @@ export interface PseudoHeaderResponse {
 export type LogStatusAndInfo = { 
 	status: "logged" | "expired" | "not_logged" | "error";
 	logged: boolean;
-	user: PseudoHeaderResponse | null;
+	notif: boolean;
+	user: headerResponse | null;
 }
 
 let isReloaded = false;
@@ -95,20 +96,20 @@ export function navigateTo(url: string) {
 
 export async function checkLogStatus(): Promise<LogStatusAndInfo> {
 	try	{	
-		const res = await fetch("/api/checkLogin", {
+		const res = await fetch("/api/checkLogged", {
 			credentials: "include"
 		})
 		const result = await res.json();
  		if (result.error || !res.ok) {
 			if (result.error === "TokenExpiredError")
-				return { status: "expired", logged: false, user: null };
-			return { status: "error", logged: false, user: null }			
+				return { status: "expired", logged: false, notif: result.notif, user: null };
+			return { status: "error", logged: false, notif: result.notif, user: null }			
 		}
 		if (result.loggedIn === true)
-			return { status: "logged", logged: true, user: { pseudo: result.user.pseudo, avatar: result.user.avatar, web_status: result.user.status, notif: result.user.notif, xp: result.user.xp, lvl: result.user.lvl} };
-		return { status: "not_logged", logged: false, user: null };
+			return { status: "logged", logged: true, notif: result.notif, user: { pseudo: result.user.pseudo, avatar: result.user.avatar, web_status: result.user.status, xp: result.user.xp, lvl: result.user.lvl } };
+		return { status: "not_logged", logged: false, notif: result.notif, user: null };
 	} catch {
-		return { status: "error", logged: false, user: null };
+		return { status: "error", logged: false, notif: false, user: null };
 	}
 }
 
@@ -178,12 +179,12 @@ export async function loadHeader(auth: LogStatusAndInfo) {
 	container!.appendChild(clone);
 	if (auth.logged)
 	{
-		displayPseudoHeader(auth.user!);
+		displayPseudoHeader(auth.user!, auth!.notif);
 		initSwitch();
 	}	
 }
 
-export function displayPseudoHeader(result: PseudoHeaderResponse)
+export function displayPseudoHeader(result: headerResponse, notif: boolean)
 {
 	document.getElementById("pseudo-header")!.textContent = result.pseudo;
 	const avatar = document.getElementById("header-avatar") as HTMLImageElement;
@@ -192,7 +193,7 @@ export function displayPseudoHeader(result: PseudoHeaderResponse)
 	displayStatus(result, status);
 	const notification = document.getElementById("notification") as HTMLImageElement;
 	notification.classList.add("hidden");
-	if (result.notif === true)
+	if (notif === true)
 		notification.classList.remove("hidden");
 	setTimeout(() => {
 			const bar = document.getElementById("progress-xp") as HTMLDivElement;
@@ -242,7 +243,6 @@ export async function router() {
 				return;
 			}
 		}
-		console.log("from ", history.state?.from, " in ", window.location.pathname);
 		if ((isReloaded || (window.location.pathname === "/home" && (!history.state || (publicPath.includes(history.state.from)))))) {
 			chatnet.connect( () => {
 				displayChat()

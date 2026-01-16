@@ -24,7 +24,13 @@ export async function initLogin()
 	const googleBtn = document.getElementById("google-login-btn");
 	googleBtn?.addEventListener("click", () => {
 		window.location.href = "/api/oauth/google";
-	});
+		});
+	const params = new URLSearchParams(window.location.search);
+	const error = params.get("error");
+
+	if (error === "account_inactive") {
+		showToast("This account has been deleted and can no longer be used!", "error", 3000, "Deleted user");
+	}
 }
 
 export async function login(username: string, password: string, form: HTMLFormElement): Promise<number> {
@@ -47,8 +53,6 @@ export async function login(username: string, password: string, form: HTMLFormEl
 			}
 			return 0;
 		}
-		// localStorage.setItem("token", result.token);
-		/*ajouter localstorage pour que cela fonctionne*/
 		if (result.ok && result.twofa === true)
 			return 2;
 		return 1;

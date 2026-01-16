@@ -3,6 +3,7 @@ import { google } from "googleapis";
 import { friends, users } from '../../server';
 import { createJWT, createTemp2FAToken } from "../../middleware/jwt";
 import { notification } from "../friends/friends";
+import bcrypt from "bcryptjs";
 
 // Google account password placeholder
 export const GOOGLE_PASSWORD_PLACEHOLDER = "__OAUTH_GOOGLE__";
@@ -50,13 +51,28 @@ export async function callbackGoogle(request: FastifyRequest, reply: FastifyRepl
       // 4. get user info from google
       const oauth2 = google.oauth2({ auth: oauth2Client, version: "v2" });
       const userInfo = await oauth2.userinfo.get();
-      const { email, id, name } = userInfo.data;
+      const { email, name } = userInfo.data;
 
-      // 5. check/create user 
+      // 5. check/create user
       let user = await users.getEmailUser(email!);
+
+      const passwordGoogle = await bcrypt.hash("google", 12);
       if (!user || user.length === 0) {
-        await users.addUser(name!, email!, GOOGLE_PASSWORD_PLACEHOLDER, 500);
+        const cleanName = name?.replace(/[^a-zA-Z0-9_]/g, "").slice(0, 16)
+        const existingUser = await users.getPseudoUser(cleanName!);
+        const finalName = (existingUser.pseudo === cleanName) ? `google_${Math.random().toString(36).slice(2, 4)}` : cleanName
+
+        await users.addUser(finalName!, email!, passwordGoogle, 500);
         user = await users.getEmailUser(email!);
+      }
+
+      // check if user.pseudo === "inactive user"
+      // YES => return inactive user try to login
+
+      if (user.pseudo === "inactive user")
+      {
+        // console.log('inactive user try to login');
+        return reply.redirect(`${process.env.PUBLIC_BASE_URL}/login?error=account_inactive`);
       }
 
       // 6.  if 2FA enabled
@@ -69,8 +85,6 @@ export async function callbackGoogle(request: FastifyRequest, reply: FastifyRepl
       // 7. JWT
       const jwtoken = createJWT(user.user_id, user.pseudo, user.avatar);
       users.updateStatus(user.user_id, "online");
-      const allFriends = await friends.getMyFriends(user.user_id);
-      notification(allFriends, user.user_id);
       reply.setCookie("token", jwtoken, { httpOnly: true, secure: true, sameSite: "strict", path: "/" });
       return reply.redirect(`${process.env.PUBLIC_BASE_URL}/oauth/callback`);
     } catch (err) {

@@ -8,7 +8,7 @@ export function ProfileView(): string {
 
 export async function initProfile() {
   const profile: IUsers = await genericFetch("/api/private/profile", {
-	method: "POST",
+	method: "GET",
 	});
 			
 	const avatar = document.getElementById("profile-avatar") as HTMLImageElement;
@@ -25,8 +25,8 @@ export async function initProfile() {
 	  			headers: { 'Content-Type': 'application/json' },
 	  			body: JSON.stringify({ status })
 			});
+			navigateTo("/profile");
 			showToast(`Status updated successfully to << ${status} >>`, "success", 2000);
-			setTimeout(() => navigateTo("/profile"), 2100);
   		});
 	}
 //   (document.getElementById("profile-money") as HTMLParagraphElement).textContent = profile.money.toString();

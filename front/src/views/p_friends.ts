@@ -22,6 +22,8 @@ function getTimeInvit(date: string): string {
 	for (const time of times)
 	{
 		if (dateDiff < time.max) {
+			if (time.max === 1)
+				return time.units;
 			const diff: string = Math.floor(dateDiff / time.div).toString();
 			return (diff + time.units);
 		}
@@ -36,7 +38,7 @@ export function FriendsView(): string {
 export async function initFriends() {
 	try {
 		const allInfo: IFriendsAndNot = await genericFetch("/api/private/friend", {
-			method: "POST",
+			method: "GET",
 		});
 		const acceptedFriends = allInfo.allMyFriends.filter(f => f.friendship_status === "accepted");
 		const pendingFriends = allInfo.allMyFriends.filter(f => f.friendship_status === "pending");
@@ -201,7 +203,7 @@ function toDeleteFriend(id: number, li: DocumentFragment) {
 	button.addEventListener("click", async () => {
 		try {
 			await genericFetch("/api/private/friend/delete", {
-				method: "POST",
+				method: "DELETE",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({ friendID: id })
 			});
