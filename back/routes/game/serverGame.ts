@@ -94,7 +94,7 @@ function getDate(id: number)
 	return games_map.get(id)?.gameDate;
 }
 
-export function createGame(PlayerId: number,  isLocal: boolean, type: "Local" | "AI" | "Online" | "Tournament", options: { vsAI: boolean }): number 
+export function createGame(PlayerId: number, isLocal: boolean, type: "Local" | "AI" | "Online" | "Tournament", options: { vsAI: boolean }): number 
 {
 	let id: number = 1;
 	while (games_map.has(id))

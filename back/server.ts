@@ -203,7 +203,6 @@ fastify.post("/api/private/game/create", async (request, reply) => {
 	const playerId = request.user?.user_id as any;
 	const { vsAI } = request.body as { vsAI: boolean };
 	let gameId: number;
-	console.log(`vsAI is: ${vsAI}`);
 	if (vsAI) {
 		gameId = createGame(Number(playerId), localMode, type, { vsAI: true });
 	} else {
