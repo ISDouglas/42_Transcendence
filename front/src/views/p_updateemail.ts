@@ -31,8 +31,8 @@ export async function initUpdateEmail() {
         headers: { "Content-Type": "application/json", },
         body: JSON.stringify({ newEmail, password })
       });
+      navigateTo("/profile");
       showToast(`Email updated successfully to << ${response.email} >>`, "success", 2000);
-      setTimeout(() => navigateTo("/profile"), 2100);
 
     } catch (err: any) {
       showToast(err, "error", 3000, "Update email:");

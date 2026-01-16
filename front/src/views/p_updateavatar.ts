@@ -47,8 +47,8 @@ async function uploadAvatar(avatar: File) {
       credentials: "include"
     });
     console.log("uplaod success ok : ", result);
+    navigateTo("/profile");
     showToast("Avatar uploaded successfully", "success", 2000);
-    setTimeout(() => navigateTo("/profile"), 2100);
     } catch (err) {
       showToast(err, "error", 3000, "Upload avatar:");
       console.error(err);
