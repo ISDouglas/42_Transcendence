@@ -4912,6 +4912,10 @@ var init_chatNetwork = __esm({
       // }
       constructor() {
         this.socket = null;
+        this.socketUserID = null;
+      }
+      getsocketUserID() {
+        return this.socketUserID;
       }
       connect(callback) {
         const serverUrl = window.location.host;
@@ -4919,10 +4923,14 @@ var init_chatNetwork = __esm({
           transports: ["websocket"],
           withCredentials: true
         });
-        if (this.socket.connected)
-          callback();
-        else
-          this.socket.once("connect", callback);
+        this.socket.once("connect", callback);
+      }
+      toKnowUserID() {
+        console.log("FRONT: \xE9coute userID");
+        this.socket.on("userID", (data) => {
+          console.log("FRONT: re\xE7u userID =", data.id);
+          this.socketUserID = data.id;
+        });
       }
       sendMessage(message) {
         this.socket.emit("generalChatMessage", message);
@@ -4981,7 +4989,9 @@ async function displayChat() {
 }
 function addMessageGeneral(data, box, container) {
   let template;
-  if (data.me && data.me === true)
+  if (data.me === void 0)
+    data.me = data.id === chatnet.getsocketUserID();
+  if (data.me)
     template = document.getElementById("my-chat-message");
   else
     template = document.getElementById("chat-message");
@@ -5022,16 +5032,14 @@ function hideChat() {
   const container = document.getElementById("chat-container");
   if (container)
     container.innerHTML = "";
-  firstLogin = false;
   chatnet?.disconnect();
 }
-var chatnet, firstLogin;
+var chatnet;
 var init_p_chat = __esm({
   "front/src/views/p_chat.ts"() {
     "use strict";
     init_chatNetwork();
     chatnet = new chatNetwork();
-    firstLogin = false;
   }
 });
 
@@ -5700,11 +5708,17 @@ async function initOAuthCallback() {
     if (data.twofa) {
       navigateTo("/twofa");
     } else {
+<<<<<<< HEAD
       if (data.firstTimeLogin) {
         navigateTo("/setggpass");
         showToast("\u{1F389} Welcome! If this is your first login, please create a password for your account!", "success", 3e3);
       } else
         navigateTo("/home");
+=======
+      navigateTo("/home");
+      if (data.firstTimeLogin)
+        showToast("Welcome! If this is your first login, please change your default password << google >> ", "success", 3e3);
+>>>>>>> elisa
     }
   } catch (err) {
     showToast(err, "error", 3e3, "Google account");
@@ -6039,6 +6053,7 @@ async function router() {
     }
     if (isReloaded || window.location.pathname === "/home" && (!history.state || publicPath.includes(history.state.from))) {
       chatnet.connect(() => {
+        chatnet.toKnowUserID();
         displayChat();
       });
       isReloaded = false;
