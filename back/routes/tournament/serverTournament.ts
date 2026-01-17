@@ -1,6 +1,7 @@
 export const tournaments_map = new Map<number, serverTournament>();
 import { Server } from "socket.io";
 import { ServerGame } from "../game/serverGame";
+import { tournament } from "../../server";
 
 interface TournamentState {
 	status: "waiting" | "semifinal" | "final" | "finished";
@@ -52,14 +53,45 @@ export class serverTournament {
 
 export function createTournament(playerId: number)
 {
+	let count: number = 0;
+	for (const tournament of tournaments_map.values()) {
+		if (tournament.idPlayers.includes(playerId))
+			count++;
+	}
+	if (count > 0)
+		return -1;
+
 	let id: number = 1;
 	while (tournaments_map.has(id))
 		id++;
-	const tournamentId = id;
-	const tournament = new serverTournament(tournamentId);
-	tournament.idPlayers[0]= playerId;
-	tournaments_map.set(tournamentId, tournament);
-	return tournamentId;
+	if (id > 1)
+	{
+		id--;
+		const tournament = tournaments_map.get(id);
+		for (let i = 0; i < 4; i++)
+		{
+			if (tournament?.state.status != "waiting")
+				break;
+			if (tournament?.idPlayers[tournament.semi_index[i]] == -1)
+			{
+				tournament.idPlayers[tournament.semi_index[i]] = playerId;
+				return id;
+			}
+		}
+		id++;
+		const tournament_bis = new serverTournament(id);
+		tournament_bis.idPlayers[0]= playerId;
+		tournaments_map.set(id, tournament_bis);
+		return id;
+	}
+	else
+	{
+		const tournament = new serverTournament(id);
+		tournament.idPlayers[0]= playerId;
+		tournaments_map.set(id, tournament);
+		return id;
+	}
+
 }
 
 export async function displayTournamentList()

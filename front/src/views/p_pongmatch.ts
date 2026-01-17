@@ -19,8 +19,11 @@ export async function initPongMatch(params?: any) {
 	console.log("beforePrev : ", beforePrev);
 	if (prev === null || beforePrev === null || !beforePrev.startsWith("/gameonline") || !prev.startsWith("/pongmatch"))
 	{
-		navigateTo("/home");
-		return;
+		if (!beforePrev.startsWith("/brackets"))
+		{
+			navigateTo("/home");
+			return;
+		}
 	}
 	const gameID: string = params?.id;
 	const paramUrl = new URLSearchParams(window.location.search);

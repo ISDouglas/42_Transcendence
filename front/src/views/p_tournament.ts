@@ -30,7 +30,10 @@ function initTournamentPage() {
 		const { tournamentId } = await genericFetch("/api/private/tournament/create", {
 			method: "POST"
 		});
-		navigateTo(`/brackets/${tournamentId}`);
+		if (tournamentId == -1)
+			alert("Your account is already in a tournament.");
+		else
+			navigateTo(`/brackets/${tournamentId}`);
 	});
 	
 	joinTournamentBtn?.addEventListener("click", async () => {

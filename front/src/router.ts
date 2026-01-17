@@ -261,10 +261,6 @@ export async function router() {
 		navigateTo("/error");
 		return;
 	}
-	if (window.location.pathname === "/gameonline") {
-		const stack = getHistoryStack();
-		stack.push("/setupgame");
-	}
 	if (location.pathname !== "/logout") {
 		const auth: LogStatusAndInfo = await checkLogStatus();
 		if (auth.status === "expired" || auth.status === "error") {

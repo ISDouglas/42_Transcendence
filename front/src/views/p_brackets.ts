@@ -1,4 +1,4 @@
-import { navigateTo, loadHeader } from "../router";
+import { navigateTo, loadHeader, getPreviousPath, getBeforePreviousPath } from "../router";
 import { TournamentInstance } from "../tournament/tournamentInstance";
 import { TournamentNetwork, TournamentState } from "../tournament/tournamentNetwork";
 
@@ -10,6 +10,28 @@ export function BracketsView(): string {
 }
 
 export async function initBrackets(params?: any) {
+	const prev = getPreviousPath();
+	let beforePrev = getBeforePreviousPath();
+	console.log("prev : ", prev);
+	console.log("beforePrev : ", beforePrev);
+	if (prev === null || beforePrev === null || !beforePrev.startsWith("/tournament") || !prev.startsWith("/brackets"))
+	{
+		if (!prev.startsWith("/brackets") || !beforePrev.startsWith("/pongmatch"))
+		{
+			navigateTo("/home");
+			return;
+		}
+	}
+
+	/*
+	prev :  /brackets/1
+	beforePrev :  /tournament
+	prev :  /pongmatch/1000?tournamentId=1
+	beforePrev :  /brackets/1
+	prev :  /brackets/1
+	beforePrev :  /pongmatch/1000?tournamentId=1
+	*/
+
 	const tournamentID: string = params?.id;
 	const startTournamentButton = document.getElementById("start-button");
 	const pseudoP1 = document.getElementById("player1-name");

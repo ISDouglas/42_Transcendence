@@ -98,10 +98,15 @@ export function handleGameSocket(io: Server, socket: Socket) {
 				countdown--;
 				if (countdown < 0) {
 					clearInterval(interval);
-					console.log("Tournament deleted :", tournamentId);
+					console.log("Game deleted :", gameId);
 					games_map.delete(gameId);
 				}
 			}, 1000);
+		}
+		else if (game.status === "waiting")
+		{
+			console.log("Game deleted :", gameId);
+			games_map.delete(gameId);
 		}
 		else
 		{

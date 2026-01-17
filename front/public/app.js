@@ -4286,8 +4286,10 @@ async function initPongMatch(params) {
   console.log("prev : ", prev);
   console.log("beforePrev : ", beforePrev);
   if (prev === null || beforePrev === null || !beforePrev.startsWith("/gameonline") || !prev.startsWith("/pongmatch")) {
-    navigateTo("/home");
-    return;
+    if (!beforePrev.startsWith("/brackets")) {
+      navigateTo("/home");
+      return;
+    }
   }
   const gameID = params?.id;
   const paramUrl = new URLSearchParams(window.location.search);
@@ -4640,6 +4642,16 @@ function BracketsView() {
   return document.getElementById("bracketshtml").innerHTML;
 }
 async function initBrackets(params) {
+  const prev = getPreviousPath();
+  let beforePrev = getBeforePreviousPath();
+  console.log("prev : ", prev);
+  console.log("beforePrev : ", beforePrev);
+  if (prev === null || beforePrev === null || !beforePrev.startsWith("/tournament") || !prev.startsWith("/brackets")) {
+    if (!prev.startsWith("/brackets") || !beforePrev.startsWith("/pongmatch")) {
+      navigateTo("/home");
+      return;
+    }
+  }
   const tournamentID = params?.id;
   const startTournamentButton = document.getElementById("start-button");
   const pseudoP1 = document.getElementById("player1-name");
@@ -4746,7 +4758,10 @@ function initTournamentPage() {
     const { tournamentId } = await genericFetch("/api/private/tournament/create", {
       method: "POST"
     });
-    navigateTo(`/brackets/${tournamentId}`);
+    if (tournamentId == -1)
+      alert("Your account is already in a tournament.");
+    else
+      navigateTo(`/brackets/${tournamentId}`);
   });
   joinTournamentBtn?.addEventListener("click", async () => {
     loadTournaments();
@@ -5958,10 +5973,6 @@ async function router() {
   if (!match) {
     navigateTo("/error");
     return;
-  }
-  if (window.location.pathname === "/gameonline") {
-    const stack = getHistoryStack();
-    stack.push("/setupgame");
   }
   if (location.pathname !== "/logout") {
     const auth = await checkLogStatus();
