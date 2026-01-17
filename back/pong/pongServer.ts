@@ -22,13 +22,16 @@ export function handleGameSocket(io: Server, socket: Socket) {
 	
 		const playerId = socket.data.user.id;
 		const pseudo = socket.data.user.pseudo;
-		// join room
-		socket.join(`game-${gameId}`);
-	
+		checkDeconnections(io, socket, playerId, game);
+
 		if (game.disconnectTimer) {
 			clearTimeout(game.disconnectTimer);
 			game.disconnectTimer = null;
 		}
+
+
+		// join room
+		socket.join(`game-${gameId}`);
 	
 		if (game.isLocal === true)
 			initLocal(game, io, socket, gameId, pseudo);
@@ -103,6 +106,7 @@ export function handleGameSocket(io: Server, socket: Socket) {
 		else
 		{
 			game.status = "disconnected";
+			setDeconnections(socket.data.user.id, game);
 			io.to(`game-${gameId}`).emit("state", updateStateGame(game.state, game.status, game.type));
 			io.to(`game-${game.id}`).emit("disconnection", updateStateGame(game.state, game.status, game.type));
 	
@@ -243,4 +247,26 @@ function getPlayer(game: ServerGame, socket: Socket) {
 		return "player2";
 
 	return null;
+}
+
+function setDeconnections(playerId: number, game: ServerGame)
+{
+	if (playerId == game.idPlayer1)
+		game.nbDeconnectionsP1++;
+	else if (playerId == game.idPlayer2)
+		game.nbDeconnectionsP2++;
+}
+
+function checkDeconnections(io: Server, socket: Socket, playerId: number, game: ServerGame)
+{
+	if (playerId == game.idPlayer1)
+	{
+		if (game.nbDeconnectionsP1 >= 2)
+			io.to(socket.id).emit("kick");
+	}
+	else if (playerId == game.idPlayer2)
+	{
+		if (game.nbDeconnectionsP2 >= 2)
+			io.to(socket.id).emit("kick");
+	}
 }

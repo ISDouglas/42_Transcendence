@@ -43,6 +43,11 @@ export async function initPongMatch(params?: any) {
 	// 3. Connect to server
 	net = new GameNetwork();
 
+	net.onKick(() => {
+		navigateTo("/home");
+		return;
+	});
+
 	//4. set role (player 1 or 2)
 	net.onRole((role) => {
 		if (net)

@@ -21,6 +21,8 @@ export class GameNetwork {
 
 	private onDisconnectionCallback?: () => void;
 
+	private onKickCallback?: () => void;
+
 	private onRoleCallback?: (role: "player1" | "player2") => void;
 
 	constructor() {
@@ -50,6 +52,10 @@ export class GameNetwork {
 			this.onDisconnectionCallback?.();
 		});
 
+		this.socket.on("kick", () => {
+			this.onKickCallback?.();
+		});
+
 		this.socket.on("gameOver", () => {
 			this.onGameOverCallback?.();
 		});
@@ -73,6 +79,10 @@ export class GameNetwork {
 
 	onDisconnection(cb: () => void) {
 		this.onDisconnectionCallback = cb;
+	}
+
+	onKick(cb: () => void) {
+		this.onKickCallback = cb;
 	}
 
 	startGame() {

@@ -4226,6 +4226,9 @@ var init_gameNetwork = __esm({
         this.socket.on("disconnection", () => {
           this.onDisconnectionCallback?.();
         });
+        this.socket.on("kick", () => {
+          this.onKickCallback?.();
+        });
         this.socket.on("gameOver", () => {
           this.onGameOverCallback?.();
         });
@@ -4244,6 +4247,9 @@ var init_gameNetwork = __esm({
       }
       onDisconnection(cb) {
         this.onDisconnectionCallback = cb;
+      }
+      onKick(cb) {
+        this.onKickCallback = cb;
       }
       startGame() {
         this.socket.emit("startGame");
@@ -4322,9 +4328,6 @@ function PongMatchView(params) {
 }
 async function initPongMatch(params) {
   const prev = getPreviousPath();
-  const beforePrev = getBeforePreviousPath();
-  console.log("prev : ", prev);
-  console.log("beforePrev : ", beforePrev);
   if (prev === null || !prev.startsWith("/gameonline") && !prev.startsWith("/brackets") && !prev.startsWith("/pongmatch")) {
     navigateTo("/home");
     return;
@@ -4344,6 +4347,10 @@ async function initPongMatch(params) {
   if (currentGame.getCurrentState().type == "Local")
     currentGame.enableLocalMode();
   net = new GameNetwork();
+  net.onKick(() => {
+    navigateTo("/home");
+    return;
+  });
   net.onRole((role) => {
     if (net)
       currentGame?.setNetwork(net, role);
@@ -5874,10 +5881,6 @@ function navigateTo(url2) {
 function getPreviousPath() {
   const stack = getHistoryStack();
   return stack[stack.length - 1] ?? null;
-}
-function getBeforePreviousPath() {
-  const stack = getHistoryStack();
-  return stack[stack.length - 2] ?? null;
 }
 async function checkLogStatus() {
   try {

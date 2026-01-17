@@ -12,6 +12,8 @@ export class ServerGame {
 	id: number;
 	idPlayer1: number;
 	idPlayer2: number;
+	nbDeconnectionsP1: number;
+	nbDeconnectionsP2: number;
 	idwinner: number;
 	status: "waiting" | "playing" | "finished" | "countdown" | "disconnected";
 	type: "Local" | "AI" | "Online" | "Tournament";
@@ -33,6 +35,8 @@ export class ServerGame {
 		this.id = id;
 		this.idPlayer1 = 0;
 		this.idPlayer2 = 0;
+		this.nbDeconnectionsP1 = 0;
+		this.nbDeconnectionsP2 = 0;
 		this.idwinner = 0;
 		this.status = "waiting";
 		this.type = "Local";
