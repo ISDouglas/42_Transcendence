@@ -63,6 +63,7 @@ const publicPath = ["/", "/login", "/register", "/logout", "/registerok", "/oaut
 
 let currentRoute: any = null;
 let currentPath: string;
+let previousPath: string | null = null;
 
 export interface headerResponse {
 	pseudo: string;
@@ -88,10 +89,16 @@ if (nav && nav.type === "reload")
 
 export function navigateTo(url: string) {
 	const state = { from: window.location.pathname };
+	previousPath = window.location.pathname + window.location.search;
+	console.log("previousPath : ", previousPath);
 	history.pushState(state, "", url);
 	currentPath = url;
 	window.scrollTo(0, 0);
 	router().catch(err => console.error("Router error:", err));;
+}
+
+export function getPreviousPath() {
+	return previousPath;
 }
 
 export async function checkLogStatus(): Promise<LogStatusAndInfo> {

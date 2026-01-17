@@ -4223,8 +4223,6 @@ var init_gameNetwork = __esm({
         this.socket.on("startCountdown", () => {
           this.onCountdownCallback?.();
         });
-        this.socket.on("spectator", () => {
-        });
         this.socket.on("disconnection", () => {
           this.onDisconnectionCallback?.();
         });
@@ -4234,9 +4232,6 @@ var init_gameNetwork = __esm({
       }
       onRole(cb) {
         this.onRoleCallback = cb;
-      }
-      onSpectator(cb) {
-        this.onSpectatorCallback = cb;
       }
       onCountdown(cb) {
         this.onCountdownCallback = cb;
@@ -4326,6 +4321,12 @@ function PongMatchView(params) {
   return document.getElementById("pongmatchhtml").innerHTML;
 }
 async function initPongMatch(params) {
+  const prev = getPreviousPath();
+  console.log("previous page : ", prev);
+  if (prev === null || !prev.startsWith("/gameonline") && !prev.startsWith("/brackets")) {
+    navigateTo("/home");
+    return;
+  }
   const gameID = params?.id;
   const paramUrl = new URLSearchParams(window.location.search);
   const tournamentId = paramUrl.get("tournamentId");
@@ -4346,8 +4347,6 @@ async function initPongMatch(params) {
       currentGame?.setNetwork(net, role);
   });
   net.join(Number(gameID), Number(tournamentId));
-  net.onSpectator(() => {
-  });
   net.onCountdown(() => {
     let countdown = 4;
     interval = setInterval(() => {
@@ -5852,11 +5851,16 @@ var init_p_achievement = __esm({
 // front/src/router.ts
 function navigateTo(url2) {
   const state = { from: window.location.pathname };
+  previousPath = window.location.pathname + window.location.search;
+  console.log("previousPath : ", previousPath);
   history.pushState(state, "", url2);
   currentPath = url2;
   window.scrollTo(0, 0);
   router().catch((err) => console.error("Router error:", err));
   ;
+}
+function getPreviousPath() {
+  return previousPath;
 }
 async function checkLogStatus() {
   try {
@@ -6043,7 +6047,7 @@ async function popState3() {
     currentPath = path;
   await router();
 }
-var routes, publicPath, currentRoute, currentPath, isReloaded, nav;
+var routes, publicPath, currentRoute, currentPath, previousPath, isReloaded, nav;
 var init_router = __esm({
   "front/src/router.ts"() {
     "use strict";
@@ -6103,6 +6107,7 @@ var init_router = __esm({
     ];
     publicPath = ["/", "/login", "/register", "/logout", "/registerok", "/oauth/callback", "/twofa"];
     currentRoute = null;
+    previousPath = null;
     isReloaded = false;
     nav = performance.getEntriesByType("navigation")[0];
     if (nav && nav.type === "reload")

@@ -1,6 +1,6 @@
 import { GameRenderer } from "../game/gameRenderer";
 import { GameNetwork } from "../game/gameNetwork";
-import { loadHeader, navigateTo } from "../router";
+import { loadHeader, navigateTo, getPreviousPath } from "../router";
 import { GameInstance } from "../game/gameInstance";
 
 let renderer: GameRenderer | null = null;
@@ -13,6 +13,13 @@ export function PongMatchView(params?: any): string {
 }
 
 export async function initPongMatch(params?: any) {
+	const prev = getPreviousPath();
+	console.log("previous page : ", prev);
+	if (prev === null || (!prev.startsWith("/gameonline") && !prev.startsWith("/brackets")))
+	{
+		navigateTo("/home");
+		return;
+	}
 	const gameID: string = params?.id;
 	const paramUrl = new URLSearchParams(window.location.search);
 	const tournamentId = paramUrl.get("tournamentId");
@@ -45,10 +52,6 @@ export async function initPongMatch(params?: any) {
 
 	// 5. Join game room
 	net.join(Number(gameID), Number(tournamentId));
-
-	net.onSpectator(() => {
-
-	});
 
 	net.onCountdown(() => {
 		let countdown = 4;
