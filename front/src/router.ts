@@ -20,6 +20,7 @@ import { initTowfa, towfaView } from "./views/twofa";
 import { UpdateEmailView, initUpdateEmail } from "./views/p_updateemail";
 import { UpdateUsernameView, initUpdateUsername } from "./views/p_updateusername";
 import { UpdatePasswordView, initUpdatePassword } from "./views/p_updatepassword";
+import { SetGGPasswordView, initSetGGPassword } from "./views/p_updatepassgg";
 import { UpdateAvatarView, initUpdateAvatar } from "./views/p_updateavatar";
 import { Update2faView, initUpdate2fa } from "./views/p_update2fa";
 import { initOAuthCallback } from "./views/oauth_callback";
@@ -27,9 +28,10 @@ import { InitTermsOfService, TermsOfServiceView } from "./views/terms_of_service
 import { InitPrivacyPolicy, PriavacyPolicyView } from "./views/privacypolicy";
 import { IUsers } from "../../back/DB/users";
 import { InitLeaderboard, LeaderboardView } from "./views/p_leaderboard";
-import { chatnet, displayChat, firstLogin } from "./views/p_chat";
+import { chatnet, displayChat } from "./views/p_chat";
 import { showToast } from "./views/show_toast";
 import { achievementsView, initAchievement } from "./views/p_achievement";
+import { endGameView, InitEndGame } from "./views/p_endgame";
 
 const routes = [
   { path: "/", view: View, init: init},
@@ -46,6 +48,7 @@ const routes = [
   { path: "/updateemail", view: UpdateEmailView, init: initUpdateEmail },
   { path: "/updateusername", view: UpdateUsernameView, init: initUpdateUsername },
   { path: "/updatepassword", view: UpdatePasswordView, init: initUpdatePassword },
+  { path: "/setggpass", view: SetGGPasswordView, init: initSetGGPassword },
   { path: "/updateavatar", view: UpdateAvatarView, init: initUpdateAvatar },
   { path: "/update2fa", view:Update2faView, init:initUpdate2fa },
   { path: "/leaderboard", view: LeaderboardView, init: InitLeaderboard},
@@ -53,6 +56,7 @@ const routes = [
   { path: "/gameonline", view: GameOnlineView, init: GameOnlineinit},
   { path: "/gamelocal", view: GameLocalView, init: GameLocalinit},
   { path: "/pongmatch/:id", view: PongMatchView, init: initPongMatch, cleanup: stopGame },
+  { path: "/endgame", view: endGameView, init: InitEndGame},
   { path: "/tournament", view: TournamentView},
   { path: "/brackets/:id", view: BracketsView, init: initBrackets, cleanup: stopTournament},
   { path: "/error", view: ErrorView, init:initError},
@@ -277,6 +281,7 @@ export async function router() {
 		}
 		if ((isReloaded || (window.location.pathname === "/home" && (!history.state || (publicPath.includes(history.state.from)))))) {
 			chatnet.connect( () => {
+				chatnet.toKnowUserID();
 				displayChat()
 			});
 			isReloaded = false;

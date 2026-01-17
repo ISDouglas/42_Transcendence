@@ -225,6 +225,16 @@ export class Users
 		return updatedUser;
 	}
 
+	async getPositionLeaderboard(userId: number): Promise<number>
+	{
+		const [rows] = await this._db.query(` SELECT rank FROM ( SELECT user_id, ROW_NUMBER() OVER (ORDER BY elo DESC) AS rank FROM Users) ranked WHERE user_id = ?;`,
+			[userId]
+		);
+		return rows.length ? rows[0].rank : -1;
+	}
+
+
+
 	async updatePassword(id: number, newPw: string): Promise<IUsers>
 	{
 		await this._db.query(`UPDATE Users SET password = ? WHERE user_id = ?`, [newPw, id]);
@@ -268,12 +278,17 @@ export class Users
 		return eloChange;
 	}
 
-	async updateElo(id_win: number, id_lose: number, score_win: number, score_lose: number)
+	async updateElo(id_win: number, id_lose: number, winner_elo: number, loser_elo: number)
+	{
+		await this._db.execute(`UPDATE Users SET elo = elo + ? WHERE user_id = ?`, [winner_elo , id_win]);
+		await this._db.execute(`UPDATE Users SET elo = elo + ? WHERE user_id = ?`, [loser_elo , id_lose]);
+	}
+
+	async getNewElo(id_win: number, id_lose: number, score_win: number, score_lose: number): Promise<{winner_elo: number, loser_elo: number}>
 	{
 		const eloWin: number = await this.getEloFromID(id_win);
 		const eloLose: number = await this.getEloFromID(id_lose);
-		await this._db.execute(`UPDATE Users SET elo = elo + ? WHERE user_id = ?`, [this.calculateElo(eloLose, eloWin, score_win, score_lose) , id_win]);
-		await this._db.execute(`UPDATE Users SET elo = elo + ? WHERE user_id = ?`, [this.calculateElo(eloWin, eloLose, score_lose, score_win) , id_lose]);
+		return {winner_elo: this.calculateElo(eloLose, eloWin, score_win, score_lose) , loser_elo: this.calculateElo(eloWin, eloLose, score_lose, score_win)}
 	}
 
 	async addElo(id: number)

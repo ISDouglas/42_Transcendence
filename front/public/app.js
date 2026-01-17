@@ -25,71 +25,19 @@ var init_home = __esm({
 
 // front/src/views/show_toast.ts
 function showToast(message, type = "success", duration, prefix) {
-  let displayMessage;
-  if (message instanceof Error) {
-    displayMessage = message.message;
-  } else if (typeof message === "string") {
-    displayMessage = message;
-  } else {
-    try {
-      displayMessage = JSON.stringify(message);
-    } catch {
-      displayMessage = "An unexpected error occurred";
-    }
+  const displayMessage = formatMessage(message, prefix);
+  const templateId = TEMPLATE_MAP[type];
+  const template = document.getElementById(TEMPLATE_MAP[type]);
+  if (!template) {
+    console.error(`Toast template "${templateId}" not found`);
+    return;
   }
-  if (prefix) {
-    displayMessage = `${prefix}: ${displayMessage}`;
-  }
-  const toast = document.createElement("div");
-  Object.assign(toast.style, {
-    position: "fixed",
-    top: "125px",
-    right: "20px",
-    minWidth: "260px",
-    display: "flex",
-    alignItems: "center",
-    gap: "10px",
-    padding: "12px 16px",
-    borderRadius: "6px",
-    fontSize: "15px",
-    color: "black",
-    boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
-    zIndex: "9999",
-    opacity: "0",
-    transform: "translateX(20px)",
-    transition: "opacity 0.3s ease, transform 0.3s ease"
-  });
-  let bg = "";
-  let icon = "";
-  switch (type) {
-    case "success":
-      bg = "#4CAF50";
-      icon = "\u2705";
-      break;
-    case "warning":
-      bg = "#F7C873";
-      icon = "\u2757";
-      break;
-    case "error":
-      bg = "#F5675F";
-      icon = "\u274C";
-      break;
-  }
-  toast.style.backgroundColor = bg;
-  toast.innerHTML = `
-    <span style="font-size:18px">${icon}</span>
-    <span style="flex:1">${displayMessage}</span>
-  `;
-  if (type === "warning" || type === "error") {
-    const closeBtn = document.createElement("span");
-    closeBtn.textContent = "\u2716";
-    Object.assign(closeBtn.style, {
-      cursor: "pointer",
-      fontWeight: "bold",
-      marginLeft: "10px"
-    });
+  const node = template.content.cloneNode(true);
+  node.getElementById("message").textContent = displayMessage;
+  const toast = node.firstElementChild;
+  const closeBtn = toast.querySelector(".close");
+  if (closeBtn) {
     closeBtn.addEventListener("click", () => removeToast(toast));
-    toast.appendChild(closeBtn);
   }
   document.body.appendChild(toast);
   requestAnimationFrame(() => {
@@ -103,22 +51,42 @@ function showToast(message, type = "success", duration, prefix) {
   }
   stackToasts();
 }
+function formatMessage(message, prefix) {
+  let result;
+  if (message instanceof Error) {
+    result = message.message;
+  } else if (typeof message === "string") {
+    result = message;
+  } else {
+    try {
+      result = JSON.stringify(message);
+    } catch {
+      result = "An unexpected error occurred";
+    }
+  }
+  return prefix ? `${prefix}: ${result}` : result;
+}
 function removeToast(toast) {
   toast.style.opacity = "0";
   toast.style.transform = "translateX(20px)";
-  toast.addEventListener("transitionend", () => toast.remove());
+  toast.addEventListener("transitionend", () => toast.remove(), { once: true });
 }
 function stackToasts() {
-  const all = Array.from(document.querySelectorAll("div")).filter(
-    (el) => el.style.position === "fixed" && el.style.right === "20px"
-  );
-  all.forEach((el, index) => {
-    el.style.top = `${125 + index * 70}px`;
+  const toasts = Array.from(document.querySelectorAll(".toast"));
+  toasts.forEach((toast, index) => {
+    toast.style.top = `${125 + index * 70}px`;
   });
 }
+var TEMPLATE_MAP;
 var init_show_toast = __esm({
   "front/src/views/show_toast.ts"() {
     "use strict";
+    TEMPLATE_MAP = {
+      success: "success-toast",
+      error: "error-toast",
+      warning: "warning-toast",
+      achievement: "achievement-toast"
+    };
   }
 });
 
@@ -139,6 +107,9 @@ async function initLogin() {
       navigateTo("/home");
     }
   });
+  const isLocalhost = location.hostname === "localhost" || location.hostname === "127.0.0.1";
+  if (!isLocalhost)
+    document.getElementById("div-google-login")?.classList.add("hidden");
   const googleBtn = document.getElementById("google-login-btn");
   googleBtn?.addEventListener("click", () => {
     window.location.href = "/api/oauth/google";
@@ -354,7 +325,7 @@ async function initRegister() {
       });
       const result = await res.json();
       if (result.ok == true) {
-        showToast(`Your account have been created succesfully`, "success", 2e3);
+        showToast(`Your account have been created succesfully`, "success", 3e3);
         navigateTo("/login");
       } else {
         const usernameInput = form.querySelector("input[name='username']");
@@ -4893,6 +4864,10 @@ var init_chatNetwork = __esm({
       // }
       constructor() {
         this.socket = null;
+        this.socketUserID = null;
+      }
+      getsocketUserID() {
+        return this.socketUserID;
       }
       connect(callback) {
         const serverUrl = window.location.host;
@@ -4900,10 +4875,12 @@ var init_chatNetwork = __esm({
           transports: ["websocket"],
           withCredentials: true
         });
-        if (this.socket.connected)
-          callback();
-        else
-          this.socket.once("connect", callback);
+        this.socket.once("connect", callback);
+      }
+      toKnowUserID() {
+        this.socket.on("userID", (data) => {
+          this.socketUserID = data.id;
+        });
       }
       sendMessage(message) {
         this.socket.emit("generalChatMessage", message);
@@ -4936,8 +4913,9 @@ async function displayChat() {
   const input = document.getElementById("chat-input");
   chatBar.addEventListener("click", () => {
     chatWindow.classList.toggle("hidden");
+    chatBar.classList = "bg-amber-800 hover:bg-amber-900 text-white px-4 py-2 rounded-lg shadow cursor-pointer w-32 xl:w-60 text-center";
     if (!chatWindow?.classList.contains("hidden")) {
-      chatBar.classList = "dark:bg-amber-800 dark:text-amber-100 bg-amber-100 hover:bg-amber-800 text-amber-100 px-4 py-2 rounded-lg shadow cursor-pointer w-32 text-center";
+      chatBar.classList = "bg-amber-100 hover:bg-amber-800 hover:text-amber-100 dark:bg-amber-800 dark:text-amber-100 px-4 py-2 rounded-lg shadow cursor-pointer w-32 xl:w-60 text-center";
       setTimeout(() => {
         chatBox.scrollTop = chatBox.scrollHeight;
       }, 0);
@@ -4962,7 +4940,9 @@ async function displayChat() {
 }
 function addMessageGeneral(data, box, container) {
   let template;
-  if (data.me && data.me === true)
+  if (data.me === void 0)
+    data.me = data.id === chatnet.getsocketUserID();
+  if (data.me)
     template = document.getElementById("my-chat-message");
   else
     template = document.getElementById("chat-message");
@@ -5003,16 +4983,14 @@ function hideChat() {
   const container = document.getElementById("chat-container");
   if (container)
     container.innerHTML = "";
-  firstLogin = false;
   chatnet?.disconnect();
 }
-var chatnet, firstLogin;
+var chatnet;
 var init_p_chat = __esm({
   "front/src/views/p_chat.ts"() {
     "use strict";
     init_chatNetwork();
     chatnet = new chatNetwork();
-    firstLogin = false;
   }
 });
 
@@ -5081,13 +5059,13 @@ async function myFriends(acceptedFriends) {
   if (!container)
     return;
   if (acceptedFriends.length === 0) {
-    container.innerHTML = `<p class="text-l italic text-center text-amber-800">No friend yet</p>`;
+    container.innerHTML = `<p class="text-base md:text-lg xl:text-xl 2xl:text-2xl italic text-center text-amber-800">No friend yet</p>`;
     return;
   }
   acceptedFriends.forEach(async (friend) => {
     const template = document.getElementById("myfriends");
     const item = document.createElement("div");
-    item.classList.add("dash");
+    item.classList.add("frd");
     const clone = template.content.cloneNode(true);
     const avatar = clone.getElementById("avatar");
     const pseudo = clone.getElementById("pseudo");
@@ -5233,13 +5211,13 @@ function pendingFr(pendingFriends) {
   if (!container)
     return;
   if (pendingFriends.length === 0) {
-    container.innerHTML = `<p class="text-l italic text-center text-amber-800">No pending invitation</p>`;
+    container.innerHTML = `<p class="text-base md:text-lg xl:text-xl 2xl:text-2xlitalic text-center text-amber-800">No pending invitation</p>`;
     return;
   }
   pendingFriends.forEach(async (friend) => {
     const template = document.getElementById("myfriends");
     const item = document.createElement("div");
-    item.classList.add("dash");
+    item.classList.add("frd");
     const clone = template.content.cloneNode(true);
     const avatar = clone.getElementById("avatar");
     const pseudo = clone.getElementById("pseudo");
@@ -5262,7 +5240,7 @@ function youMayKnow(opponent) {
   }
   const container = document.getElementById("opponent-list");
   opponent.forEach(async (user) => {
-    const template = document.getElementById("myfriends");
+    const template = document.getElementById("opponent-li");
     const item = document.createElement("div");
     item.classList.add("dash");
     const clone = template.content.cloneNode(true);
@@ -5492,6 +5470,44 @@ var init_p_updatepassword = __esm({
   }
 });
 
+// front/src/views/p_updatepassgg.ts
+function SetGGPasswordView() {
+  return document.getElementById("set-gg-password-html").innerHTML;
+}
+async function initSetGGPassword() {
+  const profile = await genericFetch("/api/private/profile", {
+    method: "GET"
+  });
+  const avatar = document.getElementById("profile-avatar");
+  avatar.src = profile.avatar + "?ts=" + Date.now();
+  document.getElementById("profile-pseudo").textContent = profile.pseudo;
+  const formPassword = document.getElementById("set-gg-password-form");
+  formPassword.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const oldPw = "google";
+    const newPw = formPassword["new-password"].value;
+    const confirm = formPassword["confirm-new-password"].value;
+    try {
+      const response = await genericFetch("/api/private/updateinfo/password", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ oldPw, newPw, confirm })
+      });
+      navigateTo("/logout");
+      showToast("Password is updated successfully! Please re-log in!", "success", 2e3);
+    } catch (err) {
+      showToast(err.message, "error", 3e3, "Update password");
+    }
+  });
+}
+var init_p_updatepassgg = __esm({
+  "front/src/views/p_updatepassgg.ts"() {
+    "use strict";
+    init_router();
+    init_show_toast();
+  }
+});
+
 // front/src/views/p_updateavatar.ts
 function UpdateAvatarView() {
   return document.getElementById("update-avatar-html").innerHTML;
@@ -5643,9 +5659,11 @@ async function initOAuthCallback() {
     if (data.twofa) {
       navigateTo("/twofa");
     } else {
-      navigateTo("/home");
-      if (data.firstTimeLogin)
-        showToast("Welcome! If this is your first login, please change your default password << google >> ", "success", 3e3);
+      if (data.firstTimeLogin) {
+        navigateTo("/setggpass");
+        showToast("Welcome! If this is your first login, please create a password for your account! \u{1F389}", "success", 3e3);
+      } else
+        navigateTo("/home");
     }
   } catch (err) {
     showToast(err, "error", 3e3, "Google account");
@@ -5714,17 +5732,17 @@ async function InitLeaderboard() {
   if (leaderboard.InfoUsers.length > 0) {
     document.getElementById("avatar-1").src = leaderboard.InfoUsers[0].avatar;
     document.getElementById("pseudo-1").textContent = leaderboard.InfoUsers[0].pseudo;
-    document.getElementById("elo-1").textContent = leaderboard.InfoUsers[0].elo.toString();
+    document.getElementById("elo-1").textContent = leaderboard.InfoUsers[0].elo.toString() + " \u{1F950}";
   }
   if (leaderboard.InfoUsers.length > 1) {
     document.getElementById("avatar-2").src = leaderboard.InfoUsers[1].avatar;
     document.getElementById("pseudo-2").textContent = leaderboard.InfoUsers[1].pseudo;
-    document.getElementById("elo-2").textContent = leaderboard.InfoUsers[1].elo.toString();
+    document.getElementById("elo-2").textContent = leaderboard.InfoUsers[1].elo.toString() + " \u{1F950}";
   }
   if (leaderboard.InfoUsers.length > 2) {
     document.getElementById("avatar-3").src = leaderboard.InfoUsers[2].avatar;
     document.getElementById("pseudo-3").textContent = leaderboard.InfoUsers[2].pseudo;
-    document.getElementById("elo-3").textContent = leaderboard.InfoUsers[2].elo.toString();
+    document.getElementById("elo-3").textContent = leaderboard.InfoUsers[2].elo.toString() + " \u{1F950}";
   }
   for (let i = 3; i < 50; i++) {
     const template = document.getElementById("leaderboard-list");
@@ -5732,11 +5750,21 @@ async function InitLeaderboard() {
     if (i < leaderboard.InfoUsers.length) {
       li.getElementById("avatar").src = leaderboard.InfoUsers[i].avatar;
       li.getElementById("pseudo").textContent = leaderboard.InfoUsers[i].pseudo;
-      li.getElementById("elo").textContent = leaderboard.InfoUsers[i].elo.toString();
+      li.getElementById("elo").textContent = leaderboard.InfoUsers[i].elo.toString() + " \u{1F950}";
+      if (leaderboard.user.pseudo === leaderboard.InfoUsers[i].pseudo) {
+        li.getElementById("background").classList.remove("bg-linear-to-r", "from-amber-50", "via-orange-50", "to-yellow-50");
+        li.getElementById("background").classList.add("bg-linear-to-r", "from-amber-100", "via-orange-100", "to-yellow-100");
+      }
     }
     li.getElementById("position").textContent = "#" + (i + 1).toString();
     container.appendChild(li);
   }
+  if (leaderboard.InfoUsers.length >= 50 && leaderboard.user.elo < leaderboard.InfoUsers[49].elo) {
+    document.getElementById("your-avatar").src = leaderboard.user.avatar;
+    document.getElementById("your-pseudo").textContent = leaderboard.user.pseudo;
+    document.getElementById("your-elo").textContent = leaderboard.user.elo.toString() + " \u{1F950}";
+  } else
+    document.getElementById("your-position").classList.add("hidden");
   console.log(leaderboard);
 }
 var init_p_leaderboard = __esm({
@@ -5769,11 +5797,8 @@ async function initAchievement() {
     const unlockedMap = mapByCode(achievement.unlocked);
     const lockedMap = mapByCode(achievement.locked);
     const unlockedTemplate = document.getElementById("unlocked-achievement");
-    console.log(unlockedTemplate);
     const secretTemplate = document.getElementById("secret-achievement");
-    console.log(secretTemplate);
     const lockedTemplate = document.getElementById("locked-achievement");
-    console.log(lockedTemplate);
     let i = 1;
     for (const code of ACHIEVEMENT_ORDER) {
       let achievement2 = unlockedMap.get(code);
@@ -5990,6 +6015,7 @@ async function router() {
     }
     if (isReloaded || window.location.pathname === "/home" && (!history.state || publicPath.includes(history.state.from))) {
       chatnet.connect(() => {
+        chatnet.toKnowUserID();
         displayChat();
       });
       isReloaded = false;
@@ -6065,6 +6091,7 @@ var init_router = __esm({
     init_p_updateemail();
     init_p_updateusername();
     init_p_updatepassword();
+    init_p_updatepassgg();
     init_p_updateavatar();
     init_p_update2fa();
     init_oauth_callback();
@@ -6089,6 +6116,7 @@ var init_router = __esm({
       { path: "/updateemail", view: UpdateEmailView, init: initUpdateEmail },
       { path: "/updateusername", view: UpdateUsernameView, init: initUpdateUsername },
       { path: "/updatepassword", view: UpdatePasswordView, init: initUpdatePassword },
+      { path: "/setggpass", view: SetGGPasswordView, init: initSetGGPassword },
       { path: "/updateavatar", view: UpdateAvatarView, init: initUpdateAvatar },
       { path: "/update2fa", view: Update2faView, init: initUpdate2fa },
       { path: "/leaderboard", view: LeaderboardView, init: InitLeaderboard },

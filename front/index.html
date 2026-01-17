@@ -6,7 +6,7 @@
 		<link href="/public/output.css" rel="stylesheet" />
 		<link rel="icon" type="image/x-icon" href="/src/image/favicon.ico">
 	</head>
-	<body>
+	<body class="min-h-screen flex flex-col">
 	<img src="/src/image/bg-croissant-white.jpg" 
 		alt="bgcroissant"
 		class="fixed inset-0 block dark:hidden -z-10 duration-300 object-cover w-full h-screen">
@@ -14,12 +14,10 @@
 		alt="bgcroissant"
 		class="fixed inset-0 -z-10 hidden dark:block duration-300 object-cover w-full h-screen">
 	<header id="header-container" ></header>
-	<main id="app"></main>
-	<div id="chat-container" class="fixed bottom-5 right-5 flex flex-col items-end"></div>
-
+	<main class="min-h-[calc(100vh-112px)] flex flex-col" id="app"></main>
+	<div id="chat-container" class="fixed bottom-5 right-5 flex flex-col items-end z-100"></div>
 	<script type="module" src="/public/app.js"></script>
 	</body>
-
 
 	<template id="headernotconnect">
 		<header class="flex dark:bg-black/30 items-center pb-2 h-28 bg-gray-200/20 backdrop-blur-sm shadow-md">
@@ -84,7 +82,7 @@
 						<label class="relative inline-flex items-center cursor-pointer">
 							<input type="checkbox" id="theme-switch" class="sr-only peer" />
 							<div
-								class="w-11 h-6 bg-amber-500 rounded-full peer-checked:bg-gray-800 transition-colors"
+								class="w-11 h-6 bg-amber-500 rounded-full peer-checked:bg-gray-800 peer-checked:border-gray-600 peer-checked:border-2 transition-colors"
 							></div>
 							<div
 								class="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-5"
@@ -152,26 +150,24 @@
 				<a href="/register" data-link class="mt-2 text-sm text-amber-900 dark:text-white hover:underline" >
 					Create account ?
 				</a>
-				<div class="flex items-center gap-2 my-4 text-sm text-gray-500">
-					<hr class="flex-1 border-gray-300 dark:border-gray-600" />
-					<span>or</span>
-					<hr class="flex-1 border-gray-300 dark:border-gray-600" />
+				<div id="div-google-login" class="">
+					<div class="flex items-center gap-2 my-4 text-sm text-gray-500">
+						<hr class="flex-1 border-gray-300 dark:border-gray-600" />
+						<span>or</span>
+						<hr class="flex-1 border-gray-300 dark:border-gray-600" />
+					</div>
+					<button type="button" id="google-login-btn" class="mx-auto w-full max-w-xs flex items-center justify-center gap-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-black/30">
+						<img src="/src/image/google-icon.svg" alt="Google login" class="h-10" />
+					</button>
 				</div>
-				<button type="button" id="google-login-btn" class="mx-auto w-full max-w-xs flex items-center justify-center gap-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-black/30">
-					<img src="/src/image/google-icon.svg" alt="Google login" class="h-10" />
-				</button>
 			</form>
 		</div>
 		<footer class="absolute bottom-4 w-full dark:text-white duration-300 text-center text-sm opacity-60">
-			<div><br></div>
-			<div>
-					<a href="/termsofservice" data-link class="hover:underline">Terms of Service</a>
-					<span>|</span>
-					<a href="/privacypolicy" data-link class="hover:underline">Privacy Policy</a>
-			</div>
+			<a href="/termsofservice" data-link class="hover:underline">Terms of Service</a>
+			<span>|</span>
+			<a href="/privacypolicy" data-link class="hover:underline">Privacy Policy</a>
 			<p>© 2026 Croiscendence</p>
-			<div><br></div>
- 		</footer>
+		</footer>
 	</template>
 
 	<template id="twofahtml">
@@ -184,15 +180,11 @@
 			<button type="submit" class="btn mx-auto w-40">Log in</button>
 		</form>
 		<footer class="absolute bottom-4 w-full dark:text-white duration-300 text-center text-sm opacity-60">
-			<div><br></div>
-			<div>
-					<a href="/termsofservice" data-link class="hover:underline">Terms of Service</a>
-					<span>|</span>
-					<a href="/privacypolicy" data-link class="hover:underline">Privacy Policy</a>
-			</div>
+			<a href="/termsofservice" data-link class="hover:underline">Terms of Service</a>
+			<span>|</span>
+			<a href="/privacypolicy" data-link class="hover:underline">Privacy Policy</a>
 			<p>© 2026 Croiscendence</p>
-			<div><br></div>
- 		</footer>
+		</footer>
 	</template>
 
 	<template id="registerhtml">
@@ -712,424 +704,433 @@
 	</template>
 
 	<template id="homehtml">
-		<div class="w-full h-[calc(100vh-112px)]">
-			<main class="w-[60%] ml-[5%] mt-40 text-center">
-				<h1 class="text-4xl md:text-6xl lg:text-7xl font-bold mx-auto
-						bg-linear-to-r from-amber-800 via-amber-600 to-orange-500 
-						bg-clip-text text-transparent drop-shadow-lg
-						hover:bg-linear-to-r hover:from-orange-500 hover:via-amber-800 hover:to-amber-600
-						animate-pulse w-fit">Welcome in Croiscendence</h1>
-				<p class="mt-10 text-base md:text-lg lg:text-xl opacity-50
-		  				 max-w-md mx-auto duration-300 dark:text-white">
+		<main class="flex items-center justify-center w-full h-[calc(100vh-170px)]">
+			<div class="flex flex-col md:flex-row w-full h-full mx-auto">
+				<div class="w-full md:w-1/2 flex flex-col justify-center items-center text-center px-4">
+				<h1 class="text-4xl sm:text-4xl md:text-5xl lg:text-6xl font-bold
+							bg-linear-to-r from-amber-800 via-amber-600 to-orange-500
+							bg-clip-text text-transparent drop-shadow-lg animate-pulse w-full">
+					Welcome in Croiscendence
+				</h1>
+				<p class="mt-6 text-base sm:text-lg lg:text-xl opacity-60 max-w-md dark:text-white">
 					You can start playing by clicking the button below,
-					and view your profile information by clicking 
-					your avatar in the top-right corner.</p>
-				<button class="btn w-40 mx-auto mt-20 block" id="scroll-button">Start playing !</button>
-				<!-- <div id="chat-container"></div> -->
-			</main>
-			<footer class="absolute bottom-4 w-full dark:text-white duration-300 text-center text-sm opacity-60">
-				<a href="/termsofservice" data-link class="hover:underline">Terms of Service</a>
-				<span>|</span>
-				<a href="/privacypolicy" data-link class="hover:underline">Privacy Policy</a>
-				<p>© 2026 Croiscendence</p>
-			</footer>
-		</div>
-		<div id="gamepage" class="-mt-40">
+					and view your profile information by clicking
+					your avatar in the top-right corner.
+				</p>
+				<button class="btn w-44 mt-6" id="scroll-button">
+					Start playing !
+				</button>
+				</div>
+				<div class="hidden md:flex w-1/2 h-full items-center justify-center">
+				</div>
+			</div>
+		</main>
+		<footer class="w-full text-center text-sm opacity-60 dark:text-white py-3">
+			<a href="/termsofservice" data-link class="hover:underline">Terms of Service</a>
+			<span>|</span>
+			<a href="/privacypolicy" data-link class="hover:underline">Privacy Policy</a>
+			<p>© 2026 Croiscendence</p>
+		</footer>
+		<section id="gamepage" class="relative min-h-screen flex flex-col md:flex-row items-center w-full px-6">
 			<img src="/src/image/gamepage.jpg"
-				alt="gamepage"
-				class="absolute block -z-10 object-cover w-full h-screen">
-			<section class="flex flex-col items-end mr-60 text-center">
-				<ul>
-					<li class="flex flex-col items-center mt-20">
-						<h1 class="text-2xl font-semibold tracking-wide">
-							Local
-						</h1>
-						<p class="text-sm opacity-60 text-center">
-							Play against a friend or an AI
-						</p>
-						<a href="/gamelocal" data-link class="btn w-48">
-							Player or AI
-						</a>
+			alt="gamepage"
+			class="absolute inset-0 -z-10 object-cover w-full h-full">
+			<div class="w-1/2">
+			</div>
+			<div class="w-1/2 mx-auto">
+				<ul class="flex flex-col gap-16 text-center mr-0 md:mr-24">
+					<li class="flex flex-col items-center">
+						<h1 class="text-2xl font-semibold tracking-wide">Local</h1>
+						<p class="text-sm opacity-60 mb-3">Play against a friend or an AI</p>
+						<a href="/gamelocal" data-link class="btn w-48">Player or AI</a>
 					</li>
-					<li class="flex flex-col items-center mt-20">
-						<h1 class="text-2xl font-semibold tracking-wide">
-							Online
-						</h1>
-						<p class="text-sm opacity-60 text-center">
-							Competitive online matches
-						</p>
-						<a href="/gameonline" data-link class="btn w-48">
-							1 VS 1
-						</a>
+					<li class="flex flex-col items-center">
+						<h1 class="text-2xl font-semibold tracking-wide">Online</h1>
+						<p class="text-sm opacity-60 mb-3">Competitive online matches</p>
+						<a href="/gameonline" data-link class="btn w-48">1 VS 1</a>
 					</li>
-					<li class="flex flex-col items-center mt-20">
-						<h1 class="text-2xl font-semibold tracking-wide">
-							Tournament
-						</h1>
-						<p class="text-sm opacity-60 text-center">
-							4 players elimination bracket
-						</p>
-						<a href="/tournament" data-link class="btn w-48">
-							4 Players
-						</a>
+					<li class="flex flex-col items-center">
+						<h1 class="text-2xl font-semibold tracking-wide">Tournament</h1>
+						<p class="text-sm opacity-60 mb-3">4 players elimination bracket</p>
+						<a href="/tournament" data-link class="btn w-48">4 Players</a>
 					</li>
 				</ul>
-			</section>
-		</div>
+			</div>
+		</section>
 	</template>
-	
-	<template id="friendshtml">
-	<div class="flex flex-col h-[calc(100vh-112px)]">
-		<div id ="search" class="relative flex flex-col w-1/4 mx-auto pt-2 justify-center h-[5%]">
-			<input type="text" id="searchInput" placeholder="🔍 Search..." class="text-lg border border-amber-600/50 backdrop-blur-sm rounded-md outline-none focus:ring-2 focus:ring-amber-600/50 focus:border-amber-600/50">
-			<ul id ="members" class="absolute z-50 w-full top-full mx-auto bg-amber-600 rounded-lg"></ul>
-		</div>
-		<div class="flex flex-row pt-3 items-start h-[95%]">
-			<div class="w-[50%] h-full">
-				<h1 class="relative z-20 font-bold text-l ml-20 w-28 text-stone-100 bg-amber-900 pl-4 rounded">My friends</h1>
-				<section class="max-h-[97%] bg-amber-100/80 -mt-4 mx-15 flex flex-col ring-2 ring-amber-400 items-center rounded-lg p-4">
-					<div id="friend-list" class="w-[95%] px-1 scrollbar-custom overflow-y-auto mb-2">
-					</div>
-				</section>
-			</div>
-			<div class="flex flex-col w-[50%] h-full justify-between">
-				<div class="max-h-[65%]">
-					<h1 class="relative z-20 font-bold text-l ml-8 w-44 text-stone-100 bg-amber-900 pl-4 rounded">Pending invitations</h1>
-					<section class="h-full bg-amber-100/80 ml-2 mr-15 -mt-4 flex flex-col ring-2 ring-amber-400 items-center rounded-lg p-2 z-10">
-						<div id="pending-list" class="w-[95%] px-1 scrollbar-custom overflow-y-auto mb-2">
-						</div>
-					</section>
-				</div>
-				<div class="h-[30%]">
-					<h1 class="relative z-20 font-bold text-l ml-8 w-76 text-stone-100 bg-amber-900 px-3 rounded">Users you played with and may know</h1>
-					<section class="h-[90%] -mt-4 bg-amber-100/80 ml-2 mr-15 flex flex-col ring-2 ring-amber-400 items-center rounded-lg relative">
-						<div id="no-opponent" class="flex flex-col hidden items-center">
-							<h1 id="no opponent text" class="mt-6 text-xl text-center font-semibold text-amber-800">Click below to begin a party and meet new users</h1>
-							<a href="/gameonline" data-link class="btn mt-2 ml-3 w-20 text-center">1 VS 1</a>
-						</div>
-						<div id="opponent" class="h-full w-full pt-2">
-							<div id="opponent-list" class="h-full grid grid-cols-1 sm:grid-cols-2 w-full scrollbar-custom overflow-y-auto">
-							</div>
-						</div>
-					</section>
-				</div>
-			</div>
 
-		</div>
-	</div>
-		<footer class="dark:text-white text-center text-sm opacity-60">
-			<div><br></div>
-			<div>
-					<a href="/termsofservice" data-link class="hover:underline">Terms of Service</a>
-					<span>|</span>
-					<a href="/privacypolicy" data-link class="hover:underline">Privacy Policy</a>
+<!-- autre : dark:bg-yellow-100/80  dark:text-amber-900  moi :  dark:text-amber-100  dark:bg-amber-800 chat:  dark:bg-yellow-950/90 -->
+	<template id="friendshtml">
+		<div class="flex flex-col h-[calc(100vh-112px)] px-2 sm:px-4 lg:px-8">
+			<div id ="search" class="relative flex flex-col w-full sm:w-2/3 md:1/3 md:w-2/4 xl:1/4 2xl:1/5 mx-auto pt-2">
+				<input type="text" id="searchInput" placeholder="🔍 Search..." 
+				class="text-base dark:text-white sm:text-base md:text-lg lg:text-lg xl:text-xl 2xl:text-2xl border border-amber-600/50 backdrop-blur-sm rounded-md outline-none focus:ring-2 focus:ring-amber-600/50 focus:border-amber-600/50">
+				<ul id ="members" class="absolute z-50 w-full top-full mx-auto dark:bg-yellow-950 bg-amber-100 rounded-lg border dark:border-amber-600/50 border-amber-500 overflow-y-auto max-h-40 sm:max-h-60 lg:max-h-80 scrollbar-custom empty:border-0"></ul> 
 			</div>
-			<p>© 2026 Croiscendence</p>
-			<div><br></div>
- 		</footer>
+			<div class="flex flex-col lg:flex-row pt-3 gap-4 h-full">
+				<div class="w-full mah-h-full lg:w-1/2 lg:h-full flex flex-col">
+					<h1 class="relative z-20 font-bold text-base ml-5 w-28 md:ml-12 md:w-32 lg:text-2xl lg:ml-16 lg:w-40 2xl:text-3xl 2xl:w-48
+					text-stone-100 bg-amber-900 pl-4  rounded">My friends</h1>
+					<section class="max-h-[97%] bg-amber-100/80 dark:bg-amber-900/60 -mt-4 md:mx-4  xl:mx-8 2xl:mx-12 flex flex-col ring-2 ring-amber-400 dark:ring-amber-900  items-center rounded-lg p-4">
+						<div id="friend-list" class="h-full w-[95%] px-1 2xl:grid 2xl:grid-cols-2 scrollbar-custom overflow-y-auto mb-2 sm:text-base md:text-lg lg:text-base xl:text-xl 2xl:text-2xl">
+						</div>
+					</section>
+				</div>
+				<div class="w-full lg:w-1/2 h-full flex flex-col lg:justify-between">
+					<div class="max-h-[70%]">
+						<div class="h-full" >
+							<h1 class="relative z-20 font-bold text-base ml-5 w-44 md:ml-12 md:w-48 lg:text-2xl lg:ml-16 lg:w-60 2xl:text-3xl 2xl:w-76
+							 text-stone-100 bg-amber-900 pl-4 rounded">Pending invitations</h1>
+							<section class="h-full bg-amber-100/80  dark:bg-amber-900/60 -mt-4 md:mx-4 xl:mx-8 2xl:mx-12 flex flex-col ring-2 ring-amber-400 dark:ring-amber-900 items-center rounded-lg p-4 z-10">
+								<div id="pending-list" class="w-full h-full 2xl:grid 2xl:grid-cols-2 px-1 scrollbar-custom overflow-y-auto mb-2 sm:text-base md:text-lg lg:text-base xl:text-xl 2xl:text-2xl">
+								</div>
+							</section>
+						</div>
+					</div>
+					<div class="pt-8 lg:max-h-[25%] 2xl:min-h-[25%] 2xl:max-h-full pb-8">
+						<div class="lg:h-full 2xl:min-h-[25%] 2xl:max-h-full">
+							<h1 class="relative z-20 font-bold text-base ml-5 w-76 md:ml-12 md:w-84 lg:text-2xl lg:ml-16 lg:w-112 2xl:text-3xl 2xl:w-136
+								 text-stone-100 bg-amber-900 pl-4 rounded">Users you played with and may know</h1>
+							<section class="2xl:max-h-full bg-amber-100/80  dark:bg-amber-900/60 -mt-4 md:mx-4 xl:mx-8 2xl:mx-12 flex flex-col ring-2 ring-amber-400 dark:ring-amber-900 items-center rounded-lg relative">
+								<div id="no-opponent" class="flex flex-col hidden items-center sm:text-base md:text-lg lg:text-lg xl:text-xl 2xl:text-2xl">
+									<h1 id="no opponent text" class="mt-6 text-xl text-center font-semibold text-amber-800 dark:text-amber-50">Click below to begin a game and meet new users</h1>
+									<a href="/gameonline" data-link class="btn mt-2 ml-3 w-20 text-center">1 VS 1</a>
+								</div>
+								<div id="opponent" class="h-full w-full pt-2 ">
+									<div id="opponent-list" class="h-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 w-full scrollbar-custom overflow-y-auto ">
+									</div>
+								</div>
+							</section>
+						</div>
+					</div>
+				</div>
+
+			</div>
+			<footer class="bottom-2 mb-2 w-full dark:text-white duration-300 text-center text-sm opacity-60">
+				<div class="flex flex-row justify-center">
+					<a href="/termsofservice" data-link class="hover:underline">Terms of Service</a>
+					<span class="mx-2">|</span>
+					<a href="/privacypolicy" data-link class="hover:underline">Privacy Policy</a>
+					<span class="mx-2">-</span>
+					<p>© 2026 Croiscendence</p>
+				</div>
+			</footer>
+		</div>
 	</template>
 
 	<template id="list-search">
-		<li class="flex flex-row gap-3 justify-between m-2 hover:bg-amber-600/20 rounded-sm">
+		<li class="flex flex-row gap-3 justify-between px-2 py-2 hover:bg-amber-500/30 rounded-md">
 			<div class="flex flex-row mr-2">
-				<img id="avatar" class="w-8 h-8 rounded-full my-auto object-cover" src="" alt="avatar"/>
-				<p id="pseudo" class="my-auto"></p>
+				<img id="avatar" class="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 xl:w-14 xl:h-14 2xl:w-16 2xl:h-16 rounded-full my-auto object-cover" src="" alt="avatar"/>
+				<p id="pseudo" class="my-auto ml-2 text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-2xl text-amber-900 dark:text-amber-50"></p>
 			</div>
-			<button id="addordelete" class="bg-amber-700 my-auto px-2 ml-2 text-white rounded cursor-pointer"></button>
+			<button id="addordelete" class="bg-amber-700 my-auto px-2 py-1 sm:px-3 sm:py-1.5 md:px-4 md:py-2 lg:px-4 lg:py-2 xl:px-5 xl:py-2 2xl:px-6 2xl:py-3
+						text-xs sm:text-sm md:text-base lg:text-base xl:text-lg 2xl:text-xl text-amber-50 rounded cursor-pointer"></button>
 		</li>
 	</template>
 
 	<template id="myfriends">
-		<div class="flex items-center justify-between w-full hover:bg-amber-600/20 rounded-sm">
-			<div class="flex flex-row items-center gap-3">
+		<div class="flex flex col items-center justify-between w-full rounded-sm">
+			<div class="flex flex-row items-center gap-3 relative">
 				<div>
 					<span id="f_status" class="absolute w-4 h-4 rounded-full"></span>
-					<img id="avatar" class="w-16 h-16 rounded-full my-auto" src="" alt="avatar"></img>
+					<img id="avatar" class="w-16 h-16 2xl:w-24 2xl:h-24 rounded-full my-auto object-cover" src="" alt="avatar"></img>
 				</div>
 				<p id="pseudo" class="text-l text-amber-800 font-semibold"></p>
 			</div>
 			<div class="flex items-center flex-col">
-				<button id="addordelete" class="bg-amber-700 px-2 py-2 text-white rounded cursor-pointer text-sm"></button>
+				<button id="addordelete" class="bg-amber-700 px-2 py-2
+				sm:px-3 sm:py-1.5 
+						md:px-4 md:py-2 
+						lg:px-4 lg:py-2 
+						xl:px-5 xl:py-2 
+						2xl:px-6 2xl:py-3
+						text-xs 
+						sm:text-sm 
+						md:text-base 
+						lg:text-base 
+						xl:text-lg 
+						2xl:text-xl
+				text-white rounded cursor-pointer"></button>
+				<p id="date-friendship" class="mt-4 mr-4 italic text-xs text-gray-600"></p>
+			</div>
+		</div>
+	</template>
+
+		<template id="opponent-li">
+		<div class="flex flex col items-center justify-between w-full rounded-sm">
+			<div class="flex flex-row items-center gap-3">
+				<div>
+					<span id="f_status" class="absolute w-4 h-4 rounded-full"></span>
+					<img id="avatar" class="w-10 h-10 2xl:w-20 2xl:h-20 rounded-full my-auto object-cover" src="" alt="avatar"></img>
+				</div>
+				<p id="pseudo" class="text-l text-amber-800 font-semibold text-xs sm:text-sm xl:text-base 2xl:text-xl"></p>
+			</div>
+			<div class="flex items-center flex-col">
+				<button id="addordelete" class="bg-amber-700 px-2 py-2
+						sm:px-3 sm:py-1.5 
+						text-xs 
+						sm:text-sm 
+						2xl:text-base
+				text-white rounded cursor-pointer"></button>
 				<p id="date-friendship" class="mt-4 mr-4 italic text-xs text-gray-600"></p>
 			</div>
 		</div>
 	</template>
 
 	<template id="profilehtml">
-		<div>
-			<br>
-		</div>
-		<main class="flex">
-			<div class="bg-[linear-gradient(180deg,var(--color-amber-400)_20%,var(--color-amber-50)_20%)] 
-						ring-4 ring-amber-900 flex flex-col w-100 h-full rounded-lg mt-2 
-						mx-auto shadow-2xl items-center">
-				<div class="flex flex-row w-100 mt-3 justify-between">
-					<div class="w-5"></div>
-					<h1 class="text-3xl mx-auto font-bold text-amber-900
-						drop-shadow-lg" id="profile-pseudo"></h1>
-					<a class="size-6 mt-2 justify-end mr-5 object-contain" href="/updateusername" data-link>
-						<img class="invert ring-1 p-0.5 ring-blue-950 rounded-md" src="src/image/crayon.png" alt="crayon">
+		<main class="flex-1 flex flex-col px-4">
+			<div class="bg-[linear-gradient(180deg,var(--color-amber-400)_20%,var(--color-amber-50)_20%)] ring-4 ring-amber-900 flex flex-col w-full max-w-md rounded-lg mt-6 mx-auto shadow-2xl items-center pb-6">
+				<div class="flex w-full mt-3 items-center px-4">
+					<div class="w-6"></div>
+					<h1 class="text-2xl sm:text-3xl mx-auto font-bold text-amber-900 drop-shadow-lg"
+						id="profile-pseudo"></h1>
+					<a class="size-6" href="/updateusername" data-link>
+						<img class="invert ring-1 p-0.5 ring-blue-950 rounded-md"
+							src="src/image/crayon.png" alt="crayon">
 					</a>
 				</div>
-				<a class="mt-2 object-contain" href="/updateavatar" data-link>
-					<img class="ring-4 ring-amber-900 rounded-full shadow-xl" id="profile-avatar" src="" alt="Your avatar" width="150">
+				<a class="mt-4" href="/updateavatar" data-link>
+					<img class="ring-4 ring-amber-900 rounded-full shadow-xl" id="profile-avatar" src="" alt="Your avatar" width="140">
 				</a>
 				<select id="profile-status"
-					class="inline-block text-amber-900 mt-4 rounded-md shadow-sm ring-2 bg-amber-500/20 ring-amber-400 sm:text-sm">
-					<option value="online">🟢 online </option>
-					<option value="busy">🔴 busy </option>
-					<option value="offline">⚫ offline </option>
+					class="mt-4 rounded-md shadow-sm ring-2 bg-amber-500/20 ring-amber-400 text-sm text-amber-900">
+					<option value="online">🟢 online</option>
+					<option value="busy">🔴 busy</option>
+					<option value="offline">⚫ offline</option>
 				</select>
-				<div class="flex flex-col mt-6">
-					<div class="flex items-start shadow-sm text-amber-900 bg-amber-300/20 w-80 ring-1 h-16 pt-1 ring-amber-900 rounded-lg mt-6">
-						<img class="bg-blue-700 shadow-sm my-1 px-1 rounded-lg size-12 invert ml-2 items-start" src="/src/image/email.png" alt="">
-						<div>
-							<h1 class="ml-2 font-bold">Email</h1>
-							<p id="profile-email" class="ml-2"></p>
+				<div class="flex flex-col mt-6 w-full px-4 space-y-4">
+					<div class="flex items-center mx-5 bg-amber-300/20 ring-1 ring-amber-900 rounded-lg p-3 text-amber-900">
+						<img class="bg-blue-700 p-1 rounded-lg size-10 invert" src="/src/image/email.png" alt="">
+						<div class="ml-3 flex-1">
+							<h1 class="font-bold">Email</h1>
+							<p id="profile-email" class="text-sm break-all"></p>
 						</div>
-						<a class="size-6 mt-4 ml-auto justify-end mr-5 object-contain" href="/updateemail" data-link>
-							<img class="invert p-0.5 bg-blue-600 rounded-md" src="src/image/crayon.png" alt="crayon">
+						<a href="/updateemail" data-link>
+							<img class="invert p-1 bg-blue-600 rounded-md size-6" src="src/image/crayon.png">
 						</a>
 					</div>
-					<div class="flex items-start shadow-sm text-amber-900 bg-amber-300/20 w-80 ring-1 h-16 pt-1 ring-amber-900 rounded-lg mt-6">
-						<img class="bg-blue-700 shadow-sm my-1 px-1 rounded-lg size-12 invert ml-2 items-start" src="/src/image/password.png" alt="">
-						<div>
-							<h1 class="ml-2 font-bold">Password</h1>
-							<p class="ml-2">••••••••••••</p>
+					<div class="flex items-center mx-5 bg-amber-300/20 ring-1 ring-amber-900 rounded-lg p-3 text-amber-900">
+						<img class="bg-blue-700 p-1 rounded-lg size-10 invert" src="/src/image/password.png" alt="">
+						<div class="ml-3 flex-1">
+							<h1 class="font-bold">Password</h1>
+							<p class="text-sm">••••••••••••</p>
 						</div>
-						<a class="size-6 mt-4 ml-auto justify-end mr-5 object-contain" href="/updatepassword" data-link>
-							<img class="invert p-0.5 bg-blue-600 rounded-md" src="src/image/crayon.png" alt="crayon">
+						<a href="/updatepassword" data-link>
+							<img class="invert p-1 bg-blue-600 rounded-md size-6" src="src/image/crayon.png">
 						</a>
 					</div>
-					<div class="flex items-start shadow-sm text-amber-900 bg-amber-300/20 w-80 ring-1 h-16 pt-1 ring-amber-900 rounded-lg mt-6">
-						<img class="bg-blue-700 shadow-sm my-1 px-1 rounded-lg size-12 invert ml-2 items-start" src="/src/image/coupe.png" alt="">
-						<div>
-							<h1 class="ml-2 font-bold">Elo</h1>
-							<p id="profile-elo" class="ml-2"></p>
+					<div class="flex items-center mx-5 bg-amber-300/20 ring-1 ring-amber-900 rounded-lg p-3 text-amber-900">
+						<img class="bg-blue-700 p-1 rounded-lg size-10 invert" src="/src/image/coupe.png" alt="">
+						<div class="ml-3">
+							<h1 class="font-bold">Elo</h1>
+							<p id="profile-elo" class="text-sm"></p>
 						</div>
 					</div>
-					<div class="flex items-start shadow-sm text-amber-900 bg-amber-300/20 w-80 mb-2 ring-1 h-16 pt-1 ring-amber-900 rounded-lg mt-6">
-						<img class="bg-blue-700 shadow-sm my-1 px-1 rounded-lg size-12 invert ml-2 items-start" src="/src/image/authentification-a-deux-facteurs.png" alt="">
-						<div>
-							<h1 class="ml-2 font-bold">Two-Factor Authentication</h1>
-							<p id="twofa-status" class="ml-2"></p>
+					<div class="flex items-center mx-5 bg-amber-300/20 ring-1 ring-amber-900 rounded-lg p-3 text-amber-900">
+						<img class="bg-blue-700 p-1 rounded-lg size-10 invert" src="/src/image/authentification-a-deux-facteurs.png" alt="">
+						<div class="ml-3 flex-1">
+							<h1 class="font-bold text-sm">Two-Factor Authentication</h1>
+							<p id="twofa-status" class="text-sm"></p>
 						</div>
-						<a class="size-6 mt-4 ml-auto justify-end mr-5 object-contain" href="/update2fa" data-link>
-							<img class="invert p-0.5 bg-blue-600 rounded-md" src="src/image/crayon.png" alt="crayon">
+						<a href="/update2fa" data-link>
+							<img class="invert p-1 bg-blue-600 rounded-md size-6" src="src/image/crayon.png">
 						</a>
 					</div>
-				</div>
-				<div>
-					<br>
 				</div>
 			</div>
 		</main>
-		<div>
-			<br>
-		</div>
-		<footer class="dark:text-white text-center text-sm opacity-60">
-			<div><br></div>
-			<div>
-					<a href="/termsofservice" data-link class="hover:underline">Terms of Service</a>
-					<span>|</span>
-					<a href="/privacypolicy" data-link class="hover:underline">Privacy Policy</a>
-			</div>
+		<footer class="w-full text-center text-sm dark:text-white opacity-60 py-3">
+			<a href="/termsofservice" data-link class="hover:underline">Terms of Service</a>
+			<span>|</span>
+			<a href="/privacypolicy" data-link class="hover:underline">Privacy Policy</a>
 			<p>© 2026 Croiscendence</p>
-			<div><br></div>
- 		</footer>
+		</footer>
 	</template>
 
 	<template id="update-email-html">
-		<div>
-			<br>
-		</div>
-		<main class="flex">
-			<div class="bg-[linear-gradient(180deg,var(--color-amber-400)_20%,var(--color-amber-50)_20%)]
-						ring-4 ring-amber-900 flex flex-col w-100 h-full rounded-lg mt-2 
-						mx-auto shadow-2xl items-center">
-				<div class="flex flex-row w-100 mt-3 justify-between">
-					<div class="w-5"></div>
-					<h1 class="text-3xl mx-auto font-bold text-amber-900
-						drop-shadow-lg" id="profile-pseudo">
+		<main class="flex-1 flex flex-col px-4">
+			<div class="bg-[linear-gradient(180deg,var(--color-amber-400)_20%,var(--color-amber-50)_20%)] ring-4 ring-amber-900 flex flex-col w-full max-w-md rounded-lg mt-6 mx-auto shadow-2xl items-center pb-6">
+				<div class="flex w-full mt-3 items-center px-4">
+					<div class="w-6"></div>
+					<h1 class="text-2xl sm:text-3xl mx-auto font-bold text-amber-900 drop-shadow-lg"
+						id="profile-pseudo">
 					</h1>
-					<a class="size-6 mt-2 justify-end mr-5 object-contain" href="/profile" data-link>
-						<img class="invert ring-1 p-0.5 ring-blue-950 rounded-md" src="src/image/back.png" alt="back">
+					<a class="size-6" href="/profile" data-link>
+						<img class="invert ring-1 p-0.5 ring-blue-950 rounded-md"
+							src="src/image/back.png" alt="back">
 					</a>
 				</div>
-				<a class="mt-2 object-contain">
-					<img class="ring-4 ring-amber-900 rounded-full shadow-xl" id="profile-avatar" src="" alt="Your avatar" width="150">
-				</a>
-				<div class="flex flex-col mt-6">
-					<!-- Change Email -->
-					<div class="flex flex-col shadow-sm text-amber-900 bg-amber-300/20
-								w-80 ring-1 ring-amber-900 rounded-lg mt-6 p-3">
-						<h2 class="font-bold mb-2 text-center">Change Email</h2>
-						<form id="change-email-form" class="flex flex-col gap-2">
-							<h2 class="text-sm text-amber-900 mt-3 mb-0.5">New Email</h2>
-							<input
-								class="rounded-md px-2 py-1 ring-1 ring-amber-400"
-								type="text"
-								name="new-email"
-								placeholder="your.new-email@example.com"
-								required />
-							<h2 class="text-sm text-amber-900 mt-3 mb-0.5">Confirm Password</h2>
-							<input
-								class="rounded-md px-2 py-1 ring-1 ring-amber-400"
-								type="password"
-								name="password"
-								placeholder="••••••••••••"
-								required />
-							<p class="text-sm text-amber-900 mt-3 mb-0.5">
-								If you change this email, your Google account (if any) will <strong>no longer be linked</strong>.
-							</p>
-							<button
-								type="submit" 
-								class="btn w-40 mx-auto mt-15 block">
-								Update Email
+				<img class="ring-4 ring-amber-900 rounded-full shadow-xl mt-4" id="profile-avatar" src="" alt="Your avatar" width="140">
+				<div class="flex flex-col mt-6 w-full px-4">
+					<div class="bg-amber-300/20 ring-1 ring-amber-900 mx-6 rounded-lg p-4 text-amber-900">
+						<h2 class="font-bold mb-4 text-center">Change Email</h2>
+						<form id="change-email-form" class="flex flex-col gap-3">
+							<label class="text-sm font-medium">New Email</label>
+							<input class="rounded-md px-2 py-1 ring-1 ring-amber-400" type="email" name="new-email" placeholder="your.new-email@example.com" required />
+							<label class="text-sm font-medium mt-2">Confirm Password</label>
+							<input class="rounded-md px-2 py-1 ring-1 ring-amber-400" type="password" name="password" placeholder="••••••••••••" required />
+							<button type="submit" class="btn w-[40%] mx-auto mt-6"> Update Email
 							</button>
 						</form>
 					</div>
 				</div>
-				<div>
-					<br>
-				</div>
 			</div>
 		</main>
-		<div>
-			<br>
-		</div>
-		<footer class="dark:text-white text-center text-sm opacity-60">
-			<div><br></div>
-			<div>
-					<a href="/termsofservice" data-link class="hover:underline">Terms of Service</a>
-					<span>|</span>
-					<a href="/privacypolicy" data-link class="hover:underline">Privacy Policy</a>
-			</div>
+		<footer class="w-full text-center text-sm dark:text-white opacity-60 py-3">
+			<a href="/termsofservice" data-link class="hover:underline">Terms of Service</a>
+			<span>|</span>
+			<a href="/privacypolicy" data-link class="hover:underline">Privacy Policy</a>
 			<p>© 2026 Croiscendence</p>
-			<div><br></div>
- 		</footer>
+		</footer>
 	</template>
 
 	<template id="update-username-html">
-		<div>
-			<br>
-		</div>
-		<main class="flex">
-			<div class="bg-[linear-gradient(180deg,var(--color-amber-400)_20%,var(--color-amber-50)_20%)]
-						ring-4 ring-amber-900 flex flex-col w-100 h-full rounded-lg mt-2 
-						mx-auto shadow-2xl items-center">
-				<div class="flex flex-row w-100 mt-3 justify-between">
-					<div class="w-5"></div>
-					<h1 class="text-3xl mx-auto font-bold text-amber-900
-						drop-shadow-lg" id="profile-pseudo">
+		<main class="flex-1 flex flex-col px-4">
+			<div class="bg-[linear-gradient(180deg,var(--color-amber-400)_20%,var(--color-amber-50)_20%)] ring-4 ring-amber-900 flex flex-col w-full max-w-md rounded-lg mt-6 mx-auto shadow-2xl items-center pb-6">
+				<div class="flex w-full mt-3 items-center px-4">
+					<div class="w-6"></div>
+					<h1 class="text-2xl sm:text-3xl mx-auto font-bold text-amber-900 drop-shadow-lg"
+						id="profile-pseudo">
 					</h1>
-					<a class="size-6 mt-2 justify-end mr-5 object-contain" href="/profile" data-link>
-						<img class="invert ring-1 p-0.5 ring-blue-950 rounded-md" src="src/image/back.png" alt="back">
+					<a class="size-6" href="/profile" data-link>
+						<img class="invert ring-1 p-0.5 ring-blue-950 rounded-md"
+							src="src/image/back.png" alt="back">
 					</a>
 				</div>
-				<a class="mt-2 object-contain">
-					<img class="ring-4 ring-amber-900 rounded-full shadow-xl" id="profile-avatar" src="" alt="Your avatar" width="150">
-				</a>
-				<div class="flex flex-col mt-6">
-
-					<!-- Change Username -->
-					<div id="update-username" class="flex flex-col ">
+				<img class="ring-4 ring-amber-900 rounded-full shadow-xl mt-4"
+					id="profile-avatar"
+					src=""
+					alt="Your avatar"
+					width="140">
+				<div class="flex flex-col mt-6 w-full px-4 space-y-6">
+					<div id="update-username" class="flex flex-col">
 						<button
 							type="button"
 							id="toggle-username"
-							class="hidden btn w-40 mx-auto py-2 block">
+							class="hidden btn w-40 mx-auto py-2">
 							Update Username
 						</button>
-
-						<div id="update-username-section" class="flex flex-col shadow-sm text-amber-900 bg-amber-300/20
-								w-80 ring-1 ring-amber-900 rounded-lg mt-6 p-3">
-							<h2 class="font-bold mb-2 text-center">Change Username</h2>
-							<form id="change-username-form" class="flex flex-col gap-2">
-								<h2 class="text-sm text-amber-900 mt-3 mb-0.5">New Username</h2>
-								<input
-									class="rounded-md px-2 py-1 ring-1 ring-amber-400"
+						<div id="update-username-section"
+							class="flex flex-col mx-6 bg-amber-300/20 ring-1 ring-amber-900 rounded-lg p-4 text-amber-900">
+							<h2 class="font-bold mb-4 text-center">Change Username</h2>
+							<form id="change-username-form" class="flex flex-col gap-3">
+								<label class="text-sm font-medium">New Username</label>
+								<input class="rounded-md px-2 py-1 ring-1 ring-amber-400"
 									type="text"
 									name="new-username"
 									placeholder="new_user_name"
 									required />
-								<h2 class="text-sm text-amber-900 mt-3 mb-0.5">Confirm Password</h2>
-								<input
-									class="rounded-md px-2 py-1 ring-1 ring-amber-400"
+								<label class="text-sm font-medium mt-2">Confirm Password</label>
+								<input class="rounded-md px-2 py-1 ring-1 ring-amber-400"
 									type="password"
 									name="password"
 									placeholder="••••••••••••"
 									required />
-								<button
-									type="submit" 
-									class="btn w-40 mx-auto mt-20 block">
+
+								<button type="submit" class="btn w-40 mx-auto mt-6">
 									Update Username
 								</button>
 							</form>
 						</div>
 					</div>
-
-					<!-- Delete User -->
 					<div id="delete-user" class="flex flex-col">
-						<button
-							type="button"
-							id="toggle-delete"
-							class="btn w-40 mx-auto block bg-red-600 px-4 py-2 text-white">
+						<button type="button"
+								id="toggle-delete"
+								class="btn w-40 mx-auto bg-red-600 md:bg-linear-to-r md:from-red-400 md:via-red-500 md:to-red-600 text-white">
 							Delete Account
 						</button>
-
-						<div id="delete-user-section" class="hidden flex flex-col shadow-sm text-red-600 bg-red-300/20
-								w-80 ring-1 ring-red-900 rounded-lg mt-6 p-3">
-							<h2 class="font-bold mb-2 text-center">🚨  Delete Account</h2>
-							<form id="delete-user-form" class="flex flex-col gap-2">
-								<h2 class="text-sm text-red-600 mt-3 mb-0.5">Write "DELETE" + "your username"</h2>
-								<input
-									class="rounded-md px-2 py-1 ring-1 ring-red-400"
+						<div id="delete-user-section"
+							class="hidden flex flex-col mx-6 bg-red-300/20 ring-1 ring-red-900 rounded-lg p-4 text-red-600">
+							<h2 class="font-bold mb-3 text-center">🚨 Delete Account</h2>
+							<form id="delete-user-form" class="flex flex-col gap-3">
+								<label class="text-sm font-medium">
+									Write <strong>DELETE</strong> + <strong>your username</strong>
+								</label>
+								<input class="rounded-md px-2 py-1 ring-1 ring-red-400"
 									type="text"
 									name="confirm-username"
 									placeholder="DELETE username"
 									required />
-								<h2 class="text-sm text-red-600 mt-3 mb-0.5">Confirm Password</h2>
-								<input
-									class="rounded-md px-2 py-1 ring-1 ring-red-400"
+								<label class="text-sm font-medium mt-2">Confirm Password</label>
+								<input class="rounded-md px-2 py-1 ring-1 ring-red-400"
 									type="password"
 									name="password"
 									placeholder="••••••••••••"
 									required />
-								<p class="text-sm text-red-600 mt-10 mb-0.5">
-									If your two‑factor authentication (2FA) is still turned on, you’ll need to <strong>switch it off</strong> first.
-									<br></br>
-									⚠️ Once your account is deleted, it’s <strong>gone for good</strong> and <strong>can’t be restored</strong>, so make sure you’re ready before continuing.
+								<p class="text-sm mt-4 leading-relaxed">
+									If your two-factor authentication (2FA) is still turned on,
+									you’ll need to <strong>switch it off</strong> first.<br>
+									⚠️ Once deleted, your account is <strong>gone forever</strong>.
 								</p>
-								<button
-									type="submit" 
-									class="btn w-40 mx-auto mt-5 block bg-red-600 text-white">
+								<button type="submit"
+										class="btn w-40 mx-auto mt-4 bg-red-600 text-white">
 									Delete Account
 								</button>
 							</form>
 						</div>
 					</div>
 				</div>
-				<div>
-					<br>
-				</div>
 			</div>
 		</main>
-		<div>
-			<br>
-		</div>
-		<footer class="dark:text-white text-center text-sm opacity-60">
-			<div><br></div>
-			<div>
-					<a href="/termsofservice" data-link class="hover:underline">Terms of Service</a>
-					<span>|</span>
-					<a href="/privacypolicy" data-link class="hover:underline">Privacy Policy</a>
-			</div>
+		<footer class="w-full text-center text-sm dark:text-white opacity-60 py-3">
+			<a href="/termsofservice" data-link class="hover:underline">Terms of Service</a>
+			<span>|</span>
+			<a href="/privacypolicy" data-link class="hover:underline">Privacy Policy</a>
 			<p>© 2026 Croiscendence</p>
-			<div><br></div>
- 		</footer>
+		</footer>
 	</template>
 
 	<template id="update-password-html">
+		<main class="flex-1 flex flex-col items-center mt-6 px-4">
+			<div class="bg-[linear-gradient(180deg,var(--color-amber-400)_20%,var(--color-amber-50)_20%)]
+						ring-4 ring-amber-900 flex flex-col w-full max-w-md rounded-lg shadow-2xl items-center p-6">
+				<div class="flex w-full justify-between items-center mb-4">
+					<div class="w-6"></div>
+					<h1 class="text-3xl font-bold text-amber-900 drop-shadow-lg mx-auto" id="profile-pseudo"></h1>
+					<a href="/profile" data-link class="size-6">
+					<img class="invert ring-1 p-0.5 ring-blue-950 rounded-md" src="src/image/back.png" alt="back">
+					</a>
+				</div>
+				<img id="profile-avatar" src="" alt="Your avatar"
+					class="ring-4 ring-amber-900 rounded-full shadow-xl mb-6" width="150">
+				<div class="flex flex-col w-full">
+					<div class="flex flex-col mx-6 shadow-sm text-amber-900 bg-amber-300/20
+								ring-1 ring-amber-900 rounded-lg p-4">
+						<h2 class="font-bold text-center mb-4">Change Password</h2>
+						<form id="change-password-form" class="flex flex-col gap-3">
+							<label class="text-sm font-medium text-amber-900">Old Password</label>
+							<input type="password" name="old-password"
+								placeholder="••••••••••••"
+								class="rounded-md px-2 py-1 ring-1 ring-amber-400"
+								required>
+							<label class="text-sm font-medium text-amber-900">New Password</label>
+							<input type="password" name="new-password"
+								placeholder="••••••••••••"
+								class="rounded-md px-2 py-1 ring-1 ring-amber-400"
+								required>
+							<label class="text-sm font-medium text-amber-900">Confirm New Password</label>
+							<input type="password" name="confirm-new-password"
+								placeholder="••••••••••••"
+								class="rounded-md px-2 py-1 ring-1 ring-amber-400"
+								required>
+							<button type="submit" class="btn w-40 mx-auto mt-6">
+							Update Password
+							</button>
+						</form>
+					</div>
+				</div>
+			</div>
+		</main>
+		<footer class="w-full text-center text-sm opacity-60 py-3 dark:text-white duration-300">
+			<a href="/termsofservice" data-link class="hover:underline">Terms of Service</a>
+			<span>|</span>
+			<a href="/privacypolicy" data-link class="hover:underline">Privacy Policy</a>
+			<p>© 2026 Croiscendence</p>
+		</footer>
+	</template>
+
+	<template id="set-gg-password-html">
 		<div>
 			<br>
 		</div>
@@ -1150,26 +1151,22 @@
 					<img class="ring-4 ring-amber-900 rounded-full shadow-xl" id="profile-avatar" src="" alt="Your avatar" width="150">
 				</a>
 				<div class="flex flex-col mt-6">
-					<!-- Change Password -->
+					<!-- Create Password -->
 					<div class="flex flex-col shadow-sm text-amber-900 bg-amber-300/20
 								w-80 ring-1 ring-amber-900 rounded-lg mt-6 p-3">
-						<h2 class="font-bold mb-2 text-center">Change Password</h2>
-						<form id="change-password-form" class="flex flex-col gap-2">
-							<h2 class="text-sm text-amber-900 mt-3 mb-0.5">Old Password</h2>
-							<input
-								class="rounded-md px-2 py-1 ring-1 ring-amber-400"
-								type="password"
-								name="old-password"
-								placeholder="••••••••••••"
-								required />
-							<h2 class="text-sm text-amber-900 mt-3 mb-0.5">New Password</h2>
+						<h2 class="font-bold mb-2 text-center">Create A Password</h2>
+						<p class="text-sm text-amber-900 mt-3 mb-0.5">
+							🎉 Welcome! This is your first time login by Google Oauth 2.0, please create a <strong>strong password</strong> to protect your account.
+						</p>
+						<form id="set-gg-password-form" class="flex flex-col gap-2">
+							<h2 class="text-sm text-amber-900 mt-3 mb-0.5">Password</h2>
 							<input
 								class="rounded-md px-2 py-1 ring-1 ring-amber-400"
 								type="password"
 								name="new-password"
 								placeholder="••••••••••••"
 								required />
-							<h2 class="text-sm text-amber-900 mt-3 mb-0.5">Confirm New Password</h2>
+							<h2 class="text-sm text-amber-900 mt-3 mb-0.5">Confirm Password</h2>
 							<input
 								class="rounded-md px-2 py-1 ring-1 ring-amber-400"
 								type="password"
@@ -1179,7 +1176,7 @@
 							<button
 								type="submit" 
 								class="btn w-40 mx-auto mt-20 block">
-								Update Password
+								Create Password
 							</button>
 						</form>
 					</div>
@@ -1205,185 +1202,164 @@
 	</template>
 
 	<template id="update-avatar-html">
-		<div>
-			<br>
-		</div>
-		<main class="flex">
-			<div class="bg-[linear-gradient(180deg,var(--color-amber-400)_20%,var(--color-amber-50)_20%)] 
-						ring-4 ring-amber-900 flex flex-col w-100 h-full rounded-lg mt-2 
-						mx-auto shadow-2xl items-center">
-				<div class="flex flex-row w-100 mt-3 justify-between">
-					<div class="w-5"></div>
-					<h1 class="text-3xl mx-auto font-bold text-amber-900
-						drop-shadow-lg" id="profile-pseudo">
-					</h1>
-					<a class="size-6 mt-2 justify-end mr-5 object-contain" href="/profile" data-link>
-						<img class="invert ring-1 p-0.5 ring-blue-950 rounded-md" src="src/image/back.png" alt="back">
+		<main class="flex-1 flex flex-col px-4">
+			<div class="bg-[linear-gradient(180deg,var(--color-amber-400)_20%,var(--color-amber-50)_20%)]
+						ring-4 ring-amber-900 flex flex-col w-full max-w-md rounded-lg mt-6 mx-auto shadow-2xl items-center pb-6">
+				<div class="flex w-full mt-3 items-center px-4">
+					<div class="w-6"></div>
+					<h1 class="text-2xl sm:text-3xl mx-auto font-bold text-amber-900 drop-shadow-lg" id="profile-pseudo"></h1>
+					<a href="/profile" data-link class="size-6">
+					<img class="invert ring-1 p-0.5 ring-blue-950 rounded-md" src="src/image/back.png" alt="back">
 					</a>
 				</div>
-				<a class="mt-2 object-contain">
-					<img class="ring-4 ring-amber-900 rounded-full shadow-xl" id="profile-avatar" src="" alt="Your avatar" width="150">
-				</a>
-				<div class="flex flex-col mt-6">
-					<!-- Change Avatar -->
-					<div class="flex flex-col shadow-sm text-amber-900 bg-amber-300/20
-								w-80 ring-1 ring-amber-900 rounded-lg mt-6 p-3">
-						<h2 class="font-bold mb-2 text-center">Change Avatar</h2>
-						<form id="upload_avatar" method="POST" enctype="multipart/form-data" class="flex flex-col gap-2">
-							<h2 class="text-sm text-amber-900 mt-3 mb-0.5">New Avatar</h2>
-							<input
-								class="rounded-md px-2 py-1 ring-1 ring-amber-400"
-								type="file"
-								name="avatar"
-								accept="image/png, image/jpeg"
-								required />
-							<button
-								type="submit" 
-								class="btn w-40 mx-auto mt-20 block">
-								Update Avatar
-							</button>
-						</form>
+				<img id="profile-avatar" src="" alt="Your avatar"
+					class="ring-4 ring-amber-900 rounded-full shadow-xl mt-4" width="140">
+				<div class="flex flex-col mt-6 w-full px-4">
+					<div class="bg-amber-300/20 ring-1 ring-amber-900 mx-6 rounded-lg p-4 text-amber-900">
+					<h2 class="font-bold mb-4 text-center">Change Avatar</h2>
+
+					<form id="upload_avatar" method="POST" enctype="multipart/form-data" class="flex flex-col gap-3">
+						<label class="text-sm font-medium">New Avatar</label>
+						<input class="rounded-md px-2 py-1 ring-1 ring-amber-400" type="file" name="avatar" accept="image/png, image/jpeg" required />
+						<button type="submit" class="btn w-[40%] mx-auto mt-6">
+						Update Avatar
+						</button>
+					</form>
 					</div>
-				</div>
-				<div>
-					<br>
 				</div>
 			</div>
 		</main>
-		<div>
-			<br>
-		</div>
-		<footer class="absolute bottom-4 w-full dark:text-white duration-300 text-center text-sm opacity-60">
-			<div><br></div>
-			<div>
-					<a href="/termsofservice" data-link class="hover:underline">Terms of Service</a>
-					<span>|</span>
-					<a href="/privacypolicy" data-link class="hover:underline">Privacy Policy</a>
-			</div>
+		<footer class="w-full text-center text-sm dark:text-white opacity-60 py-3">
+			<a href="/termsofservice" data-link class="hover:underline">Terms of Service</a>
+			<span>|</span>
+			<a href="/privacypolicy" data-link class="hover:underline">Privacy Policy</a>
 			<p>© 2026 Croiscendence</p>
-			<div><br></div>
- 		</footer>
+		</footer>
 	</template>
 
 	<template id="update-2fa-html">
-		<div>
-			<br>
-		</div>
-		<main class="flex">
-			<div class="bg-[linear-gradient(180deg,var(--color-amber-400)_20%,var(--color-amber-50)_20%)] 
-						ring-4 ring-amber-900 flex flex-col w-100 h-full rounded-lg mt-2 
-						mx-auto shadow-2xl items-center">
-				<div class="flex flex-row w-100 mt-3 justify-between">
-					<div class="w-5"></div>
-					<h1 class="text-3xl mx-auto font-bold text-amber-900
-						drop-shadow-lg" id="profile-pseudo">
-					</h1>
-					<a class="size-6 mt-2 justify-end mr-5 object-contain" href="/profile" data-link>
-						<img class="invert ring-1 p-0.5 ring-blue-950 rounded-md" src="src/image/back.png" alt="back">
+		<main class="flex-1 flex flex-col px-4">
+			<div class="bg-[linear-gradient(180deg,var(--color-amber-400)_20%,var(--color-amber-50)_20%)]
+						ring-4 ring-amber-900 flex flex-col w-full max-w-md rounded-lg mt-6 mx-auto shadow-2xl items-center pb-6">
+				<div class="flex w-full mt-3 items-center px-4">
+					<div class="w-6"></div>
+					<h1 class="text-2xl sm:text-3xl mx-auto font-bold text-amber-900 drop-shadow-lg" id="profile-pseudo"></h1>
+					<a href="/profile" data-link class="size-6">
+					<img class="invert ring-1 p-0.5 ring-blue-950 rounded-md" src="src/image/back.png" alt="back">
 					</a>
 				</div>
-				<a class="mt-2 object-contain">
-					<img class="ring-4 ring-amber-900 rounded-full shadow-xl" id="profile-avatar" src="" alt="Your avatar" width="150">
-				</a>
-				<div class="flex flex-col mt-6">
-					<!-- Update 2FA -->
-					<div class="flex flex-col shadow-sm text-amber-900 bg-amber-300/20
-								w-80 ring-1 ring-amber-900 rounded-lg mt-6 p-3">
-						<h2 class="font-bold mb-2 text-center">Two-Factor Authentication</h2>
-						<!-- Two-Factor Management Section -->
-						<div id="twofa-container" class="flex flex-col items-center mt-6">
-							<p id="twofa-status" class="font-bold text-amber-900 mb-2">2FA Status</p>
+				<img id="profile-avatar" src="" alt="Your avatar"
+					class="ring-4 ring-amber-900 rounded-full shadow-xl mt-4" width="140">
+				<div class="flex flex-col mt-6 w-full px-4">
+					<div class="bg-amber-300/20 ring-1 ring-amber-900 mx-6 rounded-lg p-4 text-amber-900">
+						<h2 class="font-bold mb-4 text-center">Two-Factor Authentication</h2>
+						<div id="twofa-container" class="flex flex-col items-center gap-3">
+							<p id="twofa-status" class="font-bold mb-2">2FA Status</p>
 							<img id="twofa-qr" class="hidden w-40 h-40 mb-2 border-2 border-amber-900 rounded-lg" alt="2FA QR Code">
+
 							<div class="flex gap-4">
-								<button id="twofa-enable-btn" class="btn bg-green-500 text-white px-4 py-2 rounded hidden">
-									Enable 2FA
-								</button>
-								<button id="twofa-disable-btn" class="btn bg-red-500 text-white px-4 py-2 rounded hidden">
-									Disable 2FA
-								</button>
+							<button id="twofa-enable-btn" class="btn bg-green-500 text-white px-4 py-2 rounded hidden">Enable 2FA</button>
+							<button id="twofa-disable-btn" class="btn bg-red-500 text-white px-4 py-2 rounded hidden">Disable 2FA</button>
 							</div>
 						</div>
-						<div id="twofa-verify-container" class="flex flex-col items-center mt-4 hidden">
-							<input
-								id="twofa-code-input"
-								maxlength="6"
-								placeholder="Enter 6-digit code"
-								class="border px-2 py-1 rounded w-32 text-center"
-							/>
-							<button id="twofa-verify-btn"
-								class="mt-2 bg-blue-500 text-white px-3 py-1 rounded">
-								Verify Code
+						<div id="twofa-verify-container" class="flex flex-col items-center mt-4 hidden gap-2">
+							<input id="twofa-code-input" maxlength="6" placeholder="Enter 6-digit code"
+								class="border px-2 py-1 rounded w-32 text-center">
+							<button id="twofa-verify-btn" class="bg-blue-500 text-white px-3 py-1 rounded">
+							Verify Code
 							</button>
 						</div>
-
 					</div>
-				</div>
-				<div>
-					<br>
 				</div>
 			</div>
 		</main>
-		<div>
-			<br>
-		</div>
-		<footer class="absolute bottom-4 w-full dark:text-white duration-300 text-center text-sm opacity-60">
-			<div><br></div>
-			<div>
-					<a href="/termsofservice" data-link class="hover:underline">Terms of Service</a>
-					<span>|</span>
-					<a href="/privacypolicy" data-link class="hover:underline">Privacy Policy</a>
-			</div>
+		<footer class="w-full text-center text-sm dark:text-white opacity-60 py-3">
+			<a href="/termsofservice" data-link class="hover:underline">Terms of Service</a>
+			<span>|</span>
+			<a href="/privacypolicy" data-link class="hover:underline">Privacy Policy</a>
 			<p>© 2026 Croiscendence</p>
-			<div><br></div>
- 		</footer>
+		</footer>
 	</template>
 
 	<template id="leaderboard">
-		<main class="h-[calc(100vh-112px)]">
-			<h1 class="h-[5%] text-center text-5xl text-amber-950">Leaderboard - TOP 50<h1>
-			<div class="h-[40%] flex flex-row items-end text-center pb-1 pt-6 w-[60%] mx-auto">
-				<div class="flex flex-col justify-between items-center w-1/3 bg-linear-to-br from-gray-300 via-slate-300 to-gray-400 mr-1 h-[85%] rounded-lg">
-					<h1 class="text-5xl text-gray-600 mt-2">#2</h1>
-					<div class="mb-1">
-						<img class="size-20 mx-auto rounded-full shadow-sm mb-5" id="avatar-2" src="src/image/croissant-white.png" alt="avatar">
-						<p class="text-3xl text-gray-600" id="pseudo-2">JustDemOn</p>
-						<p class="text-gray-600" id="elo-2">2500 CR</p>
+		<main class="flex-1 flex h-full flex-col px-4">
+			<div class="h-[50%] flex flex-col sm:flex-row items-end justify-center w-[60%] mx-auto pb-1 pt-6 gap-2">
+				<div class="relative flex flex-col hover:scale-105 transform transition-all shadow-[0_0_25px_rgba(234,179,8,0.6)] duration-300 justify-between items-center bg-linear-to-r from-yellow-400 via-yellow-300 to-yellow-500 w-full md:w-1/3 h-48 md:h-full rounded-lg p-2">
+					<h1 class="text-xl md:text-5xl text-yellow-700 mt-2">#1</h1>
+					<div class="mb-1 flex flex-col items-center">
+						<img class="w-20 h-20 md:w-20 md:h-20 rounded-full shadow-sm sm:mb-7" id="avatar-1" src="src/image/croissant-white.png" alt="avatar">
+						<p class="text-lg md:text-3xl text-yellow-700" id="pseudo-1">---</p>
+						<p class="text-yellow-700" id="elo-1">--- CR</p>
+					</div>
+					<div class="absolute inset-0 rounded-2xl overflow-hidden pointer-events-none">
+						<div class="absolute inset-0 bg-linear-to-tr from-transparent via-white/20 to-transparent -translate-x-full animate-[shimmer_3s_infinite] "></div>
 					</div>
 				</div>
-				<div class="flex flex-col justify-between items-center w-1/3 bg-linear-to-r from-yellow-400 via-yellow-300 to-yellow-500 mx-1 h-full rounded-lg">
-					<h1 class="text-5xl text-yellow-700 mt-2">#1</h1>
-					<div class="mb-1">
-						<img class="size-20 mx-auto rounded-full shadow-sm mb-7" id="avatar-1" src="src/image/croissant-white.png" alt="avatar">
-						<p class="text-3xl text-yellow-700" id="pseudo-1">JustDemOn</p>
-						<p class="text-yellow-700" id="elo-1">3400 CR</p>
+				<div class="relative flex flex-col hover:scale-105 transform transition-all duration-300 justify-between shadow-[0_0_25px_rgba(156,163,175,0.6)] items-center bg-linear-to-br from-gray-300 via-slate-300 to-gray-400 w-full md:w-1/3 h-48 md:h-[85%] rounded-lg p-2">
+					<h1 class="text-xl md:text-5xl text-gray-600 mt-2">#2</h1>
+					<div class="mb-1 flex flex-col items-center">
+						<img class="w-20 h-20 md:w-20 md:h-20 rounded-full shadow-sm sm:mb-5" id="avatar-2" src="src/image/croissant-white.png" alt="avatar">
+						<p class="text-lg md:text-3xl text-gray-600" id="pseudo-2">---</p>
+						<p class="text-gray-600" id="elo-2">--- CR</p>
+					</div>
+					<div class="absolute inset-0 rounded-2xl overflow-hidden pointer-events-none">
+						<div class="absolute inset-0 bg-linear-to-tr from-transparent via-white/20 to-transparent -translate-x-full animate-[shimmer_3s_infinite] "></div>
 					</div>
 				</div>
-				<div class="flex flex-col justify-between items-center w-1/3 bg-linear-to-r from-amber-700 via-orange-800 to-orange-900 ml-1 h-[75%] rounded-lg">
-					<h1 class="text-5xl text-amber-950 mt-2">#3</h1>
-					<div class="mb-1">
-						<img class="size-20 mx-auto rounded-full shadow-sm" id="avatar-3" src="src/image/croissant-white.png" alt="avatar">
-						<p class="text-3xl text-amber-950" id="pseudo-3">JustDemOn</p>
-						<p class="text-amber-950" id="elo-3">2300 CR</p>
+				<div class="relative flex flex-col hover:scale-105 transform transition-all duration-300 justify-between shadow-[0_0_25px_rgba(180,83,9,0.6)] items-center bg-linear-to-r from-amber-700 via-orange-800 to-orange-900 w-full md:w-1/3 h-48 md:h-[75%] rounded-lg p-2">
+					<h1 class="text-xl md:text-5xl text-amber-950 mt-2">#3</h1>
+					<div class="mb-1 flex flex-col items-center">
+						<img class="w-20 h-20 md:w-20 md:h-20 rounded-full shadow-sm" id="avatar-3" src="src/image/croissant-white.png" alt="avatar">
+						<p class="text-lg md:text-3xl text-amber-950" id="pseudo-3">---</p>
+						<p class="text-amber-950" id="elo-3">--- CR</p>
+					</div>
+					<div class="absolute inset-0 rounded-2xl overflow-hidden pointer-events-none">
+						<div class="absolute inset-0 bg-linear-to-tr from-transparent via-white/20 to-transparent -translate-x-full animate-[shimmer_3s_infinite] "></div>
 					</div>
 				</div>
 			</div>
-			<div class="h-[55%]">
-				<ul id="leaderboard-l" class="h-full pt-6 pb-6 overflow-scroll scrollbar-none">
+			<div class="h-[50%] w-full mx-auto">
+				<ul id="leaderboard-l" class="flex flex-col overflow-y-auto w-full scrollbar-none">
 				</ul>
 			</div>
 		</main>
+		<div id="your-position" class="w-[60%] mx-auto">
+			<div class="w-full h-0.5 bg-gray-400"></div>
+			  <section class="rounded-xl w-full mt-4 mx-auto mb-2 h-24 overflow-hidden
+					bg-linear-to-r from-amber-100 via-orange-100 to-yellow-100
+					border-2 border-amber-300 shadow-md hover:scale-105 transform transition-all duration-300">
+				<div class="flex flex-row justify-between items-center h-full px-4">
+					<div class="flex flex-row items-center gap-4">
+						<img id="your-avatar" class="w-16 h-16 rounded-full border-2 border-amber-400 shadow-sm" src="src/image/0.png" alt="avatar">
+						<p id="your-pseudo" class="text-xl font-semibold text-amber-900">- - -</p>
+					</div>
+					<div class="flex flex-row items-center gap-8">
+						<p id="your-elo" class="text-lg font-medium text-amber-800">- - -</p>
+						<p id="your-position" class="text-xl font-bold text-amber-900">#0</p>
+					</div>
+				</div>
+			</section>
+		</div>
+		<footer class="w-full text-center text-sm dark:text-white opacity-60 py-3">
+			<a href="/termsofservice" data-link class="hover:underline">Terms of Service</a>
+			<span>|</span>
+			<a href="/privacypolicy" data-link class="hover:underline">Privacy Policy</a>
+			<p>© 2026 Croiscendence</p>
+		</footer>
 	</template>
 
 	<template id="leaderboard-list">
-		<li class="bg-linear-to-r from-amber-50 via-orange-50 to-yellow-50 rounded-lg mx-auto border-2 border-amber-200 mb-1 h-24 w-[60%]">
-			<div class="flex flex-row justify-between h-full">
-				<div class="flex flex-row items-center">
-					<img id="avatar" class="mx-8 size-16 rounded-full" src="src/image/0.png" alt="avatar">
-					<p id="pseudo" class="text-xl">- - -</p>
+		<li id="background" class="rounded-xl w-[60%] mx-auto mb-2 h-24 overflow-hidden
+					bg-linear-to-r from-amber-50 via-orange-50 to-yellow-50
+					border-2 border-amber-200 shadow-md hover:scale-105 transform transition-all duration-300">
+			<div class="flex flex-row justify-between items-center h-full px-4">
+				<div class="flex flex-row items-center gap-4">
+					<img id="avatar" class="w-16 h-16 rounded-full border-2 border-amber-300 shadow-sm" src="src/image/0.png" alt="avatar">
+					<p id="pseudo" class="text-xl font-semibold text-amber-900">- - -</p>
 				</div>
-				<div class="flex flex-row items-center h-full">
-					<p id="elo">- - -</p>
-					<p id="position" class="mx-8 text-xl"></p>
+				<div class="flex flex-row items-center gap-8">
+					<p id="elo" class="text-lg font-medium text-amber-800">- - -</p>
+					<p id="position" class="text-xl font-bold text-amber-900">#0</p>
 				</div>
 			</div>
 		</li>
@@ -1396,15 +1372,11 @@
 			<button class="btn mx-auto w-32" id="pvai">Player VS AI</button>
 		</div>
 		<footer class="absolute bottom-4 w-full dark:text-white duration-300 text-center text-sm opacity-60">
-			<div><br></div>
-			<div>
-					<a href="/termsofservice" data-link class="hover:underline">Terms of Service</a>
-					<span>|</span>
-					<a href="/privacypolicy" data-link class="hover:underline">Privacy Policy</a>
-			</div>
+			<a href="/termsofservice" data-link class="hover:underline">Terms of Service</a>
+			<span>|</span>
+			<a href="/privacypolicy" data-link class="hover:underline">Privacy Policy</a>
 			<p>© 2026 Croiscendence</p>
-			<div><br></div>
- 		</footer>
+		</footer>
 	</template>
 
 	<template id="gameonlinehtml">
@@ -1414,16 +1386,113 @@
 		</div>
 		<div id="game-list"></div>
 		<footer class="absolute bottom-4 w-full dark:text-white duration-300 text-center text-sm opacity-60">
-			<div><br></div>
-			<div>
-					<a href="/termsofservice" data-link class="hover:underline">Terms of Service</a>
-					<span>|</span>
-					<a href="/privacypolicy" data-link class="hover:underline">Privacy Policy</a>
-			</div>
+			<a href="/termsofservice" data-link class="hover:underline">Terms of Service</a>
+			<span>|</span>
+			<a href="/privacypolicy" data-link class="hover:underline">Privacy Policy</a>
 			<p>© 2026 Croiscendence</p>
-			<div><br></div>
- 		</footer>
+		</footer>
 	</template>
+
+	<template id="end-game">
+		<div id="game-end-container"></div>
+	</template>
+
+	<template id="end-game-victory">
+		<section class="flex-1 flex items-center justify-center px-4 py-10">
+			<div class="w-full max-w-3xl flex flex-col gap-10">
+				<header class="text-center animate-fade-in">
+					<h1 class="text-5xl sm:text-6xl md:text-7xl font-extrabold text-transparent bg-clip-text bg-linear-to-r from-amber-300 via-orange-400 to-orange-600 drop-shadow-[0_5px_20px_rgba(251,191,36,0.35)]">
+						VICTOIRE
+					</h1>
+					<p class="mt-3 text-amber-950 dark:text-amber-200/70 text-sm sm:text-base">La partie est terminée</p>
+				</header>
+				<div class="rounded-2xl bg-amber-400/40 dark:bg-amber-950/40 backdrop-blur-md border border-amber-700/30 shadow-xl shadow-amber-900/40 px-6 py-8">
+					<h2 class="text-xl sm:text-2xl font-semibold text-center text-amber-950 dark:text-amber-100 mb-8">
+						Récapitulatif des scores
+					</h2>
+					<div class="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-10">
+						<div class="flex flex-col items-center px-8 py-6 scale-110 rounded-2xl 
+						bg-linear-to-r from-amber-500/30 to-orange-600/30 border border-amber-400 shadow-[0_0_30px_rgba(251,191,36,0.6)]">
+							<span id="winner-id" class="text-lg uppercase tracking-wide text-amber-950 dark:text-amber-300/70 mb-1">Joueur 1</span>
+							<span id="winner-score" class="text-4xl sm:text-5xl font-bold text-amber-800 dark:text-amber-100">11</span>
+							<span id="winner-elo" class="text-xs font-bold text-amber-800 dark:text-amber-100"></span>
+						</div>
+						<span class="text-3xl font-bold text-amber-950 dark:text-amber-500/50">VS</span>
+						<div class="flex flex-col items-center px-6 py-4 rounded-xl
+							bg-linear-to-r from-amber-500/30 to-orange-600/30 border border-amber-700/20 min-w-[120px]">
+							<span id="loser-id" class="text-xs uppercase tracking-wide text-amber-950 dark:text-amber-300/70 mb-1">Joueur 2</span>
+							<span id="loser-score" class="text-4xl sm:text-5xl font-bold text-amber-800 dark:text-amber-100">5</span>
+							<span id="loser-elo" class="text-xs font-bold text-amber-800 dark:text-amber-100"></span>
+						</div>
+					</div>
+					<p class="mt-6 text-center text-amber-800 dark:text-amber-200/70 text-sm sm:text-base">
+						Score final : <span id="final-score" class="font-semibold text-amber-950 dark:text-amber-100"></span>
+					</p>
+				</div>
+				<div class="flex flex-col sm:flex-row gap-4 justify-center">
+					<a href="/gameonline" data-link id="replay-button" class="btn px-10 py-4 text-lg  shadow-amber-900/50 transition-transform hover:scale-[1.02]">
+						Rejouer
+					</a>
+					<a href="/home" data-link class="text-center rounded-lg cursor-pointer block mt-10 duration-300 px-10 py-4 text-lg bg-amber-600/40 dark:bg-amber-950/50 hover:bg-amber-900/60 border border-amber-950/40 dark:border-amber-600/40 text-amber-950 dark:text-amber-100 transition-colors">
+						Retour à l'accueil
+					</a>
+				</div>
+			</div>
+		</section>
+	</template>
+
+	<template id="end-game-defeat">
+		<section class="flex-1 flex items-center justify-center px-4 py-10">
+			<div class="w-full max-w-3xl flex flex-col gap-10">
+				<header class="text-center animate-fade-in">
+					<h1 class="text-5xl sm:text-6xl md:text-7xl font-extrabold text-transparent bg-clip-text
+						bg-linear-to-r from-amber-700 via-orange-800 to-amber-900
+						drop-shadow-[0_5px_20px_rgba(180,83,9,0.35)]">
+						DÉFAITE
+					</h1>
+					<p class="mt-3 text-amber-950 dark:text-amber-300/60 text-sm sm:text-base">
+						La partie est terminée
+					</p>
+				</header>
+				<div class="rounded-2xl bg-amber-400/40 dark:bg-amber-950/50 backdrop-blur-md
+					border border-amber-800/30 shadow-xl shadow-amber-900/40 px-6 py-8">
+					<h2 class="text-xl sm:text-2xl font-semibold text-center text-amber-950 dark:text-amber-200 mb-8">
+						Récapitulatif des scores
+					</h2>
+					<div class="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-10">
+						<div class="flex flex-col items-center px-6 py-4 rounded-xl
+							bg-linear-to-r from-amber-500/30 to-orange-600/30 border border-amber-700/30 min-w-[120px]">
+							<span id="winner-id" class="text-xs uppercase tracking-wide text-amber-950 dark:text-amber-300/70 mb-1"></span>
+							<span id="winner-score" class="text-4xl sm:text-5xl font-bold text-amber-800 dark:text-amber-100"></span>
+							<span id="winner-elo" class="text-xs font-bold text-amber-800 dark:text-amber-100"></span>
+						</div>
+						<span class="text-3xl font-bold text-amber-600/40">VS</span>
+						<div class="flex flex-col items-center px-8 py-6 scale-110 rounded-2xl 
+							bg-linear-to-r from-amber-500/30 to-orange-600/30 border border-orange-800
+							shadow-[0_6px_28px_rgba(220,38,38,0.45)]">
+							<span id="loser-id" class="text-lg uppercase tracking-wide text-amber-950 dark:text-amber-300/70 mb-1"></span>
+							<span id="loser-score" class="text-4xl sm:text-5xl font-bold text-amber-800 dark:text-amber-100"></span>
+							<span id="loser-elo" class="text-xs font-bold text-amber-800 dark:text-amber-100"></span>
+						</div>
+					</div>
+					<p class="mt-6 text-center text-amber-800 dark:text-amber-300/70 text-sm sm:text-base">
+						Score final :
+						<span id="final-score" class="font-semibold text-amber-950 dark:text-amber-100"></span>
+					</p>
+				</div>
+				<div class="flex flex-col sm:flex-row gap-4 justify-center">
+					<a href="/gameonline" id="replay-button" data-link class="btn px-10 py-4 text-lg  shadow-amber-900/50 transition-transform hover:scale-[1.02]">
+						Rejouer
+					</a>
+					<a href="/home" data-link class="text-center rounded-lg cursor-pointer block mt-10 duration-300 px-10 py-4 text-lg bg-amber-600/40 dark:bg-amber-950/50 hover:bg-amber-900/60 border border-amber-950/40 dark:border-amber-600/40 text-amber-950 dark:text-amber-100 transition-colors">
+						Retour à l'accueil
+					</a>
+				</div>
+			</div>
+		</section>
+	</template>
+
+
 
 	<template id="pongmatchhtml">
 		<h1>Quick game</h1>
@@ -1453,15 +1522,11 @@
 			</div>
 		</div>
 		<footer class="absolute bottom-4 w-full dark:text-white duration-300 text-center text-sm opacity-60">
-			<div><br></div>
-			<div>
-					<a href="/termsofservice" data-link class="hover:underline">Terms of Service</a>
-					<span>|</span>
-					<a href="/privacypolicy" data-link class="hover:underline">Privacy Policy</a>
-			</div>
+			<a href="/termsofservice" data-link class="hover:underline">Terms of Service</a>
+			<span>|</span>
+			<a href="/privacypolicy" data-link class="hover:underline">Privacy Policy</a>
 			<p>© 2026 Croiscendence</p>
-			<div><br></div>
- 		</footer>
+		</footer>
 	</template>
 
 	<template id="tournamenthtml">
@@ -1484,15 +1549,11 @@
 			<button id="back-to-home" class="btn mx-auto w-48" data-link href="/home">Back to Home</button>
 		</div>
 		<footer class="absolute bottom-4 w-full dark:text-white duration-300 text-center text-sm opacity-60">
-			<div><br></div>
-			<div>
-					<a href="/termsofservice" data-link class="hover:underline">Terms of Service</a>
-					<span>|</span>
-					<a href="/privacypolicy" data-link class="hover:underline">Privacy Policy</a>
-			</div>
+			<a href="/termsofservice" data-link class="hover:underline">Terms of Service</a>
+			<span>|</span>
+			<a href="/privacypolicy" data-link class="hover:underline">Privacy Policy</a>
 			<p>© 2026 Croiscendence</p>
-			<div><br></div>
- 		</footer>
+		</footer>
 	</template>
 
 	<template id="bracketshtml">
@@ -1547,15 +1608,11 @@
 			</div>
 		</div>
 		<footer class="absolute bottom-4 w-full dark:text-white duration-300 text-center text-sm opacity-60">
-			<div><br></div>
-			<div>
-					<a href="/termsofservice" data-link class="hover:underline">Terms of Service</a>
-					<span>|</span>
-					<a href="/privacypolicy" data-link class="hover:underline">Privacy Policy</a>
-			</div>
+			<a href="/termsofservice" data-link class="hover:underline">Terms of Service</a>
+			<span>|</span>
+			<a href="/privacypolicy" data-link class="hover:underline">Privacy Policy</a>
 			<p>© 2026 Croiscendence</p>
-			<div><br></div>
- 		</footer>
+		</footer>
 	</template>
 
 	<template id="errorhtml">
@@ -1568,13 +1625,13 @@
 
 	<template id="dashboardhtml">
 		<div class="flex flex-row">
-			<section class="bg-amber-100/80 mt-5 ml-2 w-[50%] h-[80vh] flex flex-col ring-2 ring-amber-400 items-center rounded-lg">	<h1 class="font-bold text-xl mb-1 text-amber-900">History - 20 last games :</h1>
+			<section class="bg-amber-100/80 dark:bg-amber-900/60 mt-5 ml-2 w-[50%] h-[80vh] flex flex-col ring-2 ring-amber-400 dark:ring-amber-900 items-center rounded-lg">	<h1 class="font-bold text-xl dark:text-amber-50 mb-1 text-amber-900">History - 20 last games :</h1>
 				<div id="game-list" class="w-[90%] h-[90%] px-1 overflow-y-auto scrollbar-none mb-2 ring-2
-					bg-amber-50 rounded-lg ring-amber-200 shadow-lg">
+					bg-amber-50 dark:bg-yellow-700/20 rounded-lg ring-amber-200 dark:ring-amber-900 shadow-lg">
 				</div>
 			</section>
 			<div class="w-[50%] ml-2">
-				<section class="flex flex-row items-center ring-4 ring-amber-400 bg-amber-50 mt-5 mx-8 h-[30%] rounded-2xl">
+				<section class="flex flex-row items-center ring-4 ring-amber-400 dark:ring-amber-900 bg-amber-50 dark:bg-amber-100 mt-5 mx-8 h-[30%] rounded-2xl">
 						<img id="rank-img" class="size-40 rounded-full mx-4 border-2 w-[23%]" src="" alt="icone-rank">
 						<div class="w-[37%] mx-2">
 							<p class="text-4xl text-amber-900 pb">My Rank: <br></p>
@@ -1606,24 +1663,23 @@
 				</section>
 			</div>
 		</div>
-		<footer class="dark:text-white text-center text-sm opacity-60">
-			<div><br></div>
-			<div>
-					<a href="/termsofservice" data-link class="hover:underline">Terms of Service</a>
-					<span>|</span>
-					<a href="/privacypolicy" data-link class="hover:underline">Privacy Policy</a>
-			</div>
+		<footer class="absolute bottom-4 w-full dark:text-white duration-300 text-center text-sm opacity-60">
+			<a href="/termsofservice" data-link class="hover:underline">Terms of Service</a>
+			<span>|</span>
+			<a href="/privacypolicy" data-link class="hover:underline">Privacy Policy</a>
 			<p>© 2026 Croiscendence</p>
-			<div><br></div>
- 		</footer>
+		</footer>
 	</template>
 
 	<template id="history-dashboard">
 		<div class="flex items-center gap-4 w-1/3">
 			<img id="winnerpath" src="" alt="winner avatar"
-				class="size-10 lg:size-16 rounded-full border-2 border-green-500">
+				class="size-10 lg:size-16 hidden sm:block rounded-full border-2 border-green-500">
 			<div>
-				<p id="winnerpseudo" class="text-xs lg:text-xl font-semibold text-green-500"></p>
+				<div class="flex flex-col">
+					<p id="winnerpseudo" class="text-xs lg:text-xl font-semibold text-green-500"></p>
+					<p id="winnerelo" class="text-xs lg:text-xl text-green-500"></p>
+				</div>
 				<p id="winnerscore" class="text-sm lg:text-2xl bg-amber-600/30 rounded-sm w-3 lg:w-6 text-center ring-1 ring-amber-600/50 text-amber-900 font-bold"></p>
 			</div>
 		</div>
@@ -1642,19 +1698,22 @@
 
 		<div class="flex items-center gap-4 w-1/3 justify-end">
 			<div class="">
-				<p id="loserpseudo" class="text-xs lg:text-xl font-semibold text-red-500"></p>
+				<div class="flex flex-col">
+					<p id="loserpseudo" class="text-xs lg:text-xl font-semibold text-red-500"></p>
+					<p id="loserelo" class="text-xs lg:text-xl text-red-500"></p>
+				</div>
 				<p id="loserscore" class="text-sm lg:text-2xl bg-amber-600/30 rounded-sm ring-1 ring-amber-600/50 w-3 lg:w-6 text-center ml-auto text-amber-900 font-bold"></p>
 			</div>
 			<img id="loserpath" src="" alt="loser avatar"
-				class="size-10 lg:size-16 rounded-full object-cover border-2 border-red-500">
+				class="size-10 lg:size-16 hidden sm:block rounded-full object-cover border-2 border-red-500">
 		</div>	
 	</template>
 
 			
 	<template id="chat-template">
-		<div id="chat-window" class="hidden flex flex-col w-80 h-96 bg-amber-100 rounded-xl overflow-hidden shadow-lg mb-0.5 dark:bg-yellow-950/90">
-			<header id="headchat" class="bg-amber-500 h-12 text-center dark:bg-yellow-950 dark:border-amber-100/60 dark:border-b-1">
-				<p class="text center text-amber-50 text-xl pt-2 dark:">General Chat</p>
+		<div id="chat-window" class="hidden flex flex-col w-80 h-96 2xl:w-100 2xl:h-120 bg-amber-100 rounded-xl overflow-hidden shadow-lg mb-0.5 dark:bg-yellow-950/90">
+			<header id="headchat" class="bg-amber-500 h-12 text-center dark:bg-yellow-950 dark:border-amber-100/60 dark:border-b">
+				<p class="text center text-amber-50 text-xl pt-2 2xl:text-2xl">General Chat</p>
 			</header>
 			<div id="chat-box" class="flex-1 p-3  scrollbar-custom overflow-y-auto space-y-2 mt-2">
 				<div id="message-list" class=""></div>
@@ -1669,28 +1728,28 @@
 				<button class="bg-amber-100 px-4 text-amber-900 hover:bg-amber-500 dark:bg-yellow-950 dark:text-amber-100 dark:hover:bg-amber-100 dark:hover:text-amber-800">Send</button>
 			</form>
 		</div>
-		<div id="chat-bar" class="bg-amber-800 hover:bg-amber-900 text-white px-4 py-2 rounded-lg shadow cursor-pointer w-32 text-center">
+		<div id="chat-bar" class="bg-amber-800 hover:bg-amber-900 text-white px-4 py-2 rounded-lg shadow cursor-pointer w-32 text-center 2xl:text-2xl 2xl:w-72">
 			General Chat
 		</div>
 	</template>
-
+ 
 	<template id="chat-message">
 		<div class="bg-amber-200/70 p-2 rounded-lg wrap-break-word max-w-[85%] dark:bg-yellow-100/80">
 			<div class="flex items-center justify-between">
-				<span id="chat_pseudo" class="font-semibold text-amber-600 dark:text-amber-900"></span>
-				<span id="chat_date" class="text-xs italic text-gray-600"></span>
+				<span id="chat_pseudo" class="font-semibold 2xl:text-xl text-amber-600 dark:text-amber-900"></span>
+				<span id="chat_date" class="text-xs 2xl:text-base italic text-gray-600"></span>
 			</div>
-			<div id="message" class="text-amber-900"></div>
+			<div id="message" class="text-amber-900 2xl:text-lg"></div>
 		</div>
 	</template>
 
 	<template id="my-chat-message">
 		<div class="bg-amber-500 p-2 rounded-lg wrap-break-word max-w-[85%] ml-auto dark:bg-amber-800">
 			<div class="flex items-center justify-between">
-				<span id="chat_pseudo" class="font-semibold text-amber-50" ></span>
-				<span id="chat_date" class="text-xs italic text-gray-200"></span>
+				<span id="chat_pseudo" class="font-semibold text-amber-50 2xl:text-xl" ></span>
+				<span id="chat_date" class="text-xs 2xl:text-base italic text-gray-200"></span>
 			</div>
-			<div id="message" class="text-amber-900  dark:text-amber-100"></div>
+			<div id="message" class="text-amber-900 2xl:text-lg dark:text-amber-100"></div>
 		</div>
 	</template>
 
@@ -1703,6 +1762,12 @@
 			
 			</section>
 		</main>
+		<footer class="absolute bottom-4 w-full dark:text-white duration-300 text-center text-sm opacity-60">
+			<a href="/termsofservice" data-link class="hover:underline">Terms of Service</a>
+			<span>|</span>
+			<a href="/privacypolicy" data-link class="hover:underline">Privacy Policy</a>
+			<p>© 2026 Croiscendence</p>
+		</footer>
 	</template>
 
 	<template id="locked-achievement">
@@ -1730,7 +1795,6 @@
 			</div>
 			<div id="rarity" class="absolute top-3 right-3 px-3 py-1 rounded-full text-sm font-semibold
 				bg-white/30 backdrop-blur text-white border border-amber-600/30">
-				
 			</div>
 			<div class="absolute inset-0 rounded-2xl overflow-hidden pointer-events-none">
 				<div class="absolute inset-0 bg-linear-to-tr from-transparent via-white/20 to-transparent -translate-x-full animate-[shimmer_3s_infinite] "></div>
@@ -1755,5 +1819,92 @@
 			</div>
 		</div>
 	</template>
+
+	<template id="success-toast">
+		<div
+			id="toast-success"
+			class="toast fixed top-[125px] right-5 z-50 min-w-[280px] flex items-center gap-3 p-4 rounded-lg text-black
+				bg-linear-to-r from-green-300 to-green-400 shadow-xl opacity-0 translate-x-5 mr-8 scale-95
+				transition-all duration-300">
+			<span id="icon" class="text-xl">✅</span>
+			<span id="message" class="flex-1 font-medium text-sm"></span>
+		</div>
+	</template>
+
+	<template id="error-toast">
+		<div
+			id="toast-warning"
+			class="toast fixed top-[125px] right-5 z-50 min-w-[280px] flex items-center gap-3 p-4 rounded-lg text-black
+				bg-linear-to-r from-red-400 to-red-500 shadow-xl opacity-0 translate-x-5 scale-95
+				transition-all duration-300">
+			<span id="icon" class="text-xl grayscale-25">❌</span>
+			<span id="message" class="flex-1 font-medium text-sm"></span>
+			<button id="close"
+				class="close ml-3 text-black font-bold hover:text-gray-900 cursor-pointer transition-colors">
+				✖
+			</button>
+		</div>
+	</template>
+
+	<template id="warning-toast">
+		<div
+			id="toast-warning"
+			class="toast fixed top-[125px] right-5 z-50 min-w-[280px] flex items-center gap-3 p-4 rounded-lg text-black
+				bg-linear-to-r from-amber-400 to-amber-500 shadow-xl opacity-0 translate-x-5 scale-95
+				transition-all duration-300">
+			<span id="icon" class="text-xl">❗</span>
+			<span id="message" class="flex-1 font-medium text-sm"></span>
+			<button id="close"
+				class="close ml-3 text-black font-bold hover:text-gray-900 cursor-pointer transition-colors">
+				✖
+			</button>
+		</div>
+	</template>
+
+	<template id="secret-achievement-toast">
+		<div id="achievement-toast"
+			class="toast fixed top-1/2 mt-10 left-1/2 z-50 min-w-[280px] flex items-center gap-3 p-4 rounded-lg text-white
+            bg-linear-to-r from-violet-700 to-indigo-800 shadow-[0_0_30px_rgba(124,58,237,0.5)]
+            opacity-0 translate-x-[-50%] translate-y-[-50%] scale-95
+            transition-all duration-300">
+			<img src="/src/image/coupe.png" alt="succes" class="h-8 w-8 invert">
+			<span id="message" class="flex-1 font-medium text-sm"></span>
+			<button id="close"
+				class="close ml-3 text-black font-bold hover:text-gray-900 cursor-pointer transition-colors">
+				✖
+			</button>
+		</div>
+	</template>
+
+	<template id="common-achievement-toast">
+		<div id="achievement-toast"
+			class="toast fixed top-1/2 mt-10 left-1/2 z-50 min-w-[280px] flex items-center gap-3 p-4 rounded-lg text-white
+            bg-linear-to-r from-amber-400 to-amber-500 shadow-[0_0_25px_rgba(217,119,6,0.5)]
+            opacity-0 translate-x-[-50%] translate-y-[-50%] scale-95
+            transition-all duration-300">
+			<img src="/src/image/coupe.png" alt="succes" class="h-8 w-8 invert">
+			<span id="message" class="flex-1 font-medium text-sm"></span>
+			<button id="close"
+				class="close ml-3 text-black font-bold hover:text-gray-900 cursor-pointer transition-colors">
+				✖
+			</button>
+		</div>
+	</template>
+
+	<template id="rare-achievement-toast">
+		<div id="achievement-toast"
+			class="toast fixed top-1/2 mt-10 left-1/2 z-50 min-w-[280px] flex items-center gap-3 p-4 rounded-lg text-white
+            bg-linear-to-r from-amber-500 to-orange-500 shadow-[0_0_25px_rgba(217,119,6,0.5)]
+            opacity-0 translate-x-[-50%] translate-y-[-50%] scale-95
+            transition-all duration-300">
+			<img src="/src/image/coupe.png" alt="succes" class="h-8 w-8 invert">
+			<span id="message" class="flex-1 font-medium text-sm"></span>
+			<button id="close"
+				class="close ml-3 text-black font-bold hover:text-gray-900 cursor-pointer transition-colors">
+				✖
+			</button>
+		</div>
+	</template>
+
 
 </html>

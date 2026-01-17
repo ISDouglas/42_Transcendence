@@ -41,6 +41,7 @@ import { Achievements } from "./DB/achievements";
 import { UserStats } from "./DB/users_stats";
 import { UserAchievements } from "./DB/users_achievements";
 import { getAchivementInfo } from "./routes/achievements/achievementInfo";
+import { getEndGameInfo } from "./routes/endgame/endgame";
 
 export const db = new ManageDB("./back/DB/database.db");
 export const users = new Users(db);
@@ -279,11 +280,15 @@ fastify.get("/api/private/dashboard", async (request, reply) => {
 });
 
 fastify.get("/api/private/leaderboard", async (request, reply) => {
-	await leaderboardInfo(reply);
+	await leaderboardInfo(request, reply);
 });
 
 fastify.get("/api/private/achievement", async (request, reply) => {
 	await getAchivementInfo(request, reply);
+});
+
+fastify.get("/api/private/endgame", async (request, reply) => {
+	await getEndGameInfo(request, reply);
 });
 
 fastify.post("/api/twofa", async (request, reply) => {
@@ -307,12 +312,21 @@ async function lunchDB()
 	await users.CreateUserIA();
 	await users.CreateUserGuest();
 	const hashedPassword = await bcrypt.hash("42", 12);
-	users.addUser("42", "42", hashedPassword, 2800);
+	users.addUser("42", "42", hashedPassword, 200);
 	users.addUser("43", "43", hashedPassword, 2800);
-	
+	users.addUser("44", "44", hashedPassword, 2800);
+	users.addUser("45", "45", hashedPassword, 2800);
+	users.addUser("420", "420", hashedPassword, 200);
+	users.addUser("430", "430", hashedPassword, 2800);
+	users.addUser("440", "440", hashedPassword, 2800);
+	users.addUser("450", "450", hashedPassword, 2800);
+	users.addUser("4200", "402", hashedPassword, 200);
+	users.addUser("4300", "403", hashedPassword, 2800);
+	users.addUser("4400", "404", hashedPassword, 2800);
+	users.addUser("4500", "405", hashedPassword, 2800);
+	0
 	await generalChat.deleteChatTableAndTrigger();
-	await generalChat.createChatTable();
-	await generalChat.limitChatMessage();
+	await generalChat.createChatTableAndTrigger();
 	
 	// await friends.deleteFriendTable();
 	await friends.createFriendTable();
