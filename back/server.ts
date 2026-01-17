@@ -10,7 +10,7 @@ import fastifyCookie from "@fastify/cookie";
 import { checkAuth, tokenOK } from "./middleware/jwt";
 import { collapseTextChangeRangesAcrossMultipleVersions } from "typescript";
 import bcrypt from "bcryptjs";
-import { createGame, joinGame, displayGameList, getGameType } from "./routes/game/serverGame";
+import { createGame, joinGame, getGameType, isCreator } from "./routes/game/serverGame";
 import fs from "fs";
 import { Tournament } from './DB/tournament';
 import { uploadPendingTournaments } from "./routes/tournament/tournament.service";
@@ -196,6 +196,20 @@ fastify.post("/api/private/friend/search", async( request: FastifyRequest, reply
 	await searchUser(request, reply);
 })
 
+fastify.post("/api/private/game/onlinegame", async (request, reply) => {
+	const { localMode, type } = request.body as { localMode: boolean, type: "Local" | "AI" | "Online" | "Tournament" };
+	const playerId = request.user?.user_id as any;
+	let gameId: number;
+	const res = isCreator(playerId);
+	console.log("res onlinegame: ", res);
+	if (res == 0)
+		gameId = createGame(Number(playerId), localMode, type, { vsAI: false });
+	else
+		gameId = res;
+
+	reply.send({ gameId });
+});
+
 fastify.post("/api/private/game/create", async (request, reply) => {
 	const { localMode, type } = request.body as { localMode: boolean, type: "Local" | "AI" | "Online" | "Tournament" };
 	const playerId = request.user?.user_id as any;
@@ -215,11 +229,6 @@ fastify.post("/api/private/game/join", async (request, reply) => {
 	const id = Number(gameId);
 	const res = joinGame(Number(playerId), id);
 	reply.send({ res });
-});
-
-fastify.get("/api/private/game/list", async (request, reply) => {
-	const list = await displayGameList();
-	return { games: list };
 });
 
 fastify.post("/api/private/game/type", async (request, reply) => {

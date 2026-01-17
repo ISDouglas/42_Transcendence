@@ -8,67 +8,60 @@ export function GameOnlineView(): string {
 export function GameOnlineinit() {
 	const createGameButton = document.getElementById("create-onlinegame");
 	createGameButton?.addEventListener("click", async () => {
-		const { gameId } = await genericFetch("/api/private/game/create", {
+		const { gameId } = await genericFetch("/api/private/game/onlinegame", {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify({ localMode: false, type: "Online" })
 		});
-		navigateTo(`/pongmatch/${gameId}`);
-	});
-
-	const gameListButton = document.getElementById("display-game-list");
-	gameListButton?.addEventListener("click", async () => {
-		loadGames();
-	});
-}
-
-async function loadGames()
-{
-	const { games } = await genericFetch("/api/private/game/list");
-	renderGameList(games);
-}
-
-function renderGameList(games: any[]) {
-	const container = document.getElementById("game-list");
-	if (!container) return;
-
-	if (games.length === 0) {
-		container.innerHTML = "<p>Aucune partie disponible.</p>";
-		return;
-	}
-
-	container.innerHTML = games.map(game => `
-	<div class="game-item">
-		<p>Game #${game.id}</p>
-		<p>Status : ${game.state}</p>
-		<p>Date : ${game.createdAt}</p>
-		<button data-game-id="${game.id}" class="join-game-btn btn w-32">Rejoindre</button>
-	</div>
-	`).join("");
-
-	document.querySelectorAll(".join-game-btn").forEach(btn => {
-	btn.addEventListener("click", async () => {
-		const id = (btn as HTMLElement).dataset.gameId;
-		let res;
-		try
-		{
-			res = await genericFetch("/api/private/game/join", {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({
-					gameId: id
-				})
-			});
-			console.log("Saved data:", res);
-		} catch (err) {
-			console.error("Error saving game:", err);
-			showToast(err, "error", 3000);
-		}
-		console.log("res : ", res.res, " | type : ", typeof(res.res));
-		if (res.res == 0)
-			navigateTo(`/pongmatch/${id}`);
-		else
+		if (gameId == -1)
 			alert("Your account is already in game.");
+		else
+			navigateTo(`/pongmatch/${gameId}`);
 	});
-	});
+
 }
+
+// function renderGameList(games: any[]) {
+// 	const container = document.getElementById("game-list");
+// 	if (!container) return;
+
+// 	if (games.length === 0) {
+// 		container.innerHTML = "<p>Aucune partie disponible.</p>";
+// 		return;
+// 	}
+
+// 	container.innerHTML = games.map(game => `
+// 	<div class="game-item">
+// 		<p>Game #${game.id}</p>
+// 		<p>Status : ${game.state}</p>
+// 		<p>Date : ${game.createdAt}</p>
+// 		<button data-game-id="${game.id}" class="join-game-btn btn w-32">Rejoindre</button>
+// 	</div>
+// 	`).join("");
+
+// 	document.querySelectorAll(".join-game-btn").forEach(btn => {
+// 	btn.addEventListener("click", async () => {
+// 		const id = (btn as HTMLElement).dataset.gameId;
+// 		let res;
+// 		try
+// 		{
+// 			res = await genericFetch("/api/private/game/join", {
+// 				method: "POST",
+// 				headers: { "Content-Type": "application/json" },
+// 				body: JSON.stringify({
+// 					gameId: id
+// 				})
+// 			});
+// 			console.log("Saved data:", res);
+// 		} catch (err) {
+// 			console.error("Error saving game:", err);
+// 			showToast(err, "error", 3000);
+// 		}
+// 		console.log("res : ", res.res, " | type : ", typeof(res.res));
+// 		if (res.res == 0)
+// 			navigateTo(`/pongmatch/${id}`);
+// 		else
+// 			alert("Your account is already in game.");
+// 	});
+// 	});
+// }

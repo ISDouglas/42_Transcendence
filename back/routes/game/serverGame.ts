@@ -118,21 +118,37 @@ export function createGame(PlayerId: number, isLocal: boolean, type: "Local" | "
 	return gameId;
 }
 
-export async function displayGameList()
+export function isCreator(playerId: number)
 {
-	const list: any = [];
-
+	let count: number = 0;
 	for (const game of games_map.values()) {
-		if (game.status == "waiting" || game.status == "disconnected")
+		if (game.idPlayer1 === playerId || game.idPlayer2 === playerId)
+			count++;
+	}
+	if (count > 0)
+		return -1;
+	
+	let id: number = 1;
+	while (games_map.has(id))
+		id++;
+	if (id > 1)
+		id--;
+
+	const game = games_map.get(id);
+	if (game)
+	{
+		if (game.idPlayer2 == 0)
 		{
-			list.push({
-				id: game.id,
-				state: game.status,
-				createdAt: game.gameDate
-			});
+			if (game.idPlayer1 != playerId)
+			{
+				game.idPlayer2 = playerId;
+				return id;
+			}
+			else
+				return -1;
 		}
 	}
-	return list;
+	return 0;
 }
 
 export function joinGame(playerId: number, gameId: number) : number

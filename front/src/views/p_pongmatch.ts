@@ -1,6 +1,6 @@
 import { GameRenderer } from "../game/gameRenderer";
 import { GameNetwork } from "../game/gameNetwork";
-import { loadHeader, navigateTo, getPreviousPath } from "../router";
+import { loadHeader, navigateTo, getPreviousPath, getBeforePreviousPath, setBeforePreviousPath } from "../router";
 import { GameInstance } from "../game/gameInstance";
 
 let renderer: GameRenderer | null = null;
@@ -14,7 +14,10 @@ export function PongMatchView(params?: any): string {
 
 export async function initPongMatch(params?: any) {
 	const prev = getPreviousPath();
-	if (prev === null || (!prev.startsWith("/gameonline") && !prev.startsWith("/brackets") && !prev.startsWith("/pongmatch")))
+	let beforePrev = getBeforePreviousPath();
+	console.log("prev : ", prev);
+	console.log("beforePrev : ", beforePrev);
+	if (prev === null || beforePrev === null || !beforePrev.startsWith("/gameonline") || !prev.startsWith("/pongmatch"))
 	{
 		navigateTo("/home");
 		return;

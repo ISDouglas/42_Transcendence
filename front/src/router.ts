@@ -116,6 +116,16 @@ export function getPreviousPath() {
 	return stack[stack.length - 1] ?? null;
 }
 
+export function getBeforePreviousPath() {
+	const stack = getHistoryStack();
+	return stack[stack.length - 2] ?? null;
+}
+
+export function setBeforePreviousPath(path: string) {
+	const stack = getHistoryStack();
+	stack[stack.length - 2] = path;
+}
+
 export async function checkLogStatus(): Promise<LogStatusAndInfo> {
 	try	{	
 		const res = await fetch("/api/checkLogged", {
@@ -250,6 +260,10 @@ export async function router() {
 
 		navigateTo("/error");
 		return;
+	}
+	if (window.location.pathname === "/gameonline") {
+		const stack = getHistoryStack();
+		stack.push("/setupgame");
 	}
 	if (location.pathname !== "/logout") {
 		const auth: LogStatusAndInfo = await checkLogStatus();
