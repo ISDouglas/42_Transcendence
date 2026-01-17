@@ -63,7 +63,6 @@ const publicPath = ["/", "/login", "/register", "/logout", "/registerok", "/oaut
 
 let currentRoute: any = null;
 let currentPath: string;
-let previousPath: string | null = null;
 
 export interface headerResponse {
 	pseudo: string;
@@ -85,20 +84,36 @@ const nav = performance.getEntriesByType("navigation")[0] as PerformanceNavigati
 if (nav && nav.type === "reload")
 	isReloaded = true;
 
+const HISTORY_KEY = "historyStack";
+
+function getHistoryStack(): string[] {
+	return JSON.parse(sessionStorage.getItem(HISTORY_KEY) ?? "[]");
+}
+
+function saveHistoryStack(stack: string[]) {
+	sessionStorage.setItem(HISTORY_KEY, JSON.stringify(stack));
+}
 
 
 export function navigateTo(url: string) {
 	const state = { from: window.location.pathname };
-	previousPath = window.location.pathname + window.location.search;
-	console.log("previousPath : ", previousPath);
 	history.pushState(state, "", url);
 	currentPath = url;
+
+	const stack = getHistoryStack();
+	stack.push(currentPath);
+	if (stack.length > 10) {
+		stack.shift();
+	}
+	saveHistoryStack(stack);
+
 	window.scrollTo(0, 0);
 	router().catch(err => console.error("Router error:", err));;
 }
 
 export function getPreviousPath() {
-	return previousPath;
+	const stack = getHistoryStack();
+	return stack[stack.length - 1] ?? null;
 }
 
 export async function checkLogStatus(): Promise<LogStatusAndInfo> {
@@ -188,7 +203,7 @@ export async function loadHeader(auth: LogStatusAndInfo) {
 	{
 		displayPseudoHeader(auth.user!, auth!.notif);
 		initSwitch();
-	}	
+	}
 }
 
 export function displayPseudoHeader(result: headerResponse, notif: boolean)

@@ -119,7 +119,7 @@ export async function displayGameList()
 	const list: any = [];
 
 	for (const game of games_map.values()) {
-		if (game.status == "waiting")
+		if (game.status == "waiting" || game.status == "disconnected")
 		{
 			list.push({
 				id: game.id,

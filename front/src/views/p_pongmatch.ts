@@ -14,8 +14,7 @@ export function PongMatchView(params?: any): string {
 
 export async function initPongMatch(params?: any) {
 	const prev = getPreviousPath();
-	console.log("previous page : ", prev);
-	if (prev === null || (!prev.startsWith("/gameonline") && !prev.startsWith("/brackets")))
+	if (prev === null || (!prev.startsWith("/gameonline") && !prev.startsWith("/brackets") && !prev.startsWith("/pongmatch")))
 	{
 		navigateTo("/home");
 		return;

@@ -4322,8 +4322,10 @@ function PongMatchView(params) {
 }
 async function initPongMatch(params) {
   const prev = getPreviousPath();
-  console.log("previous page : ", prev);
-  if (prev === null || !prev.startsWith("/gameonline") && !prev.startsWith("/brackets")) {
+  const beforePrev = getBeforePreviousPath();
+  console.log("prev : ", prev);
+  console.log("beforePrev : ", beforePrev);
+  if (prev === null || !prev.startsWith("/gameonline") && !prev.startsWith("/brackets") && !prev.startsWith("/pongmatch")) {
     navigateTo("/home");
     return;
   }
@@ -5849,18 +5851,33 @@ var init_p_achievement = __esm({
 });
 
 // front/src/router.ts
+function getHistoryStack() {
+  return JSON.parse(sessionStorage.getItem(HISTORY_KEY) ?? "[]");
+}
+function saveHistoryStack(stack) {
+  sessionStorage.setItem(HISTORY_KEY, JSON.stringify(stack));
+}
 function navigateTo(url2) {
   const state = { from: window.location.pathname };
-  previousPath = window.location.pathname + window.location.search;
-  console.log("previousPath : ", previousPath);
   history.pushState(state, "", url2);
   currentPath = url2;
+  const stack = getHistoryStack();
+  stack.push(currentPath);
+  if (stack.length > 10) {
+    stack.shift();
+  }
+  saveHistoryStack(stack);
   window.scrollTo(0, 0);
   router().catch((err) => console.error("Router error:", err));
   ;
 }
 function getPreviousPath() {
-  return previousPath;
+  const stack = getHistoryStack();
+  return stack[stack.length - 1] ?? null;
+}
+function getBeforePreviousPath() {
+  const stack = getHistoryStack();
+  return stack[stack.length - 2] ?? null;
 }
 async function checkLogStatus() {
   try {
@@ -6047,7 +6064,7 @@ async function popState3() {
     currentPath = path;
   await router();
 }
-var routes, publicPath, currentRoute, currentPath, previousPath, isReloaded, nav;
+var routes, publicPath, currentRoute, currentPath, isReloaded, nav, HISTORY_KEY;
 var init_router = __esm({
   "front/src/router.ts"() {
     "use strict";
@@ -6107,11 +6124,11 @@ var init_router = __esm({
     ];
     publicPath = ["/", "/login", "/register", "/logout", "/registerok", "/oauth/callback", "/twofa"];
     currentRoute = null;
-    previousPath = null;
     isReloaded = false;
     nav = performance.getEntriesByType("navigation")[0];
     if (nav && nav.type === "reload")
       isReloaded = true;
+    HISTORY_KEY = "historyStack";
   }
 });
 
