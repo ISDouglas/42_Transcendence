@@ -4905,6 +4905,12 @@ var init_chatNetwork = __esm({
       disconnect() {
         this.socket?.disconnect();
       }
+      loadStatus() {
+        console.log("status upadta");
+        this.socket.on("statusUpdate", async (data) => {
+          getOnlineStatus(online);
+        });
+      }
     };
   }
 });
@@ -5124,7 +5130,7 @@ async function search(memberSearched, myfriends) {
     });
     listedMember.innerHTML = "";
     if (existedMember.length === 0)
-      listedMember.innerHTML = "<li>No result</li>";
+      listedMember.innerHTML = `<li class="text-base md:text-lg xl:text-xl 2xl:text-2xl italic text-center dark:text-amber-50 text-amber-800">No result</li>`;
     else {
       existedMember.forEach((member) => {
         const template = document.getElementById("list-search");
@@ -5219,7 +5225,7 @@ function pendingFr(pendingFriends) {
   if (!container)
     return;
   if (pendingFriends.length === 0) {
-    container.innerHTML = `<p class="text-base md:text-lg xl:text-xl 2xl:text-2xlitalic text-center text-amber-800">No pending invitation</p>`;
+    container.innerHTML = `<p class="text-base md:text-lg xl:text-xl 2xl:text-2xl italic text-center text-amber-800">No pending invitation</p>`;
     return;
   }
   pendingFriends.forEach(async (friend) => {
@@ -6002,10 +6008,15 @@ async function router() {
       }
     }
     if (isReloaded || window.location.pathname === "/home" && (!history.state || publicPath.includes(history.state.from))) {
+      console.log("in isrelaoeed", auth.user?.web_status);
       chatnet.connect(() => {
         chatnet.toKnowUserID();
         displayChat();
       });
+      console.log("in isrelaoeed", auth.user?.web_status);
+      console.log(auth.status);
+      auth.user.web_status = "online";
+      console.log(auth.status);
       isReloaded = false;
     }
     loadHeader15(auth);
