@@ -4,5 +4,4 @@ export function View(): string {
 
 export async function init()
 {
-
 }
