@@ -245,7 +245,7 @@ async function initDashboard() {
       item.classList.add("mt-68");
       container.appendChild(item);
     }
-    if (dashboards.WinLoose.win > 0 && dashboards.WinLoose.loose > 0) {
+    if (dashboards.WinLoose.win > 0 || dashboards.WinLoose.loose > 0) {
       const winrate = document.getElementById("winrate");
       const win = document.getElementById("win");
       const loose = document.getElementById("loose");
@@ -253,7 +253,7 @@ async function initDashboard() {
       win.textContent = dashboards.WinLoose.win.toString();
       loose.textContent = dashboards.WinLoose.loose.toString();
     }
-    if (dashboards.TotalScore.scored > 0 && dashboards.TotalScore.taken > 0) {
+    if (dashboards.TotalScore.scored > 0 || dashboards.TotalScore.taken > 0) {
       const taken = document.getElementById("taken");
       const scored = document.getElementById("scored");
       const ratio = document.getElementById("ratio");
@@ -6059,6 +6059,7 @@ async function router() {
         chatnet.toKnowUserID();
         displayChat();
       });
+      auth.user.web_status = "online";
       isReloaded = false;
     }
     loadHeader12(auth);

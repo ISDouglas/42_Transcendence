@@ -23,11 +23,11 @@
 		<header class="flex dark:bg-black/30 items-center pb-2 h-28 bg-gray-200/20 backdrop-blur-sm shadow-md">
 			<a href="/" data-link class="block dark:hidden ml-4">
 				<img src="/src/image/croissant-white.png" alt="croissantw"
-					 class="w-24 duration-200 hover:-translate-y-1 rounded-full mt-3">
+					 class="w-16 sm:w-24 duration-200 hover:-translate-y-1 rounded-full mt-3">
 			</a>
 			<a href="/" data-link class="hidden dark:block ml-4">
 				<img src="/src/image/croissant-black.png" alt="croissantd"
-					class="w-24 duration-200 hover:-translate-y-1 rounded-full mt-3">
+					class="w-16 sm:w-24 duration-200 hover:-translate-y-1 rounded-full mt-3">
 			</a>
 		</header>
 	</template>
@@ -37,34 +37,39 @@
 			<div class="flex items-center space-x-4">
 				<a href="/home" data-link class="block dark:hidden ml-4">
 					<img src="/src/image/croissant-white.png" alt="croissantw"
-					class="w-24 duration-200 hover:-translate-y-1 rounded-full mt-3">
+					class="w-16 sm:w-24 duration-200 hover:-translate-y-1 rounded-full mt-3">
 				</a>
 				<a href="/home" data-link class="hidden dark:block ml-4">
 					<img src="/src/image/croissant-black.png" alt="croissantd"
-					class="w-24 duration-200 hover:-translate-y-1 rounded-full mt-3">
+					class="w-16 sm:w-24 duration-200 hover:-translate-y-1 rounded-full mt-3">
 				</a>
 			</div>
-			<!-- Menu Deroulent -->
 			<div class="mr-10 flex items-center">
 				<input type="checkbox" id="burger" class="peer hidden">
 				<label for="burger" class="cursor-pointer select-none">
-				<div class="flex flex-row">
-					<div class="flex flex-row items-center mr-2">
-						<span class="w-12 h-12 mr-4 bg-linear-to-br from-amber-500 to-orange-500 rounded-full flex items-center font-bold text-4xl justify-center text-white" id="lvl-header"></span>
-						<div class="w-40 mr-4s">
-							<h1 class="text-2xl my-auto font-medium text-center text-amber-900 dark:text-white" id="pseudo-header"></h1>
-							<div class="w-full h-3 mt-5 bg-amber-50 ring-1 ring-amber-900 dark:ring-white rounded-full overflow-hidden">
-								<div
-									id="progress-xp"
-									class="h-full w-0 rounded-full
-									transition-all duration-700 bg-amber-500 ease-out">
-								</div>
+				<div class="flex flex-row items-center mr-2 relative">
+					<div class="flex flex-row items-center w-full">
+						<span class="w-8 h-8 sm:w-12 sm:h-12 mr-4 bg-linear-to-br from-amber-500 to-orange-500 rounded-full flex items-center font-bold text-xl text-4xl justify-center text-white" id="lvl-header"></span>
+					</div>
+					<div class="flex flex-col items-center h-full max-w-[120px] sm:max-w-[320px]">
+						<h1 class="w-full text-base sm:text-2xl font-medium text-center text-amber-900 dark:text-white truncate" id="pseudo-header"></h1>
+						<div class="w-full flex flex-col h-2 sm:h-3 mt-5 bg-amber-50 ring-1 ring-amber-900 dark:ring-white rounded-full overflow-hidden">
+							<div id="progress-xp" class="h-full w-0 rounded-full transition-all duration-700 bg-amber-500 ease-out">
 							</div>
 						</div>
 					</div>
-					<div>
+					<div class="ml-4 relative shrink-0">
 						<span id="status" class="absolute w-4 h-4 rounded-full border-2 border-white"></span>
-						<img class="rounded-full w-20 h-20" id="header-avatar" src="" alt="Your avatar" width="70"/>
+						<img class="rounded-full w-16 h-16 sm:w-20 sm:h-20" id="header-avatar" src="" alt="Your avatar" width="70"/>
+					</div>
+					<div class="mr-0 shrink-0 items-center">
+						<a href="/friends" id="notification" data-link class="hidden ml-4">
+							<img src="/src/image/wfriend.png" alt="notification"
+							class="w-12 sm:w-18 duration-200 hover:-translate-y-1 mt-3 dark:hidden notif">
+							
+							<img src="/src/image/bfriend.png" alt="notification"
+							class="w-12 sm:w-18 duration-200 hover:-translate-y-1 mt-3 hidden dark:block notif">
+						</a>
 					</div>
 				</div>
 				</label>
@@ -91,12 +96,6 @@
 						<img class="ml-2 size-5 dark:invert" src="/src/image/lune.png" alt="dark">
 					</div>
 				</nav>
-				<div class="flex justify-end items-center">
-					<a href="/friends" id="notification" data-link class="hidden ml-4">
-						<img src="/src/image/notification.png" alt="notification"
-						class="w-12 duration-200 hover:-translate-y-1 rounded-full mt-3">
-					</a>
-				</div>
 			</div>
 		</header>
 	</template>
@@ -1366,32 +1365,168 @@
 	</template>
 
 	<template id="gamelocalhtml">
-		<h1>Local Game</h1>
-		<div class="game-buttons flex justify-center">
-			<button class="btn mx-auto w-32" id="pvp">Player VS Player</button>
-			<button class="btn mx-auto w-32" id="pvai">Player VS AI</button>
-		</div>
-		<footer class="absolute bottom-4 w-full dark:text-white duration-300 text-center text-sm opacity-60">
+		<main class="text-amber-50 flex flex-col flex-1 items-center justify-center px-4 ">
+			<div class="flex flex-col items-center gap-10 max-w-6xl w-full">
+				<div class="text-center space-y-3">
+					<h1 class="text-4xl sm:text-6xl lg:text-7xl font-bold 
+								bg-linear-to-r from-amber-300 via-yellow-400 to-orange-400 
+								bg-clip-text text-transparent drop-shadow-lg">
+						PONG LOCAL & AI
+					</h1>
+					<p class="text-lg sm:text-2xl text-amber-300/80">
+						Play locally or against the AI
+					</p>
+				</div>
+				<div class="flex flex-col lg:flex-row justify-center w-full gap-6">
+					<section class="p-6 w-full lg:w-1/2 bg-linear-to-tr from-amber-100/70 to-yellow-50/70 
+									dark:bg-linear-to-br dark:from-amber-950/60 dark:to-orange-950/60 
+									border border-amber-400/60 dark:border-amber-700/60 rounded-xl flex flex-col gap-4">
+						<h2 class="text-xl sm:text-2xl font-bold mb-4 text-center text-amber-800 dark:text-amber-200">
+							Local Game
+						</h2>
+						<div class="space-y-3 text-sm sm:text-base text-amber-800 dark:text-amber-100">
+							<p>
+								• Player 1: <kbd class="px-2 py-1 bg-amber-200 border border-amber-400 rounded text-xs text-amber-900 dark:bg-amber-900/50 dark:border-amber-700 dark:text-amber-200">W</kbd> / 
+								<kbd class="px-2 py-1 bg-amber-200 border border-amber-400 rounded text-xs text-amber-900 dark:bg-amber-900/50 dark:border-amber-700 dark:text-amber-200">S</kbd>
+							</p>
+							<p>
+								• Player 2: <kbd class="px-2 py-1 bg-amber-200 border border-amber-400 rounded text-xs text-amber-900 dark:bg-amber-900/50 dark:border-amber-700 dark:text-amber-200">↑</kbd> / 
+								<kbd class="px-2 py-1 bg-amber-200 border border-amber-400 rounded text-xs text-amber-900 dark:bg-amber-900/50 dark:border-amber-700 dark:text-amber-200">↓</kbd>
+							</p>
+							<p>• First to <strong class="text-amber-900 dark:text-amber-300">11 points</strong> wins</p>
+						</div>
+						<button class="btn mt-4 mx-auto w-32" id="pvp">Player VS Player</button>
+					</section>
+					<section class="p-6 w-full lg:w-1/2 bg-linear-to-tr from-amber-100/70 to-yellow-50/70 
+									dark:bg-linear-to-br dark:from-amber-950/60 dark:to-orange-950/60 
+									border border-amber-400/60 dark:border-amber-700/60 rounded-xl flex flex-col gap-4">
+						<h2 class="text-xl sm:text-2xl font-bold mb-4 text-center text-amber-800 dark:text-amber-200">
+							Play vs AI
+						</h2>
+						<div class="space-y-3 text-sm sm:text-base text-amber-800 dark:text-amber-100">
+							<p>
+								• Player: <kbd class="px-2 py-1 bg-amber-200 border border-amber-400 rounded text-xs text-amber-900 dark:bg-amber-900/50 dark:border-amber-700 dark:text-amber-200">W</kbd> / 
+								<kbd class="px-2 py-1 bg-amber-200 border border-amber-400 rounded text-xs text-amber-900 dark:bg-amber-900/50 dark:border-amber-700 dark:text-amber-200">S</kbd>
+							</p>
+							<p>
+								• AI controls the second paddle automatically
+							</p>
+							<p>• First to <strong class="text-amber-900 dark:text-amber-300">11 points</strong> wins</p>
+						</div>
+						<button class="btn mt-4 mx-auto w-32" id="pvai">Player VS AI</button>
+					</section>
+				</div>
+			</div>
+		</main>
+		<footer class="text-center text-sm dark:text-white mb-2 opacity-60 mt-12">
 			<a href="/termsofservice" data-link class="hover:underline">Terms of Service</a>
-			<span>|</span>
+			<span class="mx-2">|</span>
 			<a href="/privacypolicy" data-link class="hover:underline">Privacy Policy</a>
 			<p>© 2026 Croiscendence</p>
 		</footer>
 	</template>
 
+
 	<template id="gameonlinehtml">
-		<h1>Online games</h1>
-		<div class="game-buttons flex justify-center">
-			<button class="btn mx-auto w-32" id="create-onlinegame">Play game</button>
-		</div>
-		<div id="game-list"></div>
-		<footer class="absolute bottom-4 w-full dark:text-white duration-300 text-center text-sm opacity-60">
+		<main class="text-amber-50 flex flex-col items-center justify-center px-4 py-10">
+			<div class="flex flex-col items-center gap-10 max-w-6xl w-full">
+				<div class="text-center space-y-3">
+					<h1 class="text-4xl sm:text-6xl lg:text-7xl font-bold bg-linear-to-r from-amber-300 via-yellow-400 to-orange-400 bg-clip-text text-transparent drop-shadow-lg">
+						PONG RANKED
+					</h1>
+					<p class="text-lg sm:text-2xl text-amber-300/80">Multijoueur Compétitif</p>
+				</div>
+				<div class="flex justify-center w-full">
+					<button class="btn mt-2 w-full sm:w-52" id="create-onlinegame">Play game</button>
+				</div>
+				<div class="flex flex-col lg:flex-row gap-8 w-full">
+					<section class="p-6 w-full lg:max-w-md  bg-linear-to-tr from-amber-100/70 to-yellow-50/70  dark:bg-linear-to-br dark:from-amber-950/60 dark:to-orange-950/60  border border-amber-400/60 dark:border-amber-700/60  rounded-xl">
+						<h2 class="text-xl sm:text-2xl font-bold mb-4  text-amber-800 dark:text-amber-200">
+							Rules of the Game
+						</h2>
+						<div class="space-y-3 text-sm sm:text-base  text-amber-800 dark:text-amber-100">
+							<p>
+								• First player to reach 
+								<strong class="text-amber-900 dark:text-amber-300">
+									11 points
+								</strong> wins
+							</p>
+							<p>
+								• <kbd class="px-2 py-1 mr-1 bg-amber-200 border border-amber-400 dark:bg-amber-900/50 dark:border-amber-700 rounded text-xs text-amber-900 dark:text-amber-200">
+									W
+								</kbd> Move up
+							</p>
+							<p>
+								• <kbd class="px-2 py-1 mr-1 bg-amber-200 border border-amber-400  dark:bg-amber-900/50 dark:border-amber-700  rounded text-xs text-amber-900 dark:text-amber-200">
+									S
+								</kbd>Move down
+							</p>
+							<p>• Earn points to rank up</p>
+							<p class="font-semibold text-amber-700 dark:text-amber-300/80">
+								Competitive mode: gain or lose 🥐!
+							</p>
+						</div>
+					</section>
+					<section class="p-6 w-full bg-linear-to-tr from-amber-100/70 to-yellow-50/70 dark:bg-linear-to-br dark:from-amber-950/60 dark:to-orange-950/60 border border-amber-400/60 dark:border-amber-700/60 rounded-xl">
+						<h2 class="text-xl sm:text-2xl font-bold mb-6 text-center text-amber-800 dark:text-amber-200">
+							Competitive Ranks
+						</h2>
+						<div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+							<div class="flex items-center gap-4">
+								<img class="h-14 w-14 rounded-full" src="src/image/rank1.png" alt="Wood">
+								<div>
+									<div class="font-bold text-amber-800 dark:text-amber-100">Wood</div>
+									<div class="text-xs text-amber-700/70 dark:text-amber-300/70">0 – 400 🥐</div>
+								</div>
+							</div>
+							<div class="flex items-center gap-4">
+								<img class="h-14 w-14 rounded-full" src="src/image/rank2.png" alt="Iron">
+								<div>
+									<div class="font-bold text-amber-800 dark:text-amber-100">Iron</div>
+									<div class="text-xs text-amber-700/70 dark:text-amber-300/70">400 – 800 🥐</div>
+								</div>
+							</div>
+							<div class="flex items-center gap-4">
+								<img class="h-14 w-14 rounded-full" src="src/image/rank3.png" alt="Bronze">
+								<div>
+									<div class="font-bold text-amber-800 dark:text-amber-100">Bronze</div>
+									<div class="text-xs text-amber-700/70 dark:text-amber-300/70">800 – 1200 🥐</div>
+								</div>
+							</div>
+							<div class="flex items-center gap-4">
+								<img class="h-14 w-14 rounded-full" src="src/image/rank4.png" alt="Silver">
+								<div>
+									<div class="font-bold text-amber-800 dark:text-amber-100">Silver</div>
+									<div class="text-xs text-amber-700/70 dark:text-amber-300/70">1200 – 1600 🥐</div>
+								</div>
+							</div>
+							<div class="flex items-center gap-4">
+								<img class="h-14 w-14 rounded-full" src="src/image/rank5.png" alt="Gold">
+								<div>
+									<div class="font-bold text-amber-800 dark:text-amber-100">Gold</div>
+									<div class="text-xs text-amber-700/70 dark:text-amber-300/70">1600 – 2000 🥐</div>
+								</div>
+							</div>
+							<div class="flex items-center gap-4">
+								<img class="h-14 w-14 rounded-full" src="src/image/rank6.png" alt="Champion">
+								<div>
+									<div class="font-bold text-amber-800 dark:text-amber-100">Champion</div>
+									<div class="text-xs text-amber-700/70 dark:text-amber-300/70">2000+ 🥐</div>
+								</div>
+							</div>
+						</div>
+					</section>
+				</div>
+			</div>
+		</main>
+		<footer class="text-center text-sm dark:text-white opacity-60">
 			<a href="/termsofservice" data-link class="hover:underline">Terms of Service</a>
-			<span>|</span>
+			<span class="mx-2">|</span>
 			<a href="/privacypolicy" data-link class="hover:underline">Privacy Policy</a>
 			<p>© 2026 Croiscendence</p>
 		</footer>
 	</template>
+
 
 	<template id="end-game">
 		<div id="game-end-container"></div>
@@ -1624,46 +1759,65 @@
 	</template>
 
 	<template id="dashboardhtml">
-		<div class="flex flex-row">
-			<section class="bg-amber-100/80 dark:bg-amber-900/60 mt-5 ml-2 w-[50%] h-[80vh] flex flex-col ring-2 ring-amber-400 dark:ring-amber-900 items-center rounded-lg">	<h1 class="font-bold text-xl dark:text-amber-50 mb-1 text-amber-900">History - 20 last games :</h1>
-				<div id="game-list" class="w-[90%] h-[90%] px-1 overflow-y-auto scrollbar-none mb-2 ring-2
-					bg-amber-50 dark:bg-yellow-700/20 rounded-lg ring-amber-200 dark:ring-amber-900 shadow-lg">
-				</div>
-			</section>
-			<div class="w-[50%] ml-2">
-				<section class="flex flex-row items-center ring-4 ring-amber-400 dark:ring-amber-900 bg-amber-50 dark:bg-amber-100 mt-5 mx-8 h-[30%] rounded-2xl">
-						<img id="rank-img" class="size-40 rounded-full mx-4 border-2 w-[23%]" src="" alt="icone-rank">
-						<div class="w-[37%] mx-2">
-							<p class="text-4xl text-amber-900 pb">My Rank: <br></p>
-							<p class="" id="rank-player"></p>
+		<div class="flex flex-col flex-1 px-4 py-6 gap-6">
+			<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 flex-1">
+				<section class="bg-amber-100/80 dark:bg-amber-900/60 ring-2 ring-amber-400 dark:ring-amber-900 rounded-xl flex flex-col p-4 min-h-[300px]">
+					<h1 class="font-bold text-xl text-center text-amber-900 dark:text-amber-50 mb-3">
+						History – 20 last games
+					</h1>
+					<div
+						id="game-list"
+						class="">
+					</div>
+				</section>
+				<div class="flex flex-col gap-6">
+					<section
+						class="flex flex-col sm:flex-row items-center gap-6 bg-amber-50 dark:bg-amber-100 ring-4 ring-amber-400 dark:ring-amber-900 rounded-2xl p-6">
+						<img id="rank-img" class="size-32 sm:size-36 rounded-full border-2" src="" alt="rank icon">
+						<div class="flex-1 text-center sm:text-left">
+							<p class="text-3xl text-amber-900">My Rank</p>
+							<p id="rank-player" class="text-xl font-bold"></p>
 						</div>
-						<div class="w-[40%] mx-2">
-							<p class="text-4xl text-center text-amber-900">My Elo: <span class="font-bold text-4xl" id="elo-player"></span> CR</p>
-							<div class="w-full h-3 mt-5 bg-gray-200 rounded-full overflow-hidden">
-								<div
-									id="progress-fill"
-									class="h-full w-0 rounded-full
-									transition-all duration-700 ease-out">
+						<div class="flex-1 w-full">
+							<p class="text-2xl text-center text-amber-900">
+								My Elo :
+								<span id="elo-player" class="font-bold"></span> CR
+							</p>
+							<div class="w-full h-3 mt-4 bg-gray-200 rounded-full overflow-hidden">
+								<div id="progress-fill"
+									class="h-full w-0 rounded-full transition-all duration-700 ease-out">
 								</div>
 							</div>
-							<p class="text-xl text-center text-amber-900">Next rank: <span class="font-bold text-xl" id="elo-next"></span> CR</p>
+							<p class="text-center text-amber-900 mt-2">
+								Next rank :
+								<span id="elo-next" class="font-bold"></span> CR
+							</p>
 						</div>
-				</section>
-				<section class="flex flex-row h-[70%]">
-					<div class="flex flex-col w-[50%] h-[95%] mx-4 text-center mt-4">
-						<p class="stat">Wins <br><span class="text-6xl" id="win"></span></p>
-						<p class="stat">Losses <br><span class="text-6xl" id="loose"></span></p>
-						<p class="stat">Winrate <br><span class="text-6xl" id="winrate"></span></p>
-					</div>
-					<div class="flex flex-col w-[50%] h-[95%] mx-4 text-center mt-4">
-						<p class="stat">Points Scored <br><span class="text-6xl" id="scored"></span></p>
-						<p class="stat">Points Taken <br><span class="text-6xl" id="taken"></span></p>
-						<p class="stat">Ratio <br><span class="text-6xl" id="ratio"></span></p>
-					</div>
-				</section>
+					</section>
+					<section class="grid grid-cols-2 gap-4">
+						<div class="stat-card">
+							Wins<br><span id="win" class="stat-value"></span>
+						</div>
+						<div class="stat-card">
+							Points Scored<br><span id="scored" class="stat-value"></span>
+						</div>
+						<div class="stat-card">
+							Losses<br><span id="loose" class="stat-value"></span>
+						</div>
+						<div class="stat-card">
+							Points Taken<br><span id="taken" class="stat-value"></span>
+						</div>
+						<div class="stat-card">
+							Winrate<br><span id="winrate" class="stat-value"></span>
+						</div>
+						<div class="stat-card">
+							Ratio<br><span id="ratio" class="stat-value"></span>
+						</div>
+					</section>
+				</div>
 			</div>
 		</div>
-		<footer class="absolute bottom-4 w-full dark:text-white duration-300 text-center text-sm opacity-60">
+		<footer class="w-full text-center text-sm dark:text-white opacity-60 py-4">
 			<a href="/termsofservice" data-link class="hover:underline">Terms of Service</a>
 			<span>|</span>
 			<a href="/privacypolicy" data-link class="hover:underline">Privacy Policy</a>
@@ -1672,44 +1826,43 @@
 	</template>
 
 	<template id="history-dashboard">
-		<div class="flex items-center gap-4 w-1/3">
-			<img id="winnerpath" src="" alt="winner avatar"
-				class="size-10 lg:size-16 hidden sm:block rounded-full border-2 border-green-500">
-			<div>
-				<div class="flex flex-col">
-					<p id="winnerpseudo" class="text-xs lg:text-xl font-semibold text-green-500"></p>
-					<p id="winnerelo" class="text-xs lg:text-xl text-green-500"></p>
+		<div
+			class="flex items-center justify-between gap-4
+			rounded-lg p-3 w-full">
+			<div class="flex items-center gap-3 w-1/3">
+				<img id="winnerpath"
+					class="size-10 lg:size-14 rounded-full border-2 border-green-500 hidden sm:block"
+					src="">
+				<div>
+					<p id="winnerpseudo" class="font-semibold text-green-600"></p>
+					<p id="winnerelo" class="text-sm text-green-500"></p>
+					<p id="winnerscore"
+						class="mt-1 bg-amber-600/30 ring-1 ring-amber-600/50
+						text-center rounded-sm text-amber-900 font-bold w-6">
+					</p>
 				</div>
-				<p id="winnerscore" class="text-sm lg:text-2xl bg-amber-600/30 rounded-sm w-3 lg:w-6 text-center ring-1 ring-amber-600/50 text-amber-900 font-bold"></p>
+			</div>
+			<div class="flex flex-col items-center text-center w-1/3">
+				<p id="type" class="font-semibold text-amber-900"></p>
+				<p id="date" class="text-sm text-amber-800"></p>
+				<p id="duration" class="text-xs text-amber-700"></p>
+			</div>
+			<div class="flex items-center gap-3 justify-end w-1/3">
+				<div class="text-right">
+					<p id="loserpseudo" class="font-semibold text-red-600"></p>
+					<p id="loserelo" class="text-sm text-red-500"></p>
+					<p id="loserscore"
+						class="mt-1 bg-amber-600/30 ring-1 ring-amber-600/50
+						text-center rounded-sm text-amber-900 font-bold w-6 ml-auto">
+					</p>
+				</div>
+				<img id="loserpath"
+					class="size-10 lg:size-14 rounded-full border-2 border-red-500 hidden sm:block"
+					src="">
 			</div>
 		</div>
-
-		<div>
-			<p class="text-xs lg:text-xl items-end font-semibold text-green-500">Winner</p>
-		</div>
-		<div class="flex flex-col items-center w-1/3">
-			<p id="type" class="text-sm lg:text-xl text-amber-950"></p>
-			<p id="date" class="text-xs lg:text-lg text-amber-800"></p>
-			<p id="duration" class="text-xs lg:text-sm text-amber-900"></p>
-		</div>
-		<div>
-			<p class="text-xs lg:text-xl items-start font-semibold text-red-500">Loser</p>
-		</div>
-
-		<div class="flex items-center gap-4 w-1/3 justify-end">
-			<div class="">
-				<div class="flex flex-col">
-					<p id="loserpseudo" class="text-xs lg:text-xl font-semibold text-red-500"></p>
-					<p id="loserelo" class="text-xs lg:text-xl text-red-500"></p>
-				</div>
-				<p id="loserscore" class="text-sm lg:text-2xl bg-amber-600/30 rounded-sm ring-1 ring-amber-600/50 w-3 lg:w-6 text-center ml-auto text-amber-900 font-bold"></p>
-			</div>
-			<img id="loserpath" src="" alt="loser avatar"
-				class="size-10 lg:size-16 hidden sm:block rounded-full object-cover border-2 border-red-500">
-		</div>	
 	</template>
 
-			
 	<template id="chat-template">
 		<div id="chat-window" class="hidden flex flex-col w-80 h-96 2xl:w-100 2xl:h-120 bg-amber-100 rounded-xl overflow-hidden shadow-lg mb-0.5 dark:bg-yellow-950/90">
 			<header id="headchat" class="bg-amber-500 h-12 text-center dark:bg-yellow-950 dark:border-amber-100/60 dark:border-b">
