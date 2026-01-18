@@ -85,7 +85,9 @@ var init_show_toast = __esm({
       success: "success-toast",
       error: "error-toast",
       warning: "warning-toast",
-      achievement: "achievement-toast"
+      "secret-achievement": "secret-achievement-toast",
+      "rare-achievement": "rare-achievement-toast",
+      "common-achievement": "common-achievement-toast"
     };
   }
 });
@@ -226,6 +228,12 @@ async function initDashboard() {
         date.textContent = new Date(game.date_game).toLocaleDateString();
         duration.textContent = "Duration: " + formatDuration(game.duration_game);
         type.textContent = game.type;
+        if (game.type === "Online" || game.type === "Tournament") {
+          const winner_elo = clone.getElementById("winnerelo");
+          winner_elo.textContent = `+ ${game.winner_elo} \u{1F950}`;
+          const loser_elo = clone.getElementById("loserelo");
+          loser_elo.textContent = `- ${Math.abs(game.loser_elo)} \u{1F950}`;
+        }
         item.appendChild(clone);
         container.appendChild(item);
       });
@@ -4382,16 +4390,21 @@ async function initPongMatch(params) {
         }
       }, 1e3);
     } else if (currentGame.isLocalMode() || currentGame.getCurrentState().type == "AI") {
-      replayBtn?.addEventListener("click", async () => {
-        navigateTo(`/gamelocal`);
-      });
-    } else {
-      let countdown = 3;
+      let countdown = 1;
       interval = setInterval(() => {
         countdown--;
         if (countdown < 0) {
           clearInterval(interval);
-          navigateTo(`/home`);
+          navigateTo(`/endgame`);
+        }
+      }, 1e3);
+    } else {
+      let countdown = 1;
+      interval = setInterval(() => {
+        countdown--;
+        if (countdown < 0) {
+          clearInterval(interval);
+          navigateTo(`/endgame`);
         }
       }, 1e3);
     }
@@ -4555,8 +4568,8 @@ var init_tournamentNetwork = __esm({
         this.socket.on("joinTournamentGame", (gameId, tournamentId) => {
           this.onjoinTournamentGameCallback?.(gameId, tournamentId);
         });
-        this.socket.on("setWinner", (winner, loser) => {
-          this.onsetWinnerCallback?.(winner, loser);
+        this.socket.on("setWinner", (winner, loser, status) => {
+          this.onsetWinnerCallback?.(winner, loser, status);
         });
         this.socket.on("hostDisconnected", () => {
           this.onHostDisconnectedCallback?.();
@@ -4615,8 +4628,6 @@ function BracketsView() {
 async function initBrackets(params) {
   const prev = getPreviousPath();
   let beforePrev = getBeforePreviousPath();
-  console.log("prev : ", prev);
-  console.log("beforePrev : ", beforePrev);
   if (prev === null || beforePrev === null || !beforePrev.startsWith("/tournament") || !prev.startsWith("/brackets")) {
     if (!prev.startsWith("/brackets") || !beforePrev.startsWith("/pongmatch")) {
       navigateTo("/home");
@@ -4633,6 +4644,7 @@ async function initBrackets(params) {
   const finalist2 = document.getElementById("finalist2");
   const champion = document.getElementById("champion");
   const pseudos = [pseudoP1, pseudoP2, pseudoP3, pseudoP4];
+  const finalists = [finalist1, finalist2];
   currentTournament = new TournamentInstance();
   net2 = new TournamentNetwork();
   net2.join(Number(tournamentID));
@@ -4646,11 +4658,15 @@ async function initBrackets(params) {
     else if (currentTournament.getCurrentState().status == "final")
       net2?.SetupFinal();
   });
-  net2.onsetWinner((winner, loser) => {
-    console.log("winner : ", winner);
-    console.log("loser : ", loser);
-    currentTournament?.setWinner(pseudos[winner]);
-    currentTournament?.setLoser(pseudos[loser]);
+  net2.onsetWinner((winner, loser, status) => {
+    if (status == "semifinal") {
+      currentTournament?.setWinner(pseudos[winner]);
+      currentTournament?.setLoser(pseudos[loser]);
+    }
+    if (status == "final") {
+      currentTournament?.setWinner(finalists[winner]);
+      currentTournament?.setLoser(finalists[loser]);
+    }
   });
   net2.onTournamentHost(() => {
     startTournamentButton?.classList.remove("hidden");
@@ -4721,7 +4737,6 @@ function generateRandomRanking() {
 }
 function initTournamentPage() {
   const createTournamentBtn = document.getElementById("create-tournament");
-  const joinTournamentBtn = document.getElementById("join-tournament");
   const createBtn = document.getElementById("create-test");
   const showBtn = document.getElementById("show-onchain");
   const backBtn = document.getElementById("back-to-home");
@@ -4734,9 +4749,6 @@ function initTournamentPage() {
     else
       navigateTo(`/brackets/${tournamentId}`);
   });
-  joinTournamentBtn?.addEventListener("click", async () => {
-    loadTournaments();
-  });
   createBtn?.addEventListener("click", async () => {
     await testTournamentDB();
   });
@@ -4745,43 +4757,6 @@ function initTournamentPage() {
   });
   backBtn?.addEventListener("click", () => {
     navigateTo("/home");
-  });
-}
-async function loadTournaments() {
-  const { tournaments } = await genericFetch("/api/private/tournament/list");
-  renderTournamentList(tournaments);
-}
-function renderTournamentList(tournaments) {
-  const container = document.getElementById("tournament-list");
-  if (!container) return;
-  if (tournaments.length === 0) {
-    container.innerHTML = "<p>Aucun tournoi disponible.</p>";
-    return;
-  }
-  container.innerHTML = tournaments.map((tournament) => `
-	<div class="tournament-item">
-		<p>Tournament #${tournament.id}</p>
-		<button data-tournament-id="${tournament.id}" class="join-tournament-btn btn w-32">Rejoindre</button>
-	</div>
-	`).join("");
-  document.querySelectorAll(".join-tournament-btn").forEach((btn) => {
-    btn.addEventListener("click", async () => {
-      const id = btn.dataset.tournamentId;
-      try {
-        const res = await genericFetch("/api/private/tournament/join", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            tournamentId: id
-          })
-        });
-        console.log("Saved data:", res);
-      } catch (err) {
-        console.error("Error saving game:", err);
-        showToast(err, "error", 2e3, "Error saving game:");
-      }
-      navigateTo(`/brackets/${id}`);
-    });
   });
 }
 async function testTournamentDB() {
@@ -5116,7 +5091,7 @@ async function search(memberSearched, myfriends) {
     });
     listedMember.innerHTML = "";
     if (existedMember.length === 0)
-      listedMember.innerHTML = "<li>No result</li>";
+      listedMember.innerHTML = `<li class="text-base md:text-lg xl:text-xl 2xl:text-2xl italic text-center dark:text-amber-50 text-amber-800">No result</li>`;
     else {
       existedMember.forEach((member) => {
         const template = document.getElementById("list-search");
@@ -5211,7 +5186,7 @@ function pendingFr(pendingFriends) {
   if (!container)
     return;
   if (pendingFriends.length === 0) {
-    container.innerHTML = `<p class="text-base md:text-lg xl:text-xl 2xl:text-2xlitalic text-center text-amber-800">No pending invitation</p>`;
+    container.innerHTML = `<p class="text-base md:text-lg xl:text-xl 2xl:text-2xl italic text-center text-amber-800">No pending invitation</p>`;
     return;
   }
   pendingFriends.forEach(async (friend) => {
@@ -5854,6 +5829,70 @@ var init_p_achievement = __esm({
   }
 });
 
+// front/src/views/p_endgame.ts
+function endGameView() {
+  return document.getElementById("end-game").innerHTML;
+}
+async function InitEndGame() {
+  const state = history.state;
+  if (!state || !state.from.includes("pongmatch")) {
+    navigateTo("/home");
+  }
+  const endgame = await genericFetch("/api/private/endgame", {
+    method: "GET"
+  });
+  const container = document.getElementById("game-end-container");
+  const templateId = `end-game-${endgame.type}`;
+  const template = document.getElementById(templateId);
+  const node = template.content.cloneNode(true);
+  container.appendChild(node);
+  document.getElementById("winner-id").textContent = endgame.gameinfo.winner_pseudo;
+  document.getElementById("winner-score").textContent = endgame.gameinfo.winner_score.toString();
+  document.getElementById("loser-id").textContent = endgame.gameinfo.loser_pseudo;
+  document.getElementById("loser-score").textContent = endgame.gameinfo.loser_score.toString();
+  document.getElementById("final-score").textContent = `${endgame.gameinfo.winner_score} - ${endgame.gameinfo.loser_score}`;
+  if (endgame.gameinfo.type === "Online" || endgame.gameinfo.type === "Tournament") {
+    document.getElementById("loser-elo").textContent = `- ${Math.abs(endgame.gameinfo.loser_elo)} \u{1F950}`;
+    document.getElementById("winner-elo").textContent = `+ ${endgame.gameinfo.winner_elo} \u{1F950}`;
+  }
+  const replayBtn = document.getElementById("replay-button");
+  switch (endgame.gameinfo.type) {
+    case "Online":
+      replayBtn.href = "/gameonline";
+      break;
+    case "AI":
+    case "Local":
+      replayBtn.href = "/gamelocal";
+      break;
+    case "Tournament":
+      replayBtn.href = "/tournament";
+      break;
+  }
+  if (!endgame.new_achievements?.length) return;
+  if (endgame.new_achievements.length > 0) {
+    for (const achievement of endgame.new_achievements) {
+      switch (achievement.rarity) {
+        case "Common":
+          showToast(`You unlock the achievement : ${achievement.title}`, "common-achievement", 5e3);
+          break;
+        case "Rare":
+          showToast(`You unlock the achievement : ${achievement.title}`, "rare-achievement", 5e3);
+          break;
+        case "Secret":
+          showToast(`You unlock the achievement : ${achievement.title}`, "secret-achievement", 5e3);
+          break;
+      }
+    }
+  }
+}
+var init_p_endgame = __esm({
+  "front/src/views/p_endgame.ts"() {
+    "use strict";
+    init_router();
+    init_show_toast();
+  }
+});
+
 // front/src/router.ts
 function getHistoryStack() {
   return JSON.parse(sessionStorage.getItem(HISTORY_KEY) ?? "[]");
@@ -5947,7 +5986,7 @@ function initSwitch() {
     }
   });
 }
-async function loadHeader15(auth) {
+async function loadHeader12(auth) {
   const container = document.getElementById("header-container");
   container.innerHTML = "";
   const templateID = auth.logged ? "headerconnect" : "headernotconnect";
@@ -6020,7 +6059,7 @@ async function router() {
       });
       isReloaded = false;
     }
-    loadHeader15(auth);
+    loadHeader12(auth);
     if (publicPath.includes(location.pathname) && auth.logged)
       navigateTo("/home");
     if (!publicPath.includes(location.pathname) && !auth.logged && location.pathname !== "/termsofservice" && location.pathname !== "/privacypolicy")
@@ -6101,6 +6140,7 @@ var init_router = __esm({
     init_p_chat();
     init_show_toast();
     init_p_achievement();
+    init_p_endgame();
     routes = [
       { path: "/", view: View, init },
       { path: "/login", view: LoginView, init: initLogin },
@@ -6124,6 +6164,7 @@ var init_router = __esm({
       { path: "/gameonline", view: GameOnlineView, init: GameOnlineinit },
       { path: "/gamelocal", view: GameLocalView, init: GameLocalinit },
       { path: "/pongmatch/:id", view: PongMatchView, init: initPongMatch, cleanup: stopGame },
+      { path: "/endgame", view: endGameView, init: InitEndGame },
       { path: "/tournament", view: TournamentView },
       { path: "/brackets/:id", view: BracketsView, init: initBrackets, cleanup: stopTournament },
       { path: "/error", view: ErrorView, init: initError },

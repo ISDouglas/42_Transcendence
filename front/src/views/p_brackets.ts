@@ -31,6 +31,7 @@ export async function initBrackets(params?: any) {
 	const finalist2 = document.getElementById("finalist2");
 	const champion = document.getElementById("champion");
 	const pseudos = [ pseudoP1, pseudoP2, pseudoP3, pseudoP4 ];
+	const finalists = [ finalist1, finalist2 ];
 
 	currentTournament = new TournamentInstance();
 
@@ -49,9 +50,17 @@ export async function initBrackets(params?: any) {
 			net?.SetupFinal();
 	});
 
-	net.onsetWinner((winner: number, loser: number) => {
-		currentTournament?.setWinner(pseudos[winner]);
-		currentTournament?.setLoser(pseudos[loser]);
+	net.onsetWinner((winner: number, loser: number, status: "semifinal" | "final") => {
+		if (status == "semifinal")
+		{
+			currentTournament?.setWinner(pseudos[winner]);
+			currentTournament?.setLoser(pseudos[loser]);
+		}
+		if (status == "final")
+		{
+			currentTournament?.setWinner(finalists[winner]);
+			currentTournament?.setLoser(finalists[loser]);
+		}
 	});
 
 	net.onTournamentHost(() => {

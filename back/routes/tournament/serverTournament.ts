@@ -15,6 +15,10 @@ export class serverTournament {
 	sockets: { player1: string | null, player2: string | null, player3: string | null, player4: string | null };
 	semi_index: number[];
 	final_arr: number[];
+	idFirst: number;
+	idSecond: number;
+	idThird: number;
+	idFourth: number;
 	disconnectTimer: NodeJS.Timeout | null;
 	state: TournamentState;
 
@@ -25,6 +29,10 @@ export class serverTournament {
 		this.sockets = { player1: null, player2: null, player3: null, player4: null };
 		this.semi_index = [0, 2, 1, 3];
 		this.final_arr = [0, 0];
+		this.idFirst = 0;
+		this.idSecond = 0;
+		this.idThird = 0;
+		this.idFourth = 0;
 		this.disconnectTimer = null;
 		this.state = {
 			status: "waiting",
