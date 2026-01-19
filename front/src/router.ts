@@ -271,8 +271,7 @@ export async function router() {
 				return;
 			}
 		}
-		console.log("reload ?", isReloaded, "from ", history?.state?.from, "to ", window.location.pathname);
-		if ((isReloaded && !publicPath.includes(window.location.pathname)|| (window.location.pathname === "/home" && (!history.state || (publicPath.includes(history.state.from)))))) {
+		if (auth.logged && ((isReloaded && !publicPath.includes(window.location.pathname)) || (window.location.pathname === "/home" && (!history.state || (publicPath.includes(history.state.from)))))) {
 			chatnet.connect( () => {
 				chatnet.toKnowUserID();
 				displayChat()
@@ -321,27 +320,23 @@ export async function popState() {
 	console.log("path = ", path, "current path", currentPath);
 	if (!history?.state?.from && fromIsPrivate)
 	{
-		console.log("1");
 		history.replaceState({ from: "/home" }, "", "/home");
 		currentPath = "/home";
 		navigateTo("/logout");
 	}
 	else if (!history?.state?.from && !fromIsPrivate)
 	{
-		console.log("2");
 		history.replaceState({ from: "/" }, "", "/");
 		currentPath = "/";
 	}
 	else if (!toIsPrivate && fromIsPrivate)
 	{
-		console.log("3");
 		history.replaceState( { from: "/home" }, "", "/home");
 		currentPath = "/home";
 	}
 	else {
 		history.state.from = currentPath;
 		currentPath = path;
-		console.log("4 ");
 	}
 	await router();
 }
