@@ -142,6 +142,7 @@ export async function initDashboard()
 			item.classList.add("text-center");
 			item.classList.add("text-3xl");
 			item.classList.add("mt-68");
+			item.classList.add("dark:text-white");
 			container.appendChild(item);
 		}
 		
