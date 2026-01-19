@@ -157,14 +157,14 @@ Each chosen module was selected to enhance the project’s educational value and
 
 #### 5. Major: Allow users to interact with other users (2 points)
 
-The minimum requirements are:
-◦ A basic chat system (send/receive messages between users).
-◦ A profile system (view user information).
-◦ A friends system (add/remove friends, see friends list).
+> The minimum requirements are:
+> - A basic chat system (send/receive messages between users).
+> - A profile system (view user information).
+> - A friends system (add/remove friends, see friends list).
 
-- Motivation: We chose this module because it contains important and relevant features for a gaming platform.
+- **Motivation**: We chose this module because it contains important and relevant features for a gaming platform.
 
-- Details:
+- **Details**:
   - Basic chat system:
     - We implemented a general chat that allows users to communicate with all other connected users.
     - WebSockets enable real-time chat, available across all pages once the user is connected.
@@ -185,7 +185,7 @@ The minimum requirements are:
     - User is also allowed to update their information and delete their own profile.
     - All user's information stores in table Users in the database.
    
-- PIC: edelanno (chat, friend), tat-nguy (profile)
+- **PIC**: edelanno (chat, friend), tat-nguy (profile)
 
 #### 6. Major: A public API to interact with the database with a secured API key, rate limiting, documentation, and at least 5 endpoints
 #### 7. Minor: Use an ORM for the database
@@ -204,9 +204,9 @@ The minimum requirements are:
 
 #### 1. Major: Standard user management and authentication (2 pts)
 
-- Motivation: Enhance user experience and user engagement of the game
+- **Motivation**: Enhance user experience and user engagement of the game
   
-- Module in details:
+- **Module in details**:
   - Users have a profile page displaying all their information
   - User is allowed to change their own information such as *Username*, *Password*, *Email*, *2FA Enable*, *Online Status*, *Avatar*...
   - User is also allowed to delete their own profile, this action can't be recover, so we ask user to write a request, confirm their password, make sure that it's not a mistake and they really want to delete. 
@@ -214,7 +214,7 @@ The minimum requirements are:
   - Users can upload an avatar (with a default avatar if none provided). The avatar path is stored in the Users database. A default path is set initially. Each time the avatar is updated, it is renamed as user_id.type. Upload restrictions are enforced for file size and type (6 MB – PNG and JPEG).
   - Users can add other users as friends and see their online status. On the friends page, users can send friend requests and view their friends along with their status.
 
-- PIC: edelanno, tat-nguy
+- **PIC**: edelanno, tat-nguy
 
 #### 2. Minor: Game statistics and match history (requires a game module).
 
@@ -250,9 +250,9 @@ The minimum requirements are:
 
 #### 1. Major Module: Monitoring system with Prometheus and Grafana (2 points)
 
-- Motivation: This helps monitoring the server system, analyzing performance and informing the team immediately when there's a trouble in operation of the server and used services.
+- **Motivation**: This helps monitoring the server system, analyzing performance and informing the team immediately when there's a trouble in operation of the server and used services.
 
-- Module in details:
+- **Module in details**:
   - Set up Prometheus to collect metrics
     
     Prometheus was deployed as the central metrics collector (http://localhost:9090)
@@ -290,7 +290,7 @@ The minimum requirements are:
     - Anonymous access to Grafana was disabled
     - Admin credentials are configured via *.env* variables and do not contain sensitive words like 'admin' or 'administrator'
 
-- PIC: tat-nguy
+- **PIC**: tat-nguy
 
 
 ### VIII - Data and Analytics
@@ -303,15 +303,15 @@ The minimum requirements are:
 
 #### 1. Minor : JWT (Json Web Token) (1 point)
 
-- Motivation: For enhanced security, we have implemented a JWT-based system.
+- **Motivation**: For enhanced security, we have implemented a JWT-based system.
   
-- Details:
+- **Details**:
   - Upon each login, a JWT is generated and stored in the cookies. It is valid for one hour and contains the user’s ID.
   - Using an addhook, the system checks on every page whether the JWT exists and is still valid.
   - If the token has expired or is invalid, the user is automatically logged out.
   - This JWT mechanism allows user information to be securely transmitted to the front-end.
 
-- PIC: edelanno
+- **PIC**: edelanno
 
 
 ---
@@ -376,6 +376,7 @@ All final design decisions and implementations as well as other missions were ma
 ---
 
 ## 🐛 Limitations and Potential Improvements
+
 - Improve matchmaking algorithms
 - Add spectator mode
 - Enhance animations and visual effects
