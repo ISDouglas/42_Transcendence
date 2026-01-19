@@ -346,6 +346,7 @@ async function lunchDB()
 	await gameInfo.deleteGameInfoTable();
 	await gameInfo.createGameInfoTable();
 	
+	await tournamentDB.deleteTournamentTables();
 	await tournamentDB.createTournamentTable();
 	await tournamentDB.createTournamentResultTable();
 	

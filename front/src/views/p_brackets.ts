@@ -10,18 +10,24 @@ export function BracketsView(): string {
 }
 
 export async function initBrackets(params?: any) {
+	const tournamentID: string = params?.id;
+
 	const prev = getPreviousPath();
 	let beforePrev = getBeforePreviousPath();
+	console.log("prev : ", prev);
+	console.log("beforePrev : ", beforePrev);
 	if (prev === null || beforePrev === null || !beforePrev.startsWith("/tournament") || !prev.startsWith("/brackets"))
 	{
-		if (!prev.startsWith("/brackets") || !beforePrev.startsWith("/pongmatch"))
+		if (!beforePrev.startsWith("/pongmatch"))
 		{
-			navigateTo("/home");
-			return;
+			if (!beforePrev.startsWith(`/brackets/${Number(tournamentID)}`))
+			{
+				navigateTo("/home");
+				return;
+			}
 		}
 	}
 
-	const tournamentID: string = params?.id;
 	const startTournamentButton = document.getElementById("start-button");
 	const watchFinalButton = document.getElementById("watch-final");
 	const pseudoP1 = document.getElementById("player1-name");

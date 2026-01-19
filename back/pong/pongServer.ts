@@ -29,7 +29,6 @@ export function handleGameSocket(io: Server, socket: Socket) {
 			game.disconnectTimer = null;
 		}
 
-
 		// join room
 		socket.join(`game-${gameId}`);
 	
@@ -110,21 +109,50 @@ export function handleGameSocket(io: Server, socket: Socket) {
 		}
 		else
 		{
-			game.status = "disconnected";
-			setDeconnections(socket.data.user.id, game);
-			io.to(`game-${gameId}`).emit("state", updateStateGame(game.state, game.status, game.type));
-			io.to(`game-${game.id}`).emit("disconnection", updateStateGame(game.state, game.status, game.type));
-	
-			if (!game.disconnectTimer) {
-				game.disconnectTimer = setTimeout(() => {
-					console.log("Timeout disconnected game : ", gameId);
-					io.to(`game-${game.id}`).emit("noReconnection");
-					game.status = "playing";
-					io.to(`game-${gameId}`).emit("state", updateStateGame(game.state, game.status, game.type));
-				}, 1 * 7 * 1000);
+			if (game.type === "Local" || game.type === "AI")
+			{
+				if (!game.disconnectTimer) {
+					game.disconnectTimer = setTimeout(() => {
+						console.log("Game deleted :", gameId);
+						games_map.delete(gameId);
+					}, 1 * 3 * 1000);
+				}
+			}
+			else
+			{
+				game.status = "disconnected";
+				setDeconnections(socket.data.user.id, game);
+				io.to(`game-${gameId}`).emit("state", updateStateGame(game.state, game.status, game.type));
+				io.to(`game-${game.id}`).emit("disconnection", updateStateGame(game.state, game.status, game.type));
+		
+				if (!game.disconnectTimer) {
+					game.disconnectTimer = setTimeout(() => {
+						console.log("Timeout disconnected game : ", gameId);
+						io.to(`game-${game.id}`).emit("noReconnection");
+						game.status = "playing";
+						io.to(`game-${gameId}`).emit("state", updateStateGame(game.state, game.status, game.type));
+					}, 1 * 3 * 1000);
+				}
 			}
 		}
 	});
+}
+
+function checkUser(io: Server, socket: Socket, game: ServerGame) : number
+{
+	if (socket.data.user.id == game.idPlayer1 && socket.id != game.sockets.player1)
+	{
+		console.log("kick1");
+		io.to(socket.id).emit("kick");
+		return -1;
+	}
+	else if (socket.data.user.id == game.idPlayer2 && socket.id != game.sockets.player2)
+	{
+		console.log("kick2");
+		io.to(socket.id).emit("kick");
+		return -1;
+	}
+	return 0;
 }
 
 export function checkForWinner(game: ServerGame, io: Server)
@@ -170,34 +198,32 @@ export function updateStateGame(state: GameState, status: "waiting" | "playing" 
 }
 
 function initLocal(game: ServerGame, io: Server, socket: Socket, gameId: number, pseudo: string) {
-	if (!game.sockets.player1 && !game.sockets.player2)
+	
+	if (game.sockets.player1 === null && game.sockets.player2 === null)
 	{
 		game.sockets.player1 = socket.id;
 		game.sockets.player2 = socket.id;
-		game.idPlayer2 = 0;
-		game.state.pseudo.player1 = pseudo;
-		game.state.pseudo.player2 = "Guest";
-		if (game.status !== "disconnected")
-		{
-			game.state.ball.speedX = Math.random() < 0.5 ? -2.5 : 2.5;
-			resetBall(game.state);
-		}
-
-		game.status = "countdown";
-		socket.emit("assignRole", "player1");
-
-		io.to(`game-${gameId}`).emit("state", updateStateGame(game.state, game.status, game.type));
-		
-		//countdown starting
-		io.to(`game-${gameId}`).emit("startCountdown", updateStateGame(game.state, game.status, game.type));
-		//predraw canvas without score to avoid empty screen before countdown
-		socket.emit("predraw", updateStateGame(game.state, game.status, game.type));
 	}
-	else
+	if (checkUser(io, socket, game) == -1)
+		return;
+	game.idPlayer2 = 0;
+	game.state.pseudo.player1 = pseudo;
+	game.state.pseudo.player2 = "Guest";
+	if (game.status !== "disconnected")
 	{
-		// Already taken (another local session occupying it) => UNUSED SO FAR
-		socket.emit("gameFull");
+		game.state.ball.speedX = Math.random() < 0.5 ? -2.5 : 2.5;
+		resetBall(game.state);
 	}
+
+	game.status = "countdown";
+	socket.emit("assignRole", "player1");
+
+	io.to(`game-${gameId}`).emit("state", updateStateGame(game.state, game.status, game.type));
+	
+	//countdown starting
+	io.to(`game-${gameId}`).emit("startCountdown", updateStateGame(game.state, game.status, game.type));
+	//predraw canvas without score to avoid empty screen before countdown
+	socket.emit("predraw", updateStateGame(game.state, game.status, game.type));
 }
 
 async function initRemoteAndAi(game: ServerGame, io: Server, socket: Socket, gameId: number, playerId: number, pseudo: string) {
@@ -206,14 +232,18 @@ async function initRemoteAndAi(game: ServerGame, io: Server, socket: Socket, gam
 
 	if (playerId === game.idPlayer1)
 	{
-		role = "player1";
 		game.sockets.player1 = socket.id;
+		if (checkUser(io, socket, game) == -1)
+			return;
+		role = "player1";
 		game.state.pseudo.player1 = pseudo;
 	}
 	else if (playerId === game.idPlayer2)
 	{
-		role = "player2";
 		game.sockets.player2 = socket.id;
+		if (checkUser(io, socket, game) == -1)
+			return;
+		role = "player2";
 		game.state.pseudo.player2 = pseudo;
 		io.to(`game-${gameId}`).emit("state", updateStateGame(game.state, game.status, game.type));
 	}
@@ -258,10 +288,14 @@ function getPlayer(game: ServerGame, socket: Socket) {
 
 function setDeconnections(playerId: number, game: ServerGame)
 {
-	if (playerId == game.idPlayer1)
-		game.nbDeconnectionsP1++;
-	else if (playerId == game.idPlayer2)
-		game.nbDeconnectionsP2++;
+	console.log("game type : ", game.type);
+	if (game.type === "Online" || game.type === "Tournament")
+	{
+		if (playerId == game.idPlayer1)
+			game.nbDeconnectionsP1++;
+		else if (playerId == game.idPlayer2)
+			game.nbDeconnectionsP2++;
+	}
 }
 
 function checkDeconnections(io: Server, socket: Socket, playerId: number, game: ServerGame)

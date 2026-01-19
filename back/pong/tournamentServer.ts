@@ -414,8 +414,10 @@ function updateStateTournament(state: TournamentState)
 	};
 }
 
-function fillSocketTournament(playerId: Number, tournament: serverTournament, socket: Socket)
+function fillSocketTournament(playerId: number, tournament: serverTournament, socket: Socket)
 {
+	tournament.idPlayers[tournament.semi_index[tournament.index]] = playerId;
+
 	const pseudo = socket.data.user.pseudo;
 	if (playerId === tournament.idPlayers[0])
 	{

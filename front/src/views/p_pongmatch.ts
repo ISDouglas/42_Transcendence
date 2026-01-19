@@ -13,24 +13,40 @@ export function PongMatchView(params?: any): string {
 }
 
 export async function initPongMatch(params?: any) {
+	const gameID: string = params?.id;
+	const paramUrl = new URLSearchParams(window.location.search);
+	const tournamentId = paramUrl.get("tournamentId");
+
 	const prev = getPreviousPath();
 	let beforePrev = getBeforePreviousPath();
 	console.log("prev : ", prev);
 	console.log("beforePrev : ", beforePrev);
-	if (prev === null || beforePrev === null || !beforePrev.startsWith("/gameonline") || !prev.startsWith("/pongmatch"))
+
+	const isNull = !prev || !beforePrev;
+
+	console.log("tournamentId : ", tournamentId);
+	if (tournamentId)
 	{
-		if (!beforePrev.startsWith("/brackets"))
+		const cameFromPongMatch = prev.startsWith("/pongmatch") || beforePrev.startsWith("/pongmatch");
+		const allowedBeforePrev = beforePrev.startsWith("/brackets");
+		if (isNull || (!cameFromPongMatch && !allowedBeforePrev))
 		{
-			if (!beforePrev.startsWith("/gamelocal"))
-			{
-				navigateTo("/home");
-				return;
-			}
+			navigateTo("/home");
+			return;
 		}
 	}
-	const gameID: string = params?.id;
-	const paramUrl = new URLSearchParams(window.location.search);
-	const tournamentId = paramUrl.get("tournamentId");
+	else
+	{
+		const cameFromPongMatch = prev.startsWith("/pongmatch") || beforePrev.startsWith("/pongmatch");
+		const allowedBeforePrev = beforePrev.startsWith("/gameonline") || beforePrev.startsWith("/gamelocal");
+		if (isNull || (!cameFromPongMatch && !allowedBeforePrev))
+		{
+			navigateTo("/home");
+			return;
+		}
+	}
+
+
 	const dashboardBtn = document.getElementById("dashboard-btn");
 	const pseudoP1 = document.getElementById("player1-name");
 	const pseudoP2 = document.getElementById("player2-name");

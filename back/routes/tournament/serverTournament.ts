@@ -10,6 +10,7 @@ interface TournamentState {
 
 export class serverTournament {
 	id: number;
+	index: number;
 	games = new Map<number, ServerGame>();
 	idPlayers: number[];
 	sockets: { player1: string | null, player2: string | null, player3: string | null, player4: string | null };
@@ -26,6 +27,7 @@ export class serverTournament {
 	constructor(id: number)
 	{
 		this.id = id;
+		this.index = 0;
 		this.idPlayers = Array(4).fill(-1);
 		this.sockets = { player1: null, player2: null, player3: null, player4: null };
 		this.semi_index = [0, 2, 1, 3];
@@ -75,13 +77,13 @@ export function createTournament(playerId: number)
 				break;
 			if (tournament?.idPlayers[tournament.semi_index[i]] == -1)
 			{
-				tournament.idPlayers[tournament.semi_index[i]] = playerId;
+				tournament!.index = i;
 				return id;
 			}
 		}
 		id++;
 		const tournament_bis = new serverTournament(id);
-		tournament_bis.idPlayers[0]= playerId;
+		tournament_bis.idPlayers[0]= playerId; 
 		tournaments_map.set(id, tournament_bis);
 		return id;
 	}
