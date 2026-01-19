@@ -101,23 +101,30 @@
 	</template>
 
 	<template id="html">
-		<main class="flex mx-auto flex-col mt-[10vh] grow">
-			<h1 class="text-4xl md:text-7xl font-bold mx-auto 
-				bg-linear-to-r from-amber-800 via-amber-600 to-orange-500 
-				bg-clip-text text-transparent drop-shadow-lg
-				hover:bg-linear-to-r hover:from-orange-500 hover:via-amber-800 hover:to-amber-600
-				animate-pulse">
-				Croiscendence</h1>
-			<div class="mt-14">
-				<nav id="public-nav">
-					<a href="/login" data-link class="btn mx-auto w-48">Log in</a>
-					<a href="/register" data-link class="btn mx-auto w-48">Register</a>
-				</nav>
-			</div>
-			<p class="absolute mb-4 opacity-60 bottom-0 w-full text-center">This isn't a bakery at all — it's the Pong game from 42!
-			<br>© 2026 Croiscendence</p>
+		<main class="flex-1 flex flex-col items-center justify-center text-center px-6 transition-colors duration-300">
+			<h1 class="text-5xl md:text-7xl font-extrabold mb-4 -mt-20 bg-linear-to-r from-amber-700 via-orange-500 to-yellow-400 dark:from-amber-300 dark:via-orange-400 dark:to-yellow-300 bg-clip-text text-transparent drop-shadow-lg"> 
+				Croiscendence
+			</h1>
+			<p class="max-w-md text-base md:text-lg mb-12
+				text-amber-900/70 dark:text-amber-200/70">
+				A competitive Pong, crispy and merciless.
+			</p>
+			<nav id="public-nav" class="flex flex-col sm:flex-row gap-6">
+				<a href="/login" data-link
+					class="btn w-48 shadow-lg shadow-amber-500/30dark:shadow-amber-900/40">
+					Log in
+				</a>
+				<a href="/register" data-link
+					class="btn w-48 shadow-lg shadow-orange-500/30 dark:shadow-orange-900/40">
+					Register
+				</a>
+			</nav>
+			<p class="absolute bottom-4 text-sm opacity-60
+				text-amber-900 dark:text-amber-200 text-center w-full px-4">
+				This isn't a bakery at all — it's the Pong game from 42!
+				<br>© 2026 Croiscendence
+			</p>
 		</main>
-		<div><br></div>
 	</template>
 
 	<template id="loginhtml">
@@ -731,9 +738,13 @@
 			<p>© 2026 Croiscendence</p>
 		</footer>
 		<section id="gamepage" class="relative min-h-screen flex flex-col md:flex-row items-center w-full px-6">
-			<img src="/src/image/gamepage.jpg"
+			<!-- <img src="/src/image/gamepage.jpg"
 			alt="gamepage"
-			class="absolute inset-0 -z-10 object-cover w-full h-full">
+			class="absolute inset-0 -z-10 object-cover w-full h-full"> -->
+			<video autoplay muted loop playsinline class="absolute inset-0 -z-10 object-cover w-full h-full">
+  				<source src="/src/image/bg-video.mp4" type="video/mp4">
+				<img src="/src/image/bg-video.jpg" alt="">
+			</video>
 			<div class="w-1/2">
 			</div>
 			<div class="w-1/2 mx-auto">
@@ -838,25 +849,41 @@
 				<p id="pseudo" class="text-l text-amber-800 font-semibold"></p>
 			</div>
 			<div class="flex items-center flex-col">
-				<button id="addordelete" class="bg-amber-700 px-2 py-2
-				sm:px-3 sm:py-1.5 
-						md:px-4 md:py-2 
-						lg:px-4 lg:py-2 
-						xl:px-5 xl:py-2 
-						2xl:px-6 2xl:py-3
-						text-xs 
-						sm:text-sm 
-						md:text-base 
-						lg:text-base 
-						xl:text-lg 
-						2xl:text-xl
-				text-white rounded cursor-pointer"></button>
-				<p id="date-friendship" class="mt-4 mr-4 italic text-xs text-gray-600"></p>
+				<!-- <div class="flex flex-row"> -->
+					<button id="addordelete" class="bg-amber-700 px-2 py-2
+					sm:px-3 sm:py-1.5 
+							md:px-4 md:py-2 
+							lg:px-4 lg:py-2 
+							xl:px-5 xl:py-2 
+							2xl:px-6 2xl:py-3
+							text-xs 
+							sm:text-sm 
+							md:text-base 
+							lg:text-base 
+							xl:text-lg 
+							2xl:text-xl
+					text-white rounded cursor-pointer"></button>
+					<button id="addordeleteBIS" class=" mt-2 hidden bg-amber-900 px-2 py-2
+					sm:px-3 sm:py-1.5 
+							md:px-4 md:py-2 
+							lg:px-4 lg:py-2 
+							xl:px-5 xl:py-2 
+							2xl:px-6 2xl:py-3
+							text-xs 
+							sm:text-sm 
+							md:text-base 
+							lg:text-base 
+							xl:text-lg 
+							2xl:text-xl
+					text-white rounded cursor-pointer"></button>
+					<!-- </div> -->
+					<p id="date-friendship" class="mt-4 mr-4 italic text-xs text-gray-600"></p>
+				</div>
 			</div>
 		</div>
 	</template>
 
-		<template id="opponent-li">
+	<template id="opponent-li">
 		<div class="flex flex col items-center justify-between w-full rounded-sm">
 			<div class="flex flex-row items-center gap-3">
 				<div>
@@ -1555,7 +1582,7 @@
 						<span class="text-3xl font-bold text-amber-950 dark:text-amber-500/50">VS</span>
 						<div class="relative flex flex-col items-center px-6 py-4 rounded-xl
 							bg-linear-to-r from-amber-500/30 to-orange-600/30 border border-amber-700/20 min-w-[120px]">
-							<img id="addgamer" class="w-8 absolute top-0 right-0 dark:hidden notif cursor-pointer hover:scale-110 transition" title="Add friend" src="/src/image/waddfriend.png"></img>
+							<img id="addgamer" class="hidden w-8 absolute top-0 right-0 dark:hidden notif cursor-pointer hover:scale-110 transition" title="Add friend" src="/src/image/waddfriend.png"></img>
 							<img id="dark-addgamer" class="w-8 absolute top-0 right-0 hidden dark:block notif cursor-pointer hover:scale-110 transition" title="Add friend" src="/src/image/baddfriend.png"></img>
 							<span id="loser-id" class="text-xs uppercase tracking-wide text-amber-950 dark:text-amber-300/70 mb-1">Joueur 2</span>
 							<span id="loser-score" class="text-4xl sm:text-5xl font-bold text-amber-800 dark:text-amber-100">5</span>
@@ -1599,7 +1626,7 @@
 					<div class="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-10">
 						<div class="relative flex flex-col items-center px-6 py-4 rounded-xl
 							bg-linear-to-r from-amber-500/30 to-orange-600/30 border border-amber-700/30 min-w-[120px]">
-							<img id="addgamer" class="w-8 absolute top-0 left-0 dark:hidden notif cursor-pointer hover:scale-110 transition" title="Add friend" src="/src/image/waddfriend.png"></img>
+							<img id="addgamer" class="hidden w-8 absolute top-0 left-0 dark:hidden notif cursor-pointer hover:scale-110 transition" title="Add friend" src="/src/image/waddfriend.png"></img>
 							<img id="dark-addgamer" class="w-8 absolute top-0 left-0 hidden dark:block notif cursor-pointer hover:scale-110 transition" title="Add friend" src="/src/image/baddfriend.png"></img>
 							<span id="winner-id" class="text-xs uppercase tracking-wide text-amber-950 dark:text-amber-300/70 mb-1"></span>
 							<span id="winner-score" class="text-4xl sm:text-5xl font-bold text-amber-800 dark:text-amber-100"></span>

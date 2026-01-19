@@ -109,16 +109,50 @@ The goal of the project is to deliver a fun and competitive game while demonstra
 
 ### Database Schema
 
-The database stores:
-- Users (user information, authentication data, profile)
-- Chat (general chat history)
-- Friend (user's friend connections)
-- achievements (game achievements)
-- game_info (game results)
-- tournament (tournament status)
-- tournament_result (tournament result)
-- user_achievements (users achievement)
-- user_stats (user statistics)
+SQLite database helps to store and retrieve data from these tables:
+
+- **Users**: users information, authentication data, profile
+	- Key: user_id (INTEGER)
+
+- **Chat**: general chat history
+	- Key: id (INTEGER)
+ 	- Relatons:
+  		- user_id (INTEGER) -> **Users** user_id
+
+- **Friend**: user's friend connections
+	- Key: id (INTEGER)
+ 	- Relations:
+  		- user_id1 (INTEGER) -> **Users** user_id
+    	- user_id2 (INTEGER) -> **Users** user_id
+
+- **game_info**: game results
+	- Key: id (INTEGER)
+   	- Relations:
+   	  	- winner_id (INTEGER) -> **Users** user_id
+   	  	- loser_id (INTEGER) -> **Users** user_id
+
+- **tournament**: tournament status
+	- Key: id (INTEGER)
+
+- **tournament_result**: tournament results
+	- Key: id (INTEGER)
+ 	- Relations:
+  		- tournament_id (INTEGER) -> **tournament** id
+		- player_id (INTEGER) -> **Users** user_id
+
+- **achievements**: game achievements
+  	- Key: achievement_id (INTEGER)
+  	
+- **user_achievements**: users achievement
+	- Key: user_id (INTEGER), achievement_id (INTEGER)
+ 	- Relations:
+  		- user_id -> **Users** user_id
+    	- achievement_id -> **achievements** achievement_id
+    
+- **user_stats** (user statistics)
+	- Key: user_id (INTEGER)
+ 	- Relations:
+  		- user_id -> **Users** user_id
 
 Relationships are designed to ensure data consistency and efficient queries.
 
@@ -224,7 +258,7 @@ Each chosen module was selected to enhance the project’s educational value and
   - The friends page is divided into four sections:
     - search bar: to add users – includes a debounce function to avoid excessive database calls.
     - friends list: displays avatar, status (online/offline...), friendship date, and a button to delete a friend.
-    - pending invitations: display username, avatar, and request date (if less than 3 days: displayed as x seconds, x minutes, x hours, or x days ago), with accept and delete buttons.
+    - pending invitations: display username, avatar, and request date (if less than 3 days: displayed as x seconds, x minutes, x hours, or x days ago), with accept/deny and delete buttons.
     - friend suggestions: other users with whom games have been played, limited to 20 suggestions.
     - SQL queries are used to build this page. The Friend table, which associates two users with information about their friendship (date, status), and the game_info table, used for friend suggestions, provide the necessary data to build this page.
    
@@ -267,6 +301,44 @@ Each chosen module was selected to enhance the project’s educational value and
 
 #### 2. Minor: Game statistics and match history (requires a game module).
 
+Minor: Game statistics and match history (requires a game module).
+◦ Track user game statistics (wins, losses, ranking, level, etc.).
+◦ Display match history (1v1 games, dates, results, opponents).
+◦ Show achievements and progression.
+◦ Leaderboard integration.
+
+Player Statistics Tracking:
+
+I implemented multiple API requests to retrieve all relevant player data, including wins, losses, and rank,
+which are then dynamically displayed on the user dashboard. The player’s level is shown directly in the header,
+accompanied by a visual progression bar that reflects experience gained and overall advancement in real time.
+
+Match History System:
+
+The DB stores a detailed match history for every player. For each 1v1 game, the following information is recorded and displayed:
+◦ Match date and time
+◦ Game mode (ranked, local, AI, etc.)
+◦ Final result (win or loss)
+◦ Opponent identity (player or AI)
+
+Achievements and Progression:
+
+A dedicated achievement system was designed to reward player engagement and skill progression.
+Achievements can be:
+
+◦ Unlocked, locked, or secret
+◦ Based on specific conditions (number of wins, ranking reached, special accomplishments, etc.)
+◦ Common, rare, secret
+
+Ranking and Leaderboard Integration:
+
+Competitive performance feeds directly into a leaderboard system, 
+where players are ranked based on their accumulated ranking points. This provides:
+
+◦ A clear competitive hierarchy
+◦ Motivation through comparison with other players
+◦ Real-time reflection of player progression in the global ranking
+
 #### 3. Minor: Implement remote authentication with OAuth 2.0 (Google, GitHub, 42, etc.)
 
 #### 4. Major: Advanced permissions system:
@@ -276,7 +348,6 @@ Each chosen module was selected to enhance the project’s educational value and
 #### 6. Minor: Implement a complete 2FA (Two-Factor Authentication) system for the users
 
 #### 7. Minor: User activity analytics and insights dashboard
-
 
 ### IV - Artificial Intelligence
 
@@ -293,6 +364,26 @@ Each chosen module was selected to enhance the project’s educational value and
 #### 7. Minor: Implement a tournament system
 #### 8. Minor: Game customization options
 #### 9. Minor: A gamification system to reward users for their actions
+
+ Minor: A gamification system to reward users for their actions.
+◦ Implement at least 3 of the following: achievements, badges, leaderboards,
+	XP/level system, daily challenges, rewards
+◦ System must be persistent (stored in database)
+◦ Visual feedback for users (notifications, progress bars, etc.)
+◦ Clear rules and progression mechanics
+
+4 implementations:
+◦ Avhievements
+◦ XP/level system
+◦ leaderboards,
+◦ badges
+
+All data is persistently stored in the database, ensuring progress is maintained between sessions.
+
+Visual feedback is provided through notifications and progress bars, giving users real-time updates on their achievements and progression.
+
+Rules and progression mechanics are transparent: players can view clear rules before starting a game, ensuring a fair and understandable system.
+
 #### 10. Minor: Implement spectator mode for games
 
 ### VII - Devops
@@ -361,7 +452,6 @@ Each chosen module was selected to enhance the project’s educational value and
   - This JWT mechanism allows user information to be securely transmitted to the front-end.
 
 - **PIC**: edelanno
-
 
 ---
 

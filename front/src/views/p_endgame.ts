@@ -34,15 +34,14 @@ export async function InitEndGame()
 		(document.getElementById("final-score") as HTMLParagraphElement).textContent = `${endgame.gameinfo.winner_score} - ${endgame.gameinfo.loser_score}`;
 		const addFriend  = document.getElementById("addgamer") as HTMLImageElement;
 		const addFriendDark  = document.getElementById("dark-addgamer") as HTMLImageElement;
-		if (endgame.friend) {
-			addFriend.classList.add("hidden");
+		if (endgame.friend || endgame.gameinfo.type === "AI" ||endgame.gameinfo.type === "Local")
 			addFriendDark.classList.remove("dark:block");
-		}
 		if (endgame.gameinfo.type === "Online" || endgame.gameinfo.type === "Tournament")
 		{
 			(document.getElementById("loser-elo") as HTMLSpanElement).textContent = `- ${Math.abs(endgame.gameinfo.loser_elo)} 🥐`;
 			(document.getElementById("winner-elo") as HTMLSpanElement).textContent = `+ ${endgame.gameinfo.winner_elo} 🥐`;
 			if (addFriend && addFriendDark && !endgame.friend) {
+				addFriend.classList.remove("hidden");
 				[addFriend, addFriendDark].forEach(el => {
 					el?.addEventListener("click", async() => {
 						if (endgame.type === "victory") {
