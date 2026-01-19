@@ -142,13 +142,11 @@ function checkUser(io: Server, socket: Socket, game: ServerGame) : number
 {
 	if (socket.data.user.id == game.idPlayer1 && socket.id != game.sockets.player1)
 	{
-		console.log("kick1");
 		io.to(socket.id).emit("kick");
 		return -1;
 	}
 	else if (socket.data.user.id == game.idPlayer2 && socket.id != game.sockets.player2)
 	{
-		console.log("kick2");
 		io.to(socket.id).emit("kick");
 		return -1;
 	}
