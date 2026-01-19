@@ -1,6 +1,6 @@
 # ft_transcendence — Croiscendence 🥐
 
-*This project was created as part of the 42 curriculum by **edelanno**, **lanyang**, **nrontard**, **pmenard** and **tat-nguy***
+*This project was created as part of the 42 curriculum by **edelanno**, **layang**, **nrontard**, **pmenard** and **tat-nguy***
 
 ---
 
@@ -39,17 +39,17 @@ The application respects the technical constraints imposed by the subject, such 
 
 | Name | Role(s) | Responsibilities |
 |----|----|----|
-|  | Product Owner & Developer | Product management, general decisions, stakeholders communication |
-|  | Project Manager & Developer | Team organize, team communication, architecture |
-|  | Scrum Master & Developer | Process and deadline tracking, infrastructure | 
-|  | Back-end Lead & Developer | backend decisions, security, database |
-|  | Front-end Lead & Developer | Game logic, real-time features, Frontend decisions, UI/UX |
+| edelanno | Product Owner & Developer | Product management, general decisions, stakeholders communication |
+| pmenard | Project Manager & Developer | Team organize, team communication, architecture |
+| tat-nguy | Scrum Master & Developer | Process and deadline tracking, infrastructure | 
+| layang | Back-end Lead & Developer | backend decisions, security, database |
+| nrontard | Front-end Lead & Developer | Game logic, real-time features, Frontend decisions, UI/UX |
 
 
 ### Project Management
 
-- **Regular communication:** Meeting weekly in Alantis co-working place to explain the work and sync on progress and the difficulities.
-- **Task organization:** Trello, GitHub Issues and Pull Requests to track who does what.
+- **Regular communication:** Meeting twice par week in Alantic co-working place to explain the work and sync on progress and the difficulities.
+- **Task organization:** Discord, GitHub Issues and Pull Requests to track who does what.
 - **Work breakdown:** Project were divided according to modules and features.
 - **Code reviews:** Code review every week during the meeting.
 - **Documentation:** Keep notes and add into README to explain how things work.
@@ -68,6 +68,8 @@ Responsibilities included:
 - Docker configuration and deployment
 
 Other challenges such as real-time synchronization, authentication flow, and containerization were addressed collaboratively through testing and code reviews.
+
+This subject was particularly challenging and complex, requiring coordinated work from a team of five people. Throughout the project, we faced multiple conflicts, which were addressed and resolved through code revisions and regular meetings.
 
 ---
 
@@ -101,10 +103,10 @@ The goal of the project is to deliver a fun and competitive game while demonstra
 - SQLite (chosen for simplicity, performance, and ease of deployment)
 
 #### Other Technologies
-- WebSockets for real-time gameplay
+- WebSockets for real-time gameplay and live-chat
 - Docker & Docker Compose for containerization
 
-*Technical choices were made to balance performance, simplicity, and compliance with the ft_transcendence subject constraints.*
+*Technical choices were made to balance performance, simplicity, and compliance with the ft_transcendence subject constraints with the argement of all group members.*
 
 
 ### Database Schema
@@ -160,9 +162,12 @@ Relationships are designed to ensure data consistency and efficient queries.
 
 - User authentication
 - Real-time Pong gameplay
+- Live chat
+- Friendship
 - Matchmaking system
 - Tournament management
 - User statistics and profiles
+- Achievements
 
 Each feature was implemented collaboratively, with ownership depending on complexity
 and workload distribution.
@@ -170,58 +175,6 @@ and workload distribution.
 ---
 
 ## Modules in Detail
-
-- **Major Modules** (2 points each)
-
-IMPLEMENT A COMPLETE WEB-BASED GAME WHERE USERS CAN PLAY AGAINST EACH OTHER
-
-> - Motivation for choosing it
-We started working on Transcendence about a month before the subject was updated. In the previous version of the subject, we were required to implement a Pong game, and we decided to continue in that direction by building upon the work we had already started.
-
-> - Implementation details
-The backend is responsible for the entire game logic. It manages the positions of the paddles and the ball, the score, collision detection, and all game-related rules. It continuously sends the necessary game state data to the frontend, which is only responsible for rendering the game for each player.
-This architecture was chosen to ensure a more secure and fair gameplay experience, as it prevents players from manipulating the game state or cheating.
-
-> - Team members involved
-pmenard
-nrontard
-layang
-
-REMOTE PLAYERS - ENABLE TWO PLAYERS ON SEPARATE COMPUTERS TO PLAY THE SAME GAME IN REAL-TIME
-
-> - Motivation for choosing it
-From the very beginning, supporting remote players was an obvious choice for us. Our goal was to create a website that allows anyone to play on the same device against a friend, against an AI, or against another player using a different device.
-
-> - Implementation details
-To support remote players, we initially started with a private API. However, we quickly realized that this approach was not well suited for real-time gameplay. We therefore switched to using WebSockets, which provide a more efficient and reliable way to handle real-time communication between players.
-The technical details of this implementation are further explained in the dedicated WebSocket module.
-
-> - Team members involved
-pmenard
-
-- **Minor Modules** (1 point each)
-
-IMPLEMENT A TOURNAMENT SYSTEM
-> - Motivation for choosing it
-We believe that tournaments are a great addition to a game, as they introduce a stronger sense of competition and engagement for players.
-
-> - Implementation details
-The first player to join a tournament is designated as its creator. This player can either wait for other participants to join or start the tournament immediately, in which case any remaining slots are filled with AI players.
-To improve readability and user experience, we also added visual indicators using colors to clearly show match results and distinguish winners from losers.
-
-> - Team members involved
-pmenard
-
-IMPLEMENT SPECTATOR MODE FOR GAMES
-
-> - Motivation for choosing it
-We wanted to allow players who were eliminated from a tournament to watch the final match if they wished.
-
-> - Implementation details
-When the final match starts, an HTML button becomes available for eliminated players. By clicking on this button, they can join the game as spectators and watch the match in real time.
-
-> - Team members involved
-pmenard
 
 Each chosen module was selected to enhance the project’s educational value and gameplay experience.
 
@@ -233,17 +186,18 @@ Each chosen module was selected to enhance the project’s educational value and
 
 ### I - Web
 
-#### 1. Major: Use a framework for both the frontend and backend
-#### 2. Minor: Use a frontend framework (React, Vue, Angular, Svelte, etc.)
-#### 3. Minor: Use a backend framework (Express, Fastify, NestJS, Django, etc.).
-#### 4. Major: Implement real-time features using WebSockets or similar technology.
+#### 3. Minor: Use a backend framework (Fastify) (1 pt)
+
+- Motivation: It was a major module of the accient subject
+
+- Details:
+	- Fastify API to communicate between frontend and backend.
+
+- PIC: edelanno, layang, nrontard, pmenard and tat-nguy
+
+#### 4. Major: Implement real-time features using WebSockets or similar technology (2 pts)
 
 #### 5. Major: Allow users to interact with other users (2 points)
-
-> The minimum requirements are:
-> - A basic chat system (send/receive messages between users).
-> - A profile system (view user information).
-> - A friends system (add/remove friends, see friends list).
 
 - **Motivation**: We chose this module because it contains important and relevant features for a gaming platform.
 
@@ -270,15 +224,10 @@ Each chosen module was selected to enhance the project’s educational value and
    
 - **PIC**: edelanno (chat, friend), tat-nguy (profile)
 
-#### 6. Major: A public API to interact with the database with a secured API key, rate limiting, documentation, and at least 5 endpoints
-#### 7. Minor: Use an ORM for the database
 #### 8. Minor: A complete notification system for all creation, update, and deletion actions.
-#### 9. Minor: Real-time collaborative features (shared workspaces, live editing, collabo-rative drawing, etc.).
-#### 10. Minor: Server-Side Rendering (SSR) for improved performance and SEO.
-#### 11. Minor: Progressive Web App (PWA) with offline support and installability.
-#### 12. Minor: Custom-made design system with reusable components, including a propercolor palette, typography, and icons (minimum: 10 reusable components).
-#### 13. Minor: Implement advanced search functionality with filters, sorting, and pagination.
-#### 14. Minor: File upload and management system.
+
+- PIC: layang
+  
 
 
 ### II - Accessibility and Internationalization
@@ -339,38 +288,67 @@ where players are ranked based on their accumulated ranking points. This provide
 ◦ Motivation through comparison with other players
 ◦ Real-time reflection of player progression in the global ranking
 
+- PIC: nrontard
+
 #### 3. Minor: Implement remote authentication with OAuth 2.0 (Google, GitHub, 42, etc.)
 
-#### 4. Major: Advanced permissions system:
+- PIC: layang
 
-#### 5. Major: An organization system
 
 #### 6. Minor: Implement a complete 2FA (Two-Factor Authentication) system for the users
 
-#### 7. Minor: User activity analytics and insights dashboard
+- PIC: layang
+
 
 ### IV - Artificial Intelligence
+
+#### Major: Introduce an AI Opponent for games (2 pts)
+
+- PIC: layang
+
 
 ### V - Cybersecurity
 
 ### VI - Gaming and user experience
 
-#### 1. Major: Implement a complete web-based game where users can play against each other
-#### 2. Major: Remote players — Enable two players on separate computers to play the same game in real-time
-#### 3. Major: Multiplayer game (more than two players)
-#### 4. Major: Add another game with user history and matchmaking
-#### 5. Major: Implement advanced 3D graphics using a library like Three.js or Babylon.js.
-#### 6. Minor: Advanced chat features (enhances the basic chat from "User interaction" module).
-#### 7. Minor: Implement a tournament system
-#### 8. Minor: Game customization options
-#### 9. Minor: A gamification system to reward users for their actions
+#### 1. Major: Implement a complete web-based game where users can play against each other (2 pts)
 
- Minor: A gamification system to reward users for their actions.
-◦ Implement at least 3 of the following: achievements, badges, leaderboards,
-	XP/level system, daily challenges, rewards
-◦ System must be persistent (stored in database)
-◦ Visual feedback for users (notifications, progress bars, etc.)
-◦ Clear rules and progression mechanics
+- **Motivation for choosing it**
+We started working on Transcendence about a month before the subject was updated. In the previous version of the subject, we were required to implement a Pong game, and we decided to continue in that direction by building upon the work we had already started.
+
+- **Implementation details**
+The backend is responsible for the entire game logic. It manages the positions of the paddles and the ball, the score, collision detection, and all game-related rules. It continuously sends the necessary game state data to the frontend, which is only responsible for rendering the game for each player.
+This architecture was chosen to ensure a more secure and fair gameplay experience, as it prevents players from manipulating the game state or cheating.
+
+- **Team members involved**
+pmenard, nrontard, layang
+
+
+#### 2. Major: Remote players — Enable two players on separate computers to play the same game in real-time (2 pts)
+
+- **Motivation for choosing it**
+From the very beginning, supporting remote players was an obvious choice for us. Our goal was to create a website that allows anyone to play on the same device against a friend, against an AI, or against another player using a different device.
+
+- **Implementation details**
+To support remote players, we initially started with a private API. However, we quickly realized that this approach was not well suited for real-time gameplay. We therefore switched to using WebSockets, which provide a more efficient and reliable way to handle real-time communication between players.
+The technical details of this implementation are further explained in the dedicated WebSocket module.
+
+- **Team members involved**
+pmenard
+
+#### 7. Minor: Implement a tournament system (1 pt)
+
+- **Motivation for choosing it**
+We believe that tournaments are a great addition to a game, as they introduce a stronger sense of competition and engagement for players.
+
+- **Implementation details**
+The first player to join a tournament is designated as its creator. This player can either wait for other participants to join or start the tournament immediately, in which case any remaining slots are filled with AI players.
+To improve readability and user experience, we also added visual indicators using colors to clearly show match results and distinguish winners from losers.
+
+- **Team members involved**
+pmenard
+
+#### 9. Minor: A gamification system to reward users for their actions (1 pt)
 
 4 implementations:
 ◦ Avhievements
@@ -384,7 +362,20 @@ Visual feedback is provided through notifications and progress bars, giving user
 
 Rules and progression mechanics are transparent: players can view clear rules before starting a game, ensuring a fair and understandable system.
 
-#### 10. Minor: Implement spectator mode for games
+- **PIC**: nrontard
+
+
+#### 10. Minor: Implement spectator mode for games (1 pt)
+
+- **Motivation for choosing it**
+We wanted to allow players who were eliminated from a tournament to watch the final match if they wished.
+
+- **Implementation details**
+When the final match starts, an HTML button becomes available for eliminated players. By clicking on this button, they can join the game as spectators and watch the match in real time.
+
+- **Team members involved**
+pmenard
+
 
 ### VII - Devops
 
@@ -438,6 +429,7 @@ Rules and progression mechanics are transparent: players can view clear rules be
 ### IX - Blockchain
 #### 1. Major: Store tournament scores on the Blockchain (2 pts)
 
+- PIC: layang
 
 ### X - Modules of choice
 
@@ -505,10 +497,10 @@ Rules and progression mechanics are transparent: players can view clear rules be
 
 AI tools (such as ChatGPT, Gemini 3, Mistral's Le Chat) were used for:
 - Documentation assistance and defination explication
-- Code review suggestions
+- Code review suggestion
 - Debugging guidance
 - Typo and spell checking
-- Image quality enhancement
+- Video creation for the background
 
 All final design decisions and implementations as well as other missions were made by the team.
 
@@ -516,11 +508,10 @@ All final design decisions and implementations as well as other missions were ma
 
 ## 🐛 Limitations and Potential Improvements
 
-- Improve matchmaking algorithms
-- Add spectator mode
-- Enhance animations and visual effects
-- Support persistent tournaments
-- Improve scalability for higher player counts
+- Choose AI difficulties
+- Invite specific user to play
+- Chat in private
+- Game in 3D
 
 ---
 
