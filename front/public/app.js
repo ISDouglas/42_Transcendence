@@ -4748,19 +4748,8 @@ function TournamentView() {
   setTimeout(() => initTournamentPage(), 0);
   return html;
 }
-function generateRandomRanking() {
-  const ranking = [];
-  while (ranking.length < 8) {
-    const randomId = Math.floor(Math.random() * 16) + 1;
-    if (!ranking.includes(randomId)) {
-      ranking.push(randomId);
-    }
-  }
-  return ranking;
-}
 function initTournamentPage() {
   const createTournamentBtn = document.getElementById("create-tournament");
-  const createBtn = document.getElementById("create-test");
   const showBtn = document.getElementById("show-onchain");
   const backBtn = document.getElementById("back-to-home");
   createTournamentBtn?.addEventListener("click", async () => {
@@ -4772,9 +4761,6 @@ function initTournamentPage() {
     else
       navigateTo(`/brackets/${tournamentId}`);
   });
-  createBtn?.addEventListener("click", async () => {
-    await testTournamentDB();
-  });
   showBtn?.addEventListener("click", async () => {
     await showDBOnChain();
   });
@@ -4782,29 +4768,8 @@ function initTournamentPage() {
     navigateTo("/home");
   });
 }
-async function testTournamentDB() {
-  const testRanking = generateRandomRanking();
-  try {
-    const data = await genericFetch("/api/private/tournament/add", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ranking: testRanking })
-    });
-    const dbPanel = document.getElementById("db-panel");
-    if (dbPanel) {
-      dbPanel.innerHTML = `
-				<div class="p-2 border-b">
-					<p class="text-green-700 font-bold">\u2705 Tournament Created!</p>
-					<p><strong>Ranking:</strong> ${testRanking.join(", ")}</p>
-					<p class="text-gray-600 text-sm">(Now stored in database)</p>
-				</div>
-			`;
-    }
-    console.log("Tournament response:", data);
-  } catch (err) {
-    console.error("Error creating tournament:", err);
-    showToast(err, "error", 2e3, "Error creating tournament:");
-  }
+function formatRanking(ranking) {
+  return ranking.map((id) => id === -1 ? "AI" : id.toString()).join(", ");
 }
 async function showDBOnChain() {
   try {
@@ -4815,7 +4780,7 @@ async function showDBOnChain() {
     dbPanel.innerHTML = data.map((t) => `
 			<div class="p-2 border-b">
 				<p><strong>ID:</strong> ${t.tournamentId}</p>
-				<p><strong>Ranking:</strong> ${t.ranking.join(", ")}</p>
+				<p><strong>Ranking:</strong>  ${Array.isArray(t.ranking) ? formatRanking(t.ranking) : "N/A"} </p>
 				<p><strong>On Chain:</strong>
 					<span class="${t.onChain ? "text-green-600" : "text-red-600"}">
 						${t.onChain ? "\u2705 YES" : "\u274C NO"}
@@ -4826,7 +4791,7 @@ async function showDBOnChain() {
     chainPanel.innerHTML = data.map((t) => `
 			<div class="p-2 border-b">
 				<p><strong>ID:</strong> ${t.tournamentId}</p>
-				${t.onChain ? `<p><strong>Blockchain Ranking:</strong> ${t.blockchainRanking.join(", ")}</p>` : `<p class="text-red-600"><strong>Not On Chain \u274C</strong></p>`}
+				${t.onChain && Array.isArray(t.blockchainRanking) ? `<p><strong>Blockchain Ranking:</strong> ${formatRanking(t.blockchainRanking)} </p>` : `<p class="text-red-600"><strong>Not On Chain \u274C</strong></p>`}				  
 			</div>
 		`).join("");
   } catch (err) {
@@ -5662,7 +5627,7 @@ async function initOAuthCallback() {
     } else {
       if (data.firstTimeLogin) {
         navigateTo("/setggpass");
-        showToast("Welcome! If this is your first login, please create a password for your account! \u{1F389}", "success", 3e3);
+        showToast("Welcome! If this is your first login, please create a password for your account! \u{1F389}", "warning");
       } else
         navigateTo("/home");
     }
@@ -5880,14 +5845,13 @@ async function InitEndGame() {
     document.getElementById("final-score").textContent = `${endgame.gameinfo.winner_score} - ${endgame.gameinfo.loser_score}`;
     const addFriend = document.getElementById("addgamer");
     const addFriendDark = document.getElementById("dark-addgamer");
-    if (endgame.friend) {
-      addFriend.classList.add("hidden");
+    if (endgame.friend || endgame.gameinfo.type === "AI" || endgame.gameinfo.type === "Local")
       addFriendDark.classList.remove("dark:block");
-    }
     if (endgame.gameinfo.type === "Online" || endgame.gameinfo.type === "Tournament") {
       document.getElementById("loser-elo").textContent = `- ${Math.abs(endgame.gameinfo.loser_elo)} \u{1F950}`;
       document.getElementById("winner-elo").textContent = `+ ${endgame.gameinfo.winner_elo} \u{1F950}`;
       if (addFriend && addFriendDark && !endgame.friend) {
+        addFriend.classList.remove("hidden");
         [addFriend, addFriendDark].forEach((el) => {
           el?.addEventListener("click", async () => {
             if (endgame.type === "victory") {
@@ -6125,7 +6089,7 @@ async function router() {
       }
     }
     console.log("reload ?", isReloaded, "from ", history?.state?.from, "to ", window.location.pathname);
-    if (isReloaded && !publicPath.includes(window.location.pathname) || window.location.pathname === "/home" && (!history.state || publicPath.includes(history.state.from))) {
+    if (auth.logged && (isReloaded && !publicPath.includes(window.location.pathname) || window.location.pathname === "/home" && (!history.state || publicPath.includes(history.state.from)))) {
       chatnet.connect(() => {
         chatnet.toKnowUserID();
         displayChat();
@@ -6136,8 +6100,10 @@ async function router() {
     loadHeader10(auth);
     if (publicPath.includes(location.pathname) && auth.logged)
       navigateTo("/home");
-    if (!publicPath.includes(location.pathname) && !auth.logged && location.pathname !== "/termsofservice" && location.pathname !== "/privacypolicy")
+    if (!publicPath.includes(location.pathname) && !auth.logged && location.pathname !== "/termsofservice" && location.pathname !== "/privacypolicy") {
+      console.log("in if");
       navigateTo("/");
+    }
   }
   const { route, params } = match;
   document.querySelector("#header-container").innerHTML;
@@ -6170,22 +6136,18 @@ async function popState() {
   const fromIsPrivate = !publicPath.includes(currentPath);
   console.log("path = ", path, "current path", currentPath);
   if (!history?.state?.from && fromIsPrivate) {
-    console.log("1");
     history.replaceState({ from: "/home" }, "", "/home");
     currentPath = "/home";
     navigateTo("/logout");
   } else if (!history?.state?.from && !fromIsPrivate) {
-    console.log("2");
     history.replaceState({ from: "/" }, "", "/");
     currentPath = "/";
   } else if (!toIsPrivate && fromIsPrivate) {
-    console.log("3");
     history.replaceState({ from: "/home" }, "", "/home");
     currentPath = "/home";
   } else {
     history.state.from = currentPath;
     currentPath = path;
-    console.log("4 ");
   }
   await router();
 }
