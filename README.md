@@ -267,6 +267,44 @@ Each chosen module was selected to enhance the project’s educational value and
 
 #### 2. Minor: Game statistics and match history (requires a game module).
 
+Minor: Game statistics and match history (requires a game module).
+◦ Track user game statistics (wins, losses, ranking, level, etc.).
+◦ Display match history (1v1 games, dates, results, opponents).
+◦ Show achievements and progression.
+◦ Leaderboard integration.
+
+Player Statistics Tracking:
+
+I implemented multiple API requests to retrieve all relevant player data, including wins, losses, and rank,
+which are then dynamically displayed on the user dashboard. The player’s level is shown directly in the header,
+accompanied by a visual progression bar that reflects experience gained and overall advancement in real time.
+
+Match History System:
+
+The DB stores a detailed match history for every player. For each 1v1 game, the following information is recorded and displayed:
+◦ Match date and time
+◦ Game mode (ranked, local, AI, etc.)
+◦ Final result (win or loss)
+◦ Opponent identity (player or AI)
+
+Achievements and Progression:
+
+A dedicated achievement system was designed to reward player engagement and skill progression.
+Achievements can be:
+
+◦ Unlocked, locked, or secret
+◦ Based on specific conditions (number of wins, ranking reached, special accomplishments, etc.)
+◦ Common, rare, secret
+
+Ranking and Leaderboard Integration:
+
+Competitive performance feeds directly into a leaderboard system, 
+where players are ranked based on their accumulated ranking points. This provides:
+
+◦ A clear competitive hierarchy
+◦ Motivation through comparison with other players
+◦ Real-time reflection of player progression in the global ranking
+
 #### 3. Minor: Implement remote authentication with OAuth 2.0 (Google, GitHub, 42, etc.)
 
 #### 4. Major: Advanced permissions system:
@@ -276,7 +314,6 @@ Each chosen module was selected to enhance the project’s educational value and
 #### 6. Minor: Implement a complete 2FA (Two-Factor Authentication) system for the users
 
 #### 7. Minor: User activity analytics and insights dashboard
-
 
 ### IV - Artificial Intelligence
 
@@ -293,6 +330,26 @@ Each chosen module was selected to enhance the project’s educational value and
 #### 7. Minor: Implement a tournament system
 #### 8. Minor: Game customization options
 #### 9. Minor: A gamification system to reward users for their actions
+
+ Minor: A gamification system to reward users for their actions.
+◦ Implement at least 3 of the following: achievements, badges, leaderboards,
+	XP/level system, daily challenges, rewards
+◦ System must be persistent (stored in database)
+◦ Visual feedback for users (notifications, progress bars, etc.)
+◦ Clear rules and progression mechanics
+
+4 implementations:
+◦ Avhievements
+◦ XP/level system
+◦ leaderboards,
+◦ badges
+
+All data is persistently stored in the database, ensuring progress is maintained between sessions.
+
+Visual feedback is provided through notifications and progress bars, giving users real-time updates on their achievements and progression.
+
+Rules and progression mechanics are transparent: players can view clear rules before starting a game, ensuring a fair and understandable system.
+
 #### 10. Minor: Implement spectator mode for games
 
 ### VII - Devops
