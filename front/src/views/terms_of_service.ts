@@ -1,4 +1,4 @@
-import { navigateTo, popState } from "../router";
+import { navigateTo } from "../router";
 
 export function TermsOfServiceView(): string
 {

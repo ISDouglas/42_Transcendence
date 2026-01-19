@@ -239,7 +239,7 @@ function pendingFr(pendingFriends: IMyFriends[]) {
 	if (!container)
 		return;
 	if (pendingFriends.length === 0) {
-		container.innerHTML = `<p class="text-base md:text-lg xl:text-xl 2xl:text-2xl italic text-center text-amber-800">No pending invitation</p>`;
+		container.innerHTML = `<p class="text-base md:text-lg xl:text-xl 2xl:text-2xl italic text-center dark:text-amber-50  text-amber-800">No pending invitation</p>`;
 		return;
 	}
 	pendingFriends.forEach(async (friend: IMyFriends) => {

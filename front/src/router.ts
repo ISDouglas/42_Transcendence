@@ -94,7 +94,8 @@ function saveHistoryStack(stack: string[]) {
 }
 
 export function navigateTo(url: string) {
-	const state = { from: window.location.pathname };
+	const state = { from: currentPath };
+	console.log("from =", state.from, "url =", url);
 	history.pushState(state, "", url);
 	currentPath = url;
 
@@ -270,7 +271,8 @@ export async function router() {
 				return;
 			}
 		}
-		if ((isReloaded || (window.location.pathname === "/home" && (!history.state || (publicPath.includes(history.state.from)))))) {
+		console.log("reload ?", isReloaded, "from ", history?.state?.from, "to ", window.location.pathname);
+		if ((isReloaded && !publicPath.includes(window.location.pathname)|| (window.location.pathname === "/home" && (!history.state || (publicPath.includes(history.state.from)))))) {
 			chatnet.connect( () => {
 				chatnet.toKnowUserID();
 				displayChat()
@@ -316,23 +318,30 @@ export async function popState() {
 	const path = window.location.pathname;
 	const toIsPrivate = !publicPath.includes(path);
 	const fromIsPrivate = !publicPath.includes(currentPath);
-	if (!history.state.from && fromIsPrivate)
+	console.log("path = ", path, "current path", currentPath);
+	if (!history?.state?.from && fromIsPrivate)
 	{
+		console.log("1");
 		history.replaceState({ from: "/home" }, "", "/home");
 		currentPath = "/home";
 		navigateTo("/logout");
 	}
-	else if (!history.state.from && !fromIsPrivate)
+	else if (!history?.state?.from && !fromIsPrivate)
 	{
+		console.log("2");
 		history.replaceState({ from: "/" }, "", "/");
 		currentPath = "/";
 	}
 	else if (!toIsPrivate && fromIsPrivate)
 	{
+		console.log("3");
 		history.replaceState( { from: "/home" }, "", "/home");
 		currentPath = "/home";
 	}
-	else
+	else {
+		history.state.from = currentPath;
 		currentPath = path;
+		console.log("4 ");
+	}
 	await router();
 }
