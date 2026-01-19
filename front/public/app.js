@@ -4902,7 +4902,7 @@ async function displayChat() {
     chatWindow.classList.toggle("hidden");
     chatBar.classList = "bg-amber-800 hover:bg-amber-900 text-white px-4 py-2 rounded-lg shadow cursor-pointer w-32 xl:w-60 text-center";
     if (!chatWindow?.classList.contains("hidden")) {
-      chatBar.classList = "bg-amber-100 text:amber-800 hover:bg-amber-800 hover:text-amber-100 dark:bg-amber-800 dark:text-amber-100 px-4 py-2 rounded-lg shadow cursor-pointer w-32 xl:w-60 text-center";
+      chatBar.classList = "bg-amber-100 text-amber-800 hover:bg-amber-800 hover:text-white dark:bg-amber-800 dark:text-white px-4 py-2 rounded-lg shadow cursor-pointer w-32 xl:w-60 text-center";
       setTimeout(() => {
         chatBox.scrollTop = chatBox.scrollHeight;
       }, 0);
@@ -5145,12 +5145,16 @@ function toAddFriend(id, li) {
 }
 function toAcceptFriend(friend, li) {
   const button = li.getElementById("addordelete");
+  const buttonD = li.getElementById("addordeleteBIS");
   if (friend.asked_by !== friend.id) {
     toDeleteFriend(friend.id, li);
     return button;
   }
   button.textContent = "Accept";
+  buttonD.textContent = "Deny";
   button.classList.add("hover:bg-amber-800");
+  buttonD.classList.remove("hidden");
+  buttonD.classList.add("hover:bg-amber-800");
   button.addEventListener("click", async () => {
     try {
       await genericFetch("/api/private/friend/accept", {
@@ -5160,9 +5164,26 @@ function toAcceptFriend(friend, li) {
       });
       button.textContent = "Accepted";
       button.disabled = true;
+      buttonD.classList.add("hidden");
       navigateTo("/friends");
     } catch (err) {
       button.disabled = false;
+      showToast(err, "error", 3e3);
+    }
+  });
+  buttonD.addEventListener("click", async () => {
+    try {
+      await genericFetch("/api/private/friend/delete", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ friendID: friend.id })
+      });
+      buttonD.textContent = "Denied";
+      buttonD.disabled = true;
+      button.classList.add("hidden");
+      navigateTo("/friends");
+    } catch (err) {
+      buttonD.disabled = false;
       showToast(err, "error", 3e3);
     }
   });
@@ -5192,7 +5213,7 @@ function pendingFr(pendingFriends) {
   if (!container)
     return;
   if (pendingFriends.length === 0) {
-    container.innerHTML = `<p class="text-base md:text-lg xl:text-xl 2xl:text-2xl italic text-center text-amber-800">No pending invitation</p>`;
+    container.innerHTML = `<p class="text-base md:text-lg xl:text-xl 2xl:text-2xl italic text-center dark:text-amber-50  text-amber-800">No pending invitation</p>`;
     return;
   }
   pendingFriends.forEach(async (friend) => {
@@ -5861,7 +5882,7 @@ async function InitEndGame() {
     const addFriendDark = document.getElementById("dark-addgamer");
     if (endgame.friend) {
       addFriend.classList.add("hidden");
-      addFriendDark.classList.add("hidden");
+      addFriendDark.classList.remove("dark:block");
     }
     if (endgame.gameinfo.type === "Online" || endgame.gameinfo.type === "Tournament") {
       document.getElementById("loser-elo").textContent = `- ${Math.abs(endgame.gameinfo.loser_elo)} \u{1F950}`;
@@ -5951,7 +5972,8 @@ function saveHistoryStack(stack) {
   sessionStorage.setItem(HISTORY_KEY, JSON.stringify(stack));
 }
 function navigateTo(url2) {
-  const state = { from: window.location.pathname };
+  const state = { from: currentPath };
+  console.log("from =", state.from, "url =", url2);
   history.pushState(state, "", url2);
   currentPath = url2;
   const stack = getHistoryStack();
@@ -6102,7 +6124,8 @@ async function router() {
         return;
       }
     }
-    if (isReloaded || window.location.pathname === "/home" && (!history.state || publicPath.includes(history.state.from))) {
+    console.log("reload ?", isReloaded, "from ", history?.state?.from, "to ", window.location.pathname);
+    if (isReloaded && !publicPath.includes(window.location.pathname) || window.location.pathname === "/home" && (!history.state || publicPath.includes(history.state.from))) {
       chatnet.connect(() => {
         chatnet.toKnowUserID();
         displayChat();
@@ -6137,26 +6160,33 @@ async function initRouter() {
   });
   currentPath = window.location.pathname;
   window.addEventListener("popstate", async () => {
-    await popState3();
+    await popState();
   });
   await router();
 }
-async function popState3() {
+async function popState() {
   const path = window.location.pathname;
   const toIsPrivate = !publicPath.includes(path);
   const fromIsPrivate = !publicPath.includes(currentPath);
-  if (!history.state.from && fromIsPrivate) {
+  console.log("path = ", path, "current path", currentPath);
+  if (!history?.state?.from && fromIsPrivate) {
+    console.log("1");
     history.replaceState({ from: "/home" }, "", "/home");
     currentPath = "/home";
     navigateTo("/logout");
-  } else if (!history.state.from && !fromIsPrivate) {
+  } else if (!history?.state?.from && !fromIsPrivate) {
+    console.log("2");
     history.replaceState({ from: "/" }, "", "/");
     currentPath = "/";
   } else if (!toIsPrivate && fromIsPrivate) {
+    console.log("3");
     history.replaceState({ from: "/home" }, "", "/home");
     currentPath = "/home";
-  } else
+  } else {
+    history.state.from = currentPath;
     currentPath = path;
+    console.log("4 ");
+  }
   await router();
 }
 var routes, publicPath, currentRoute, currentPath, isReloaded, nav, HISTORY_KEY;

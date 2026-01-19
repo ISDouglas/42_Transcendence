@@ -224,7 +224,7 @@ Each chosen module was selected to enhance the project’s educational value and
   - The friends page is divided into four sections:
     - search bar: to add users – includes a debounce function to avoid excessive database calls.
     - friends list: displays avatar, status (online/offline...), friendship date, and a button to delete a friend.
-    - pending invitations: display username, avatar, and request date (if less than 3 days: displayed as x seconds, x minutes, x hours, or x days ago), with accept and delete buttons.
+    - pending invitations: display username, avatar, and request date (if less than 3 days: displayed as x seconds, x minutes, x hours, or x days ago), with accept/deny and delete buttons.
     - friend suggestions: other users with whom games have been played, limited to 20 suggestions.
     - SQL queries are used to build this page. The Friend table, which associates two users with information about their friendship (date, status), and the game_info table, used for friend suggestions, provide the necessary data to build this page.
    
@@ -418,7 +418,6 @@ Rules and progression mechanics are transparent: players can view clear rules be
   - This JWT mechanism allows user information to be securely transmitted to the front-end.
 
 - **PIC**: edelanno
-
 
 ---
 
