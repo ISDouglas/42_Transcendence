@@ -257,10 +257,6 @@ fastify.get("/api/private/tournament/list", async (request, reply) => {
 	reply.send({ message: "Player joined tournament" });
 }); */
 
-fastify.post("/api/private/tournament/add", (req, reply) => {
-	return tournamentService.updateTournament(req, reply);
-});
-
 fastify.get("/api/private/tournament/all", (req, reply) => {
 	return tournamentService.getAllTournamentsDetailed(req, reply);
 });
@@ -350,7 +346,8 @@ async function lunchDB()
 	await gameInfo.deleteGameInfoTable();
 	await gameInfo.createGameInfoTable();
 	
-	await tournament.createTournamentTable();
+	await tournamentDB.createTournamentTable();
+	await tournamentDB.createTournamentResultTable();
 	
 	await achievements.deleteTable();
 	await achievements.createAchievementsTable();
@@ -372,7 +369,7 @@ const start = async () => {
 		console.log(`Server running on port ${PORT}`);
 		await db.connect();
 		await lunchDB();
-		blockchainUpload();
+		//blockchainUpload();
 		// const hashedPasswor= await bcrypt.hash("42", 12);
 		// let hashedPassword = await bcrypt.hash("a", 12);
 		// users.addUser("a", "e@g.c", hashedPassword, 200);
