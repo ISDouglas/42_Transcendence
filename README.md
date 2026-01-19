@@ -1,10 +1,10 @@
 # ft_transcendence — Croiscendence 🥐
 
-*This project was created as part of the 42 curriculum by edelanno, lanyang, nrontard, pmenard, tat-nguy
+*This project was created as part of the 42 curriculum by **edelanno**, **lanyang**, **nrontard**, **pmenard** and **tat-nguy***
 
 ---
 
-## Introduction
+## ℹ️ Introduction
 
 ### The Project
 
@@ -33,7 +33,7 @@ The application respects the technical constraints imposed by the subject, such 
 
 ---
 
-## The Team
+## 🧑‍🧑‍🧒‍🧒 The Team
 
 ### Team Information
 
@@ -46,8 +46,6 @@ The application respects the technical constraints imposed by the subject, such 
 |  | Front-end Lead & Developer | Game logic, real-time features, Frontend decisions, UI/UX |
 
 
----
-
 ### Project Management
 
 - **Regular communication:** Meeting weekly in Alantis co-working place to explain the work and sync on progress and the difficulities.
@@ -58,7 +56,6 @@ The application respects the technical constraints imposed by the subject, such 
 - **Version control:** Git with feature branches and code reviews.
 - **Communication channel:** Discord for daily communication and meetings.
 
----
 
 ### Individual Contributions
 
@@ -74,7 +71,7 @@ Other challenges such as real-time synchronization, authentication flow, and con
 
 ---
 
-## Description
+## 📜 Description
 
 ### Overview
 
@@ -86,7 +83,6 @@ Other challenges such as real-time synchronization, authentication flow, and con
 
 The goal of the project is to deliver a fun and competitive game while demonstrating solid full-stack engineering skills.
 
----
 
 ### Technical Stack
 
@@ -110,7 +106,6 @@ The goal of the project is to deliver a fun and competitive game while demonstra
 
 **Technical choices were made to balance performance, simplicity, and compliance with the ft_transcendence subject constraints.**
 
----
 
 ### Database Schema
 
@@ -120,8 +115,6 @@ The database stores:
 - Tournaments (participants, progression)
 
 Relationships are designed to ensure data consistency and efficient queries.
-
----
 
 ### Key Features
 
@@ -136,7 +129,7 @@ and workload distribution.
 
 ---
 
-### Modules in Detail
+## Modules in Detail
 
 - **Major Modules** (2 points each)
 - **Minor Modules** (1 point each)
@@ -149,9 +142,97 @@ Each chosen module was selected to enhance the project’s educational value and
 > - Team members involved
 > )
 
-#### VII - Devops
+### I - Web
 
-##### 1. Major Module: Monitoring system with Prometheus and Grafana (2 points)
+#### 1. Major: Use a framework for both the frontend and backend
+#### 2. Minor: Use a frontend framework (React, Vue, Angular, Svelte, etc.)
+#### 3. Minor: Use a backend framework (Express, Fastify, NestJS, Django, etc.).
+#### 4. Major: Implement real-time features using WebSockets or similar technology.
+#### 5. Major: Allow users to interact with other users (2 points)
+
+The minimum requirements are:
+◦ A basic chat system (send/receive messages between users).
+◦ A profile system (view user information).
+◦ A friends system (add/remove friends, see friends list).
+
+We chose this module because it contains important and relevant features for a gaming platform.
+
+We implemented a general chat that allows users to communicate with all other connected users.
+WebSockets enable real-time chat, available across all pages once the user is connected.
+To ensure persistence, messages are stored in a database, with a limit of 25 messages (managed by a trigger that removes the oldest entry when a new one is added).
+Messages are displayed in one color when a member sends a message and in another color when they receive one.
+Multiple connections are also handled: if a user connects from multiple devices, the message bubbles remain consistent, and each message appears only once.
+
+The friends page is divided into four sections:
+- search bar: to add users – includes a debounce function to avoid excessive database calls.
+- friends list: displays avatar, status (online/offline...), friendship date, and a button to delete a friend.
+- pending invitations: display username, avatar, and request date (if less than 3 days: displayed as x seconds, x minutes, x hours, or x days ago), with accept and delete buttons.
+- friend suggestions: other users with whom games have been played, limited to 20 suggestions.
+
+SQL queries are used to build this page. The Friend table, which associates two users with information about their friendship (date, status), and the game_info table, used for friend suggestions, provide the necessary data to build this page.
+
+
+
+#### 6. Major: A public API to interact with the database with a secured API key, rate limiting, documentation, and at least 5 endpoints
+#### 7. Minor: Use an ORM for the database
+#### 8. Minor: A complete notification system for all creation, update, and deletion actions.
+#### 9. Minor: Real-time collaborative features (shared workspaces, live editing, collabo-rative drawing, etc.).
+#### 10. Minor: Server-Side Rendering (SSR) for improved performance and SEO.
+#### 11. Minor: Progressive Web App (PWA) with offline support and installability.
+#### 12. Minor: Custom-made design system with reusable components, including a propercolor palette, typography, and icons (minimum: 10 reusable components).
+#### 13. Minor: Implement advanced search functionality with filters, sorting, and pagination.
+#### 14. Minor: File upload and management system.
+
+
+### II - Accessibility and Internationalization
+
+### III - User Management
+
+#### 1. Major: Standard user management and authentication (2 pts)
+
+- Motivation: Enhance user experience and user engagement of the game
+  
+- Module in details:
+  - Users have a profile page displaying all their information
+  - User can update their profile informations such as *Username*, *Password*, *Email*, *2FA Enable*, *Online Status*, *Avatar*
+  - Users can upload an avatar (with a default avatar if none provided). The avatar path is stored in the Users database. A default path is set initially. Each time the avatar is updated, it is renamed as user_id.type. Upload restrictions are enforced for file size and type (6 MB – PNG and JPEG).
+  - Users can add other users as friends and see their online status. On the friends page, users can send friend requests and view their friends along with their status.
+
+- PIC: edelanno, tat-nguy
+
+#### 2. Minor: Game statistics and match history (requires a game module).
+
+#### 3. Minor: Implement remote authentication with OAuth 2.0 (Google, GitHub, 42, etc.)
+
+#### 4. Major: Advanced permissions system:
+
+#### 5. Major: An organization system
+
+#### 6. Minor: Implement a complete 2FA (Two-Factor Authentication) system for the users
+
+#### 7. Minor: User activity analytics and insights dashboard
+
+
+### IV - Artificial Intelligence
+
+### V - Cybersecurity
+
+### VI - Gaming and user experience
+
+#### 1. Major: Implement a complete web-based game where users can play against each other
+#### 2. Major: Remote players — Enable two players on separate computers to play the same game in real-time
+#### 3. Major: Multiplayer game (more than two players)
+#### 4. Major: Add another game with user history and matchmaking
+#### 5. Major: Implement advanced 3D graphics using a library like Three.js or Babylon.js.
+#### 6. Minor: Advanced chat features (enhances the basic chat from "User interaction" module).
+#### 7. Minor: Implement a tournament system
+#### 8. Minor: Game customization options
+#### 9. Minor: A gamification system to reward users for their actions
+#### 10. Minor: Implement spectator mode for games
+
+### VII - Devops
+
+#### 1. Major Module: Monitoring system with Prometheus and Grafana (2 points)
 
 - Motivation: This helps monitoring the server system, analyzing performance and informing the team immediately when there's a trouble in operation of the server and used services.
 
@@ -196,71 +277,30 @@ Each chosen module was selected to enhance the project’s educational value and
 - PIC: tat-nguy
 
 
-IV.1 Web
+### VIII - Data and Analytics
+
+### IX - Blockchain
+#### 1. Major: Store tournament scores on the Blockchain (2 pts)
 
 
+### X - Modules of choice
 
+#### 1. Minor : JWT (Json Web Token) (1 point)
 
+- Motivation: For enhanced security, we have implemented a JWT-based system.
+  
+- Details:
+  - Upon each login, a JWT is generated and stored in the cookies. It is valid for one hour and contains the user’s ID.
+  - Using an addhook, the system checks on every page whether the JWT exists and is still valid.
+  - If the token has expired or is invalid, the user is automatically logged out.
+  - This JWT mechanism allows user information to be securely transmitted to the front-end.
 
-Major: Allow users to interact with other users. The minimum requirements are:
-◦ A basic chat system (send/receive messages between users).
-◦ A profile system (view user information).
-◦ A friends system (add/remove friends, see friends list).
+- PIC: edelanno
 
-We chose this module because it contains important and relevant features for a gaming platform.
-
-We implemented a general chat that allows users to communicate with all other connected users.
-WebSockets enable real-time chat, available across all pages once the user is connected.
-To ensure persistence, messages are stored in a database, with a limit of 25 messages (managed by a trigger that removes the oldest entry when a new one is added).
-Messages are displayed in one color when a member sends a message and in another color when they receive one.
-Multiple connections are also handled: if a user connects from multiple devices, the message bubbles remain consistent, and each message appears only once.
-
-The friends page is divided into four sections:
-- search bar: to add users – includes a debounce function to avoid excessive database calls.
-- friends list: displays avatar, status (online/offline...), friendship date, and a button to delete a friend.
-- pending invitations: display username, avatar, and request date (if less than 3 days: displayed as x seconds, x minutes, x hours, or x days ago), with accept and delete buttons.
-- friend suggestions: other users with whom games have been played, limited to 20 suggestions.
-
-SQL queries are used to build this page. The Friend table, which associates two users with information about their friendship (date, status), and the game_info table, used for friend suggestions, provide the necessary data to build this page.
-
-
-
-
-
-IV.3 User Management
-
-
-Major: Standard user management and authentication.
-◦ Users can update their profile information.
-◦ Users can upload an avatar (with a default avatar if none provided).
-◦ Users can add other users ass friends and see their online status.
-◦ Users have a profile page displaying their information
-
-
-
-
-The avatar path is stored in the Users database.
-A default path is set initially. Each time the avatar is updated, it is renamed as user_id.type.
-Upload restrictions are enforced for file size and type (6 MB – PNG and JPEG).
-
-On the friends page, users can send friend requests and view their friends along with their status.
-
-
-
-
-
-IV.10 Modules of choice
-Minor : JWT (Json Web Token)
-
-For enhanced security, we have implemented a JWT-based system.
-Upon each login, a JWT is generated and stored in the cookies. It is valid for one hour and contains the user’s ID.
-Using an addhook, the system checks on every page whether the JWT exists and is still valid.
-If the token has expired or is invalid, the user is automatically logged out.
-This JWT mechanism allows user information to be securely transmitted to the front-end.
 
 ---
 
-## Instructions
+## 💻 Instructions
 
 ### Prerequisites
 
@@ -294,7 +334,7 @@ This JWT mechanism allows user information to be securely transmitted to the fro
 
 ---
 
-## Resources
+## 🤖 Resources
 
 ### References
 
@@ -319,13 +359,15 @@ All final design decisions and implementations as well as other missions were ma
 
 ---
 
-## Limitations and Potential Improvements
+## 🐛 Limitations and Potential Improvements
 - Improve matchmaking algorithms
 - Add spectator mode
 - Enhance animations and visual effects
 - Support persistent tournaments
 - Improve scalability for higher player counts
 
-Happy Playing!
+---
+
+🎮 Happy Playing! 🎮
 
 
