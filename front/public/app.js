@@ -222,9 +222,13 @@ async function initDashboard() {
         winnerpath.src = game.winner_avatar;
         winnerscore.textContent = game.winner_score.toString();
         winnerpseudo.textContent = game.winner_pseudo;
+        if (game.winner_id === dashboards.userId)
+          winnerpseudo.classList.add("font-semibold", "filter", "drop-shadow-[0_0_12px_rgba(34,255,120,0.9)]");
         loserpath.src = game.loser_avatar;
         loserscore.textContent = game.loser_score.toString();
         loserpseudo.textContent = game.loser_pseudo;
+        if (game.loser_id === dashboards.userId)
+          loserpseudo.classList.add("font-semibold", "filter", "drop-shadow-[0_0_10px_rgba(255,0,0,0.8)]");
         date.textContent = new Date(game.date_game).toLocaleDateString();
         duration.textContent = "Duration: " + formatDuration(game.duration_game);
         type.textContent = game.type;
@@ -4748,19 +4752,8 @@ function TournamentView() {
   setTimeout(() => initTournamentPage(), 0);
   return html;
 }
-function generateRandomRanking() {
-  const ranking = [];
-  while (ranking.length < 8) {
-    const randomId = Math.floor(Math.random() * 16) + 1;
-    if (!ranking.includes(randomId)) {
-      ranking.push(randomId);
-    }
-  }
-  return ranking;
-}
 function initTournamentPage() {
   const createTournamentBtn = document.getElementById("create-tournament");
-  const createBtn = document.getElementById("create-test");
   const showBtn = document.getElementById("show-onchain");
   const backBtn = document.getElementById("back-to-home");
   createTournamentBtn?.addEventListener("click", async () => {
@@ -4772,9 +4765,6 @@ function initTournamentPage() {
     else
       navigateTo(`/brackets/${tournamentId}`);
   });
-  createBtn?.addEventListener("click", async () => {
-    await testTournamentDB();
-  });
   showBtn?.addEventListener("click", async () => {
     await showDBOnChain();
   });
@@ -4782,29 +4772,8 @@ function initTournamentPage() {
     navigateTo("/home");
   });
 }
-async function testTournamentDB() {
-  const testRanking = generateRandomRanking();
-  try {
-    const data = await genericFetch("/api/private/tournament/add", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ranking: testRanking })
-    });
-    const dbPanel = document.getElementById("db-panel");
-    if (dbPanel) {
-      dbPanel.innerHTML = `
-				<div class="p-2 border-b">
-					<p class="text-green-700 font-bold">\u2705 Tournament Created!</p>
-					<p><strong>Ranking:</strong> ${testRanking.join(", ")}</p>
-					<p class="text-gray-600 text-sm">(Now stored in database)</p>
-				</div>
-			`;
-    }
-    console.log("Tournament response:", data);
-  } catch (err) {
-    console.error("Error creating tournament:", err);
-    showToast(err, "error", 2e3, "Error creating tournament:");
-  }
+function formatRanking(ranking) {
+  return ranking.map((id) => id === -1 ? "AI" : id.toString()).join(", ");
 }
 async function showDBOnChain() {
   try {
@@ -4815,7 +4784,7 @@ async function showDBOnChain() {
     dbPanel.innerHTML = data.map((t) => `
 			<div class="p-2 border-b">
 				<p><strong>ID:</strong> ${t.tournamentId}</p>
-				<p><strong>Ranking:</strong> ${t.ranking.join(", ")}</p>
+				<p><strong>Ranking:</strong>  ${Array.isArray(t.ranking) ? formatRanking(t.ranking) : "N/A"} </p>
 				<p><strong>On Chain:</strong>
 					<span class="${t.onChain ? "text-green-600" : "text-red-600"}">
 						${t.onChain ? "\u2705 YES" : "\u274C NO"}
@@ -4826,7 +4795,7 @@ async function showDBOnChain() {
     chainPanel.innerHTML = data.map((t) => `
 			<div class="p-2 border-b">
 				<p><strong>ID:</strong> ${t.tournamentId}</p>
-				${t.onChain ? `<p><strong>Blockchain Ranking:</strong> ${t.blockchainRanking.join(", ")}</p>` : `<p class="text-red-600"><strong>Not On Chain \u274C</strong></p>`}
+				${t.onChain && Array.isArray(t.blockchainRanking) ? `<p><strong>Blockchain Ranking:</strong> ${formatRanking(t.blockchainRanking)} </p>` : `<p class="text-red-600"><strong>Not On Chain \u274C</strong></p>`}				  
 			</div>
 		`).join("");
   } catch (err) {
@@ -5641,7 +5610,7 @@ async function initOAuthCallback() {
     } else {
       if (data.firstTimeLogin) {
         navigateTo("/setggpass");
-        showToast("Welcome! If this is your first login, please create a password for your account! \u{1F389}", "success", 3e3);
+        showToast("Welcome! If this is your first login, please create a password for your account! \u{1F389}", "warning");
       } else
         navigateTo("/home");
     }
@@ -5861,7 +5830,7 @@ async function InitEndGame() {
     const addFriendDark = document.getElementById("dark-addgamer");
     if (endgame.friend) {
       addFriend.classList.add("hidden");
-      addFriendDark.classList.add("hidden");
+      addFriendDark.classList.remove("dark:block");
     }
     if (endgame.gameinfo.type === "Online" || endgame.gameinfo.type === "Tournament") {
       document.getElementById("loser-elo").textContent = `- ${Math.abs(endgame.gameinfo.loser_elo)} \u{1F950}`;
