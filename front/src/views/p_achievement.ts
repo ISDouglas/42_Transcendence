@@ -48,8 +48,9 @@ export async function initAchievement()
 		const achievement: AchievementInfo = await genericFetch("/api/private/achievement", {method: "GET"});
 		const container1 = document.getElementById("part1") as HTMLElement;
 		const container2 = document.getElementById("part2") as HTMLElement;
+		const container3 = document.getElementById("part3") as HTMLElement;
+		const container4 = document.getElementById("part4") as HTMLElement;
 
-			console.log(achievement.locked);
 		const unlockedMap = mapByCode(achievement.unlocked);
 		const lockedMap = mapByCode(achievement.locked);
 
@@ -91,7 +92,14 @@ export async function initAchievement()
 
 			effect.classList.add(...rarityBackground[achievement.rarity]);
 
-			(i <= 4 ? container1 : container2).appendChild(node);
+			if (i <=2)
+				container1.appendChild(node);
+			else if (i > 2 && i <=4)
+				container2.appendChild(node);
+			else if (i > 4 && i <=6)
+				container3.appendChild(node);
+			else if (i > 6 && i <=8)
+				container4.appendChild(node);
 			i++;
 		}
 	}
