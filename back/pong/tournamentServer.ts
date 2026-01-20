@@ -22,7 +22,7 @@ export function handleTournamentSocket(io: Server, socket: Socket)
 			tournament.disconnectTimer = null;
 		}
 	
-		fillSocketTournament(playerId, tournament, socket);
+		fillSocketTournament(playerId, tournament, socket, io);
 		updateBrackets(io, tournament, socket.data.tournamentId);
 		io.to(`tournament-${tournamentId}`).emit("state", updateStateTournament(tournament.state));
 	
@@ -414,10 +414,8 @@ function updateStateTournament(state: TournamentState)
 	};
 }
 
-function fillSocketTournament(playerId: number, tournament: serverTournament, socket: Socket)
+function fillSocketTournament(playerId: number, tournament: serverTournament, socket: Socket, io: Server)
 {
-	tournament.idPlayers[tournament.semi_index[tournament.index]] = playerId;
-
 	const pseudo = socket.data.user.pseudo;
 	if (playerId === tournament.idPlayers[0])
 	{
@@ -441,7 +439,7 @@ function fillSocketTournament(playerId: number, tournament: serverTournament, so
 	}
 	else
 	{
-		return;
+		io.to(socket.id).emit("kick");
 	}
 }
 

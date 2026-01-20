@@ -4598,6 +4598,9 @@ var init_tournamentNetwork = __esm({
         this.socket.on("hostDisconnected", () => {
           this.onHostDisconnectedCallback?.();
         });
+        this.socket.on("kick", () => {
+          this.onKickCallback?.();
+        });
         this.socket.on("disconnection", () => {
           this.onDisconnectionCallback?.();
         });
@@ -4619,6 +4622,9 @@ var init_tournamentNetwork = __esm({
       }
       SetupFinal() {
         this.socket.emit("setupFinal");
+      }
+      onKick(cb) {
+        this.onKickCallback = cb;
       }
       onSetUpSpecFinal(cb) {
         this.onsetUpSpecFinalCallback = cb;
@@ -4657,18 +4663,6 @@ function BracketsView() {
 }
 async function initBrackets(params) {
   const tournamentID = params?.id;
-  const prev = getPreviousPath();
-  let beforePrev = getBeforePreviousPath();
-  console.log("prev : ", prev);
-  console.log("beforePrev : ", beforePrev);
-  if (prev === null || beforePrev === null || !beforePrev.startsWith("/tournament") || !prev.startsWith("/brackets")) {
-    if (!beforePrev.startsWith("/pongmatch")) {
-      if (!beforePrev.startsWith(`/brackets/${Number(tournamentID)}`)) {
-        navigateTo("/home");
-        return;
-      }
-    }
-  }
   const startTournamentButton = document.getElementById("start-button");
   const replayButton = document.getElementById("replay-button");
   const homeButton = document.getElementById("home-button");
@@ -4723,6 +4717,10 @@ async function initBrackets(params) {
       net2?.startTournament();
       startTournamentButton?.classList.add("hidden");
     });
+  });
+  net2.onKick(() => {
+    navigateTo("/home");
+    return;
   });
   net2.onStartTournamentGame((gameId, tournamentId) => {
     navigateTo(`/pongmatch/${gameId}?tournamentId=${tournamentId}`);

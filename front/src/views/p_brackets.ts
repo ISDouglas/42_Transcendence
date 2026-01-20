@@ -1,4 +1,4 @@
-import { navigateTo, getPreviousPath, getBeforePreviousPath } from "../router";
+import { navigateTo } from "../router";
 import { TournamentInstance } from "../tournament/tournamentInstance";
 import { TournamentNetwork, TournamentState } from "../tournament/tournamentNetwork";
 
@@ -11,23 +11,6 @@ export function BracketsView(): string {
 
 export async function initBrackets(params?: any) {
 	const tournamentID: string = params?.id;
-
-	const prev = getPreviousPath();
-	let beforePrev = getBeforePreviousPath();
-	console.log("prev : ", prev);
-	console.log("beforePrev : ", beforePrev);
-	if (prev === null || beforePrev === null || !beforePrev.startsWith("/tournament") || !prev.startsWith("/brackets"))
-	{
-		if (!beforePrev.startsWith("/pongmatch"))
-		{
-			if (!beforePrev.startsWith(`/brackets/${Number(tournamentID)}`))
-			{
-				navigateTo("/home");
-				return;
-			}
-		}
-	}
-
 	const startTournamentButton = document.getElementById("start-button");
 	const replayButton = document.getElementById("replay-button");
 	const homeButton = document.getElementById("home-button");
@@ -92,6 +75,11 @@ export async function initBrackets(params?: any) {
 			net?.startTournament();
 			startTournamentButton?.classList.add("hidden");
 		});
+	});
+
+	net.onKick(() => {
+		navigateTo("/home");
+		return;
 	});
 
 	net.onStartTournamentGame((gameId: number, tournamentId: number) => {
