@@ -192,9 +192,31 @@
 		</footer>
 	</template>
 
+	<template id="set-gg-password-html">
+		<main class="flex flex-col items-center">
+			<form id="set-gg-password-form" class="flex flex-col rounded-lg items-center justify-center text-center bg-white ring-4 ring-amber-300 dark:bg-black/20 backdrop-blur-lg shadow-lg mt-40 w-100 h-100 mx-auto">
+				<h1 class="text-xl font-bold text-amber-900 dark:text-white mb-6">Create A Password</h1>
+				<p class="text-sm text-amber-900 dark:text-gray-400 mt-3 mb-0.5">
+					🎉 Welcome! This is your first time login by Google Oauth 2.0, please create a <strong>strong password</strong> to protect your account.
+				</p>
+				<h2 class="text-2xl font-bold text-amber-900 dark:text-white my-3">Password</h2>
+				<input class="input" type="password" name="new-password" placeholder="••••••••••••" required />
+				<h2 class="text-2xl font-bold text-amber-900 dark:text-white my-3">Confirm Password</h2>
+				<input class="input" type="password" name="confirm-new-password" placeholder="••••••••••••" required />
+				<button type="submit"  class="btn w-40"> Create Password</button>
+			</form>
+			<p id="rules-password" class="mt-4 max-w-md text-center text-xs text-amber-900 dark:text-white opacity-50 px-4">
+			Password rules :<br>
+			- The password must contain at least 12 characters.<br>
+			- It must include at least one uppercase letter (A-Z), one lowercase letter (a-z) and one digit (0-9).<br>
+			- It must include at least one special character : !@#$%^&*()_-+=.?.<br>
+			</p>
+		</main>
+	</template>
+
 	<template id="registerhtml">
-		<div class="register-container min-h-screen flex flex-col items-center justify-start px-4">
-			<form id="register-form" class="mt-20 w-full max-w-md flex flex-col rounded-lg ring-4 ring-amber-300 bg-white dark:bg-black/20 backdrop-blur-lg shadow-lg px-8 py-6">
+		<div class="register-container flex flex-col items-center justify-start px-4">
+			<form id="register-form" class="mt-10 w-full max-w-md flex flex-col rounded-lg ring-4 ring-amber-300 bg-white dark:bg-black/20 backdrop-blur-lg shadow-lg px-8 py-6">
 				<h1 class="text-center text-xl font-bold text-amber-900 dark:text-white">
 					Registration
 					<span class="block text-lg font-normal opacity-50 mt-1">
@@ -1129,76 +1151,6 @@
 		</footer>
 	</template>
 
-	<template id="set-gg-password-html">
-		<div>
-			<br>
-		</div>
-		<main class="flex">
-			<div class="bg-[linear-gradient(180deg,var(--color-amber-400)_20%,var(--color-amber-50)_20%)] 
-						ring-4 ring-amber-900 flex flex-col w-100 h-full rounded-lg mt-2 
-						mx-auto shadow-2xl items-center">
-				<div class="flex flex-row w-100 mt-3 justify-between">
-					<div class="w-5"></div>
-					<h1 class="text-3xl mx-auto font-bold text-amber-900
-						drop-shadow-lg" id="profile-pseudo">
-					</h1>
-					<a class="size-6 mt-2 justify-end mr-5 object-contain" href="/profile" data-link>
-						<img class="invert ring-1 p-0.5 ring-blue-950 rounded-md" src="src/image/back.png" alt="back">
-					</a>
-				</div>
-				<a class="mt-2 object-contain">
-					<img class="ring-4 ring-amber-900 rounded-full shadow-xl" id="profile-avatar" src="" alt="Your avatar" width="150">
-				</a>
-				<div class="flex flex-col mt-6">
-					<!-- Create Password -->
-					<div class="flex flex-col shadow-sm text-amber-900 bg-amber-300/20
-								w-80 ring-1 ring-amber-900 rounded-lg mt-6 p-3">
-						<h2 class="font-bold mb-2 text-center">Create A Password</h2>
-						<p class="text-sm text-amber-900 mt-3 mb-0.5">
-							🎉 Welcome! This is your first time login by Google Oauth 2.0, please create a <strong>strong password</strong> to protect your account.
-						</p>
-						<form id="set-gg-password-form" class="flex flex-col gap-2">
-							<h2 class="text-sm text-amber-900 mt-3 mb-0.5">Password</h2>
-							<input
-								class="rounded-md px-2 py-1 ring-1 ring-amber-400"
-								type="password"
-								name="new-password"
-								placeholder="••••••••••••"
-								required />
-							<h2 class="text-sm text-amber-900 mt-3 mb-0.5">Confirm Password</h2>
-							<input
-								class="rounded-md px-2 py-1 ring-1 ring-amber-400"
-								type="password"
-								name="confirm-new-password"
-								placeholder="••••••••••••"
-								required />
-							<button
-								type="submit" 
-								class="btn w-40 mx-auto mt-20 block">
-								Create Password
-							</button>
-						</form>
-					</div>
-				</div>
-				<div>
-					<br>
-				</div>
-			</div>
-		</main>
-		<div>
-			<br>
-		</div>
-		<footer class="dark:text-white text-center text-sm opacity-60">
-			<div><br></div>
-			<div>
-					<a href="/termsofservice" data-link class="hover:underline">Terms of Service</a>
-					<span>|</span>
-					<a href="/privacypolicy" data-link class="hover:underline">Privacy Policy</a>
-			</div>
-			<p>© 2026 Croiscendence</p>
-			<div><br></div>
- 		</footer>
-	</template>
 
 	<template id="update-avatar-html">
 		<main class="flex-1 flex flex-col px-4">
@@ -1666,13 +1618,6 @@
 				</div>
 			</div>
 		</div>
-
-		<footer class="absolute bottom-4 w-full dark:text-white duration-300 text-center text-sm opacity-60">
-			<a href="/termsofservice" data-link class="hover:underline">Terms of Service</a>
-			<span>|</span>
-			<a href="/privacypolicy" data-link class="hover:underline">Privacy Policy</a>
-			<p>© 2026 Croiscendence</p>
-		</footer>
 	</template>
 
 	<template id="tournamenthtml">
@@ -1770,12 +1715,6 @@
 				</a>
 			</div>
 		</div>
-		<footer class="absolute bottom-4 w-full dark:text-white duration-300 text-center text-sm opacity-60">
-			<a href="/termsofservice" data-link class="hover:underline">Terms of Service</a>
-			<span>|</span>
-			<a href="/privacypolicy" data-link class="hover:underline">Privacy Policy</a>
-			<p>© 2026 Croiscendence</p>
-		</footer>
 	</template>
 
 	<template id="errorhtml">

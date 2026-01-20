@@ -58,7 +58,7 @@ const routes = [
   { path: "/oauth/callback", init: initOAuthCallback },
 ];
 
-const publicPath = ["/", "/login", "/register", "/logout", "/registerok", "/oauth/callback", "/twofa"];
+const publicPath = ["/", "/login", "/register", "/logout", "/registerok", "/twofa"];
 
 let currentRoute: any = null;
 let currentPath: string;
@@ -271,7 +271,7 @@ export async function router() {
 				return;
 			}
 		}
-		if (auth.logged && ((isReloaded && !publicPath.includes(window.location.pathname)) || (window.location.pathname === "/home" && (!history.state || (publicPath.includes(history.state.from)))))) {
+		if (auth.logged && ((isReloaded && !publicPath.includes(window.location.pathname)) || (window.location.pathname === "/home" && (!history.state || (publicPath.includes(history.state.from)) || history.state.from === "/oauth/callback" )))) {
 			chatnet.connect( () => {
 				chatnet.toKnowUserID();
 				displayChat()
@@ -318,9 +318,10 @@ export async function popState() {
 	const path = window.location.pathname;
 	const toIsPrivate = !publicPath.includes(path);
 	const fromIsPrivate = !publicPath.includes(currentPath);
-	console.log("path = ", path, "current path", currentPath);
+	console.log(history.state.from);
 	if (!history?.state?.from && fromIsPrivate)
 	{
+		console.log(history.state);
 		history.replaceState({ from: "/home" }, "", "/home");
 		currentPath = "/home";
 		navigateTo("/logout");
