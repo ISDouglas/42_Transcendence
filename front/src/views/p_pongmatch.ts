@@ -1,6 +1,6 @@
 import { GameRenderer } from "../game/gameRenderer";
 import { GameNetwork } from "../game/gameNetwork";
-import { navigateTo, getPreviousPath, getBeforePreviousPath } from "../router";
+import { navigateTo } from "../router";
 import { GameInstance } from "../game/gameInstance";
 import { showToast } from "./show_toast";
 
@@ -17,37 +17,6 @@ export async function initPongMatch(params?: any) {
 	const gameID: string = params?.id;
 	const paramUrl = new URLSearchParams(window.location.search);
 	const tournamentId = paramUrl.get("tournamentId");
-
-	const prev = getPreviousPath();
-	let beforePrev = getBeforePreviousPath();
-	console.log("prev : ", prev);
-	console.log("beforePrev : ", beforePrev);
-
-	const isNull = !prev || !beforePrev;
-
-	console.log("tournamentId : ", tournamentId);
-	// if (tournamentId)
-	// {
-	// 	const cameFromPongMatch = prev.startsWith("/pongmatch") || beforePrev.startsWith("/pongmatch");
-	// 	const allowedBeforePrev = beforePrev.startsWith("/brackets");
-	// 	if (isNull || (!cameFromPongMatch && !allowedBeforePrev))
-	// 	{
-	// 		navigateTo("/home");
-	// 		return;
-	// 	}
-	// }
-	// else
-	// {
-	// 	const cameFromPongMatch = prev.startsWith("/pongmatch") || beforePrev.startsWith("/pongmatch");
-	// 	const allowedBeforePrev = beforePrev.startsWith("/gameonline") || beforePrev.startsWith("/gamelocal");
-	// 	if (isNull || (!cameFromPongMatch && !allowedBeforePrev))
-	// 	{
-	// 		navigateTo("/home");
-	// 		return;
-	// 	}
-	// }
-
-
 	const pseudoP1 = document.getElementById("player1-name") as HTMLSpanElement;
 	const pseudoP2 = document.getElementById("player2-name") as HTMLSpanElement;
 	const title = document.getElementById("game-type") as HTMLTitleElement;
