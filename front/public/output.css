@@ -768,39 +768,9 @@
   .w-\[95\%\] {
     width: 95%;
   }
-<<<<<<< HEAD
-<<<<<<< HEAD
   .w-\[280px\] {
     width: 280px;
   }
-=======
-  .w-\[180px\] {
-    width: 180px;
-  }
-<<<<<<< HEAD
-<<<<<<< HEAD
-  .w-\[270px\] {
-    width: 270px;
-  }
-  .w-\[280px\] {
-    width: 280px;
-  }
-  .w-\[clamp\(120px\,40vw\,320px\)\] {
-    width: clamp(120px, 40vw, 320px);
-  }
-=======
->>>>>>> elisa
-=======
-  .w-\[280px\] {
-    width: 280px;
-  }
->>>>>>> elisa
->>>>>>> main
-=======
-  .w-\[280px\] {
-    width: 280px;
-  }
->>>>>>> noah
   .w-auto {
     width: auto;
   }
@@ -3344,11 +3314,6 @@
   .dark\:text-black {
     &:where(.dark, .dark *) {
       color: var(--color-black);
-    }
-  }
-  .dark\:text-gray-200 {
-    &:where(.dark, .dark *) {
-      color: var(--color-gray-200);
     }
   }
   .dark\:text-gray-400 {

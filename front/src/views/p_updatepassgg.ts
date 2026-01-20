@@ -6,11 +6,6 @@ export function SetGGPasswordView(): string {
 }
 
 export async function initSetGGPassword() {
-  // get pseudo and avatar
-  const profile = await genericFetch("/api/private/profile", {
-	  method: "GET",
-	});
-
 	(document.getElementById("header") as HTMLElement).classList.add("hidden");
   // form change password
   const formPassword = document.getElementById("set-gg-password-form") as HTMLFormElement;

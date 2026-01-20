@@ -153,7 +153,7 @@ export async function genericFetch(url: string, options: RequestInit = {})
 	if (result.error) {
 		throw new Error(result.error || result.message || "Unknown error");
 	}	
-	if (!res.ok){
+	if (result.ok === false || !res.ok){
 		throw new Error(result.error || result.message || "Unknown error");
 	}
 	return result;
@@ -256,6 +256,7 @@ export async function router() {
 		navigateTo("/error");
 		return;
 	}
+	
 	if (location.pathname !== "/logout") {
 		const auth: LogStatusAndInfo = await checkLogStatus();
 		if (auth.status === "expired" || auth.status === "error") {
@@ -335,7 +336,7 @@ export async function popState() {
 		currentPath = "/home";
 	}
 	else {
-		history.state.from = currentPath;
+		history.pushState( { from: currentPath } , "", path );
 		currentPath = path;
 	}
 	await router();
