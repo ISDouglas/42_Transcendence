@@ -5481,9 +5481,7 @@ async function initSetGGPassword() {
   const profile = await genericFetch("/api/private/profile", {
     method: "GET"
   });
-  const avatar = document.getElementById("profile-avatar");
-  avatar.src = profile.avatar + "?ts=" + Date.now();
-  document.getElementById("profile-pseudo").textContent = profile.pseudo;
+  document.getElementById("header").classList.add("hidden");
   const formPassword = document.getElementById("set-gg-password-form");
   formPassword.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -6136,7 +6134,7 @@ async function router() {
         return;
       }
     }
-    if (auth.logged && (isReloaded && !publicPath.includes(window.location.pathname) || window.location.pathname === "/home" && (!history.state || publicPath.includes(history.state.from)))) {
+    if (auth.logged && (isReloaded && !publicPath.includes(window.location.pathname) || window.location.pathname === "/home" && (!history.state || publicPath.includes(history.state.from) || history.state.from === "/oauth/callback"))) {
       chatnet.connect(() => {
         chatnet.toKnowUserID();
         displayChat();
@@ -6180,8 +6178,9 @@ async function popState() {
   const path = window.location.pathname;
   const toIsPrivate = !publicPath.includes(path);
   const fromIsPrivate = !publicPath.includes(currentPath);
-  console.log("path = ", path, "current path", currentPath);
+  console.log(history.state.from);
   if (!history?.state?.from && fromIsPrivate) {
+    console.log(history.state);
     history.replaceState({ from: "/home" }, "", "/home");
     currentPath = "/home";
     navigateTo("/logout");
@@ -6259,7 +6258,7 @@ var init_router = __esm({
       { path: "/error", view: ErrorView, init: initError },
       { path: "/oauth/callback", init: initOAuthCallback }
     ];
-    publicPath = ["/", "/login", "/register", "/logout", "/registerok", "/oauth/callback", "/twofa"];
+    publicPath = ["/", "/login", "/register", "/logout", "/registerok", "/twofa"];
     currentRoute = null;
     isReloaded = false;
     nav = performance.getEntriesByType("navigation")[0];
