@@ -274,7 +274,11 @@ export class Users
 			multiplier = 1.2;
 		else
 			multiplier = 1.5;
-		const eloChange = Math.round(32 * multiplier * (score - expected));
+		let eloChange = Math.round(32 * multiplier * (score - expected));
+		if (eloChange < 5 && score === 1)
+			eloChange = 5;
+		if (eloChange < 5 && score === 0)
+			eloChange = -5;
 		return eloChange;
 	}
 
