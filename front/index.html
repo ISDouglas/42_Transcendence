@@ -715,7 +715,7 @@
 				<h1 class="text-4xl sm:text-4xl md:text-5xl lg:text-6xl font-bold
 							bg-linear-to-r from-amber-800 via-amber-600 to-orange-500
 							bg-clip-text text-transparent drop-shadow-lg animate-pulse w-full">
-					Welcome to Croiscendence
+					Welcome in Croiscendence
 				</h1>
 				<p class="mt-6 text-base sm:text-lg lg:text-xl opacity-60 max-w-md dark:text-white">
 					You can start playing by clicking the button below,
@@ -1621,10 +1621,10 @@
 				</div>
 				<div class="flex flex-col sm:flex-row gap-4 justify-center">
 					<a href="/gameonline" id="replay-button" data-link class="btn px-10 py-4 text-lg  shadow-amber-900/50 transition-transform hover:scale-[1.02]">
-						Rejouer
+						Play again
 					</a>
 					<a href="/home" data-link class="text-center rounded-lg cursor-pointer block mt-10 duration-300 px-10 py-4 text-lg bg-amber-600/40 dark:bg-amber-950/50 hover:bg-amber-900/60 border border-amber-950/40 dark:border-amber-600/40 text-amber-950 dark:text-amber-100 transition-colors">
-						Retour à l'accueil
+						Back to home
 					</a>
 				</div>
 			</div>
@@ -1634,33 +1634,40 @@
 
 
 	<template id="pongmatchhtml">
-		<h1>Quick game</h1>
-
+		<h1 id="game-type" class="text-4xl mx-auto mb-6 sm:text-6xl lg:text-7xl font-bold bg-linear-to-r from-amber-300 via-yellow-400 to-orange-400 bg-clip-text text-transparent drop-shadow-l"></h1>
 		<div class="game-container">
-			<div class="flex justify-center items-center mx-auto w-full gap-4">
-
-				<!-- Player 1 -->
-				<div id="player1-info" class="w-32 text-right font-semibold text-blue-500">
-					<span id="player1-name">Waiting for Player 1</span>
+			<div class="flex justify-center flex-col lg:flex-row items-center mx-auto w-full gap-4">
+				<div id="player1-info" class="flex items-center gap-3 p-3 w-64 rounded-xl bg-amber-900/80 border border-amber-700 shadow-lg">
+					<img id="player1-avatar" src="/files/0.png" alt="Player avatar" class="w-12 h-12 rounded-full border-2 border-amber-500 object-cover"/>
+					<div class="flex flex-col">
+						<span id="player1-name" class="text-amber-600 font-semibold leading-tight">
+							Waiting for Player 1
+						</span>
+						<span class="text-sm text-slate-300 flex items-center gap-1" >
+							Level <span id="player1-lvl">40</span>
+						</span>
+						<span class="text-sm text-slate-300 flex items-center gap-1" >
+							<span id="player1-elo">400</span> 🥐
+						</span>
+					</div>
 				</div>
-
-				<!-- Canvas -->
-				<canvas id="canvas" width="900" height="720"></canvas>
-
-				<!-- Player 2 -->
-				<div id="player2-info" class="w-32 text-left font-semibold text-red-500">
-					<span id="player2-name">Waiting for Player 2</span>
+				<canvas id="canvas" width="600" height="480" class="border-4 border-amber-800 max-w-full h-auto sm:w-[480px] md:w-[560px] lg:w-[600px]"></canvas>
+				<div id="player2-info" class="flex items-center gap-3 p-3 w-64 rounded-xl bg-yellow-900/80 border border-yellow-700 shadow-lg">
+					<img id="player2-avatar" src="/files/0.png" alt="Player avatar" class="w-12 h-12 rounded-full border-2 border-yellow-500 object-cover"/>
+					<div class="flex flex-col">
+						<span id="player2-name" class="text-yellow-400 font-semibold leading-tight">
+							Waiting for Player 2
+						</span>
+						<span class="text-sm text-slate-300 flex items-center gap-1" >
+							Level <span id="player2-lvl">40</span>
+						</span>
+						<span class="text-sm text-slate-300 flex items-center gap-1">
+							<span id="player2-elo">400</span> 🥐
+						</span>
+					</div>
 				</div>
-
 			</div>
 		</div>
-
-		<footer class="absolute bottom-4 w-full dark:text-white duration-300 text-center text-sm opacity-60">
-			<a href="/termsofservice" data-link class="hover:underline">Terms of Service</a>
-			<span>|</span>
-			<a href="/privacypolicy" data-link class="hover:underline">Privacy Policy</a>
-			<p>© 2026 Croiscendence</p>
-		</footer>
 	</template>
 
 	<template id="tournamenthtml">
