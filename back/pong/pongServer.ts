@@ -17,11 +17,18 @@ export function handleGameSocket(io: Server, socket: Socket) {
 	
 		socket.data.tournamentId = tournamentId;
 		socket.data.gameId = gameId;
+
 		//add io (server) to game
 		game.setIo(io);
 	
 		const playerId = socket.data.user.id;
 		const pseudo = socket.data.user.pseudo;
+		if (socket.data.user.id != game.idPlayer1 && socket.data.user.id != game.idPlayer2)
+		{
+			socket.data.kick = true;
+			io.to(socket.id).emit("kick");
+			return;
+		}
 		checkDeconnections(io, socket, playerId, game);
 
 		if (game.disconnectTimer) {
@@ -87,6 +94,8 @@ export function handleGameSocket(io: Server, socket: Socket) {
 		if (!game)
 			return;
 
+		if (socket.data.kick)
+			return;
 		console.log("Client disconnected:", socket.id);
 
 		if (game.status === "finished")
@@ -150,6 +159,8 @@ function checkUser(io: Server, socket: Socket, game: ServerGame) : number
 		io.to(socket.id).emit("kick");
 		return -1;
 	}
+	else if (socket.data.user.id != game.idPlayer1 && socket.data.user.id != game.idPlayer2)
+		io.to(socket.id).emit("kick");
 	return 0;
 }
 

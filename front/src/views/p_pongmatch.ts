@@ -47,8 +47,6 @@ export async function initPongMatch(params?: any) {
 		}
 	}
 
-
-	const dashboardBtn = document.getElementById("dashboard-btn");
 	const pseudoP1 = document.getElementById("player1-name");
 	const pseudoP2 = document.getElementById("player2-name");
 
@@ -222,9 +220,6 @@ export async function initPongMatch(params?: any) {
 			}
 			}, 1000);
 		}
-		dashboardBtn?.addEventListener("click", async () => {
-			navigateTo(`/dashboard`);
-		});
 	});
 }
 

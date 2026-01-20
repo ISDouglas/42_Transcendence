@@ -521,8 +521,6 @@ var init_gameRenderer = __esm({
             );
           }
         }
-        if (state.type != "Tournament")
-          document.getElementById("buttons")?.classList.remove("hidden");
       }
       draw(state, drawScore) {
         this.clear();
@@ -4306,7 +4304,6 @@ async function initPongMatch(params) {
       return;
     }
   }
-  const dashboardBtn = document.getElementById("dashboard-btn");
   const pseudoP1 = document.getElementById("player1-name");
   const pseudoP2 = document.getElementById("player2-name");
   let input1 = "stop";
@@ -4443,9 +4440,6 @@ async function initPongMatch(params) {
         }
       }, 1e3);
     }
-    dashboardBtn?.addEventListener("click", async () => {
-      navigateTo(`/dashboard`);
-    });
   });
 }
 function stopGame() {
