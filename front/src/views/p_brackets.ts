@@ -1,3 +1,4 @@
+import { hostname } from "os";
 import { navigateTo } from "../router";
 import { TournamentInstance } from "../tournament/tournamentInstance";
 import { TournamentNetwork, TournamentState } from "../tournament/tournamentNetwork";
@@ -15,6 +16,8 @@ export async function initBrackets(params?: any) {
 	const replayButton = document.getElementById("replay-button");
 	const homeButton = document.getElementById("home-button");
 	const watchFinalButton = document.getElementById("watch-final");
+	const waitHost = document.getElementById("wait-host");
+	const waitGame = document.getElementById("wait-game");
 	const pseudoP1 = document.getElementById("player1-name");
 	const pseudoP2 = document.getElementById("player2-name");
 	const pseudoP3 = document.getElementById("player3-name");
@@ -39,11 +42,17 @@ export async function initBrackets(params?: any) {
 		if (currentTournament.getCurrentState().status == "semifinal")
 			net?.SetupSemiFinal();
 		else if (currentTournament.getCurrentState().status == "final")
+		{
+			waitHost?.classList.add("hidden");
+			waitGame?.classList.remove("hidden");
 			net?.SetupFinal();
+		}
 		else if (currentTournament.getCurrentState().status == "finished")
 		{
+			waitGame?.classList.add("hidden");
 			replayButton?.classList.remove("hidden");
 			homeButton?.classList.remove("hidden");
+			watchFinalButton?.classList.add("hidden");
 		}
 	});
 
@@ -75,6 +84,10 @@ export async function initBrackets(params?: any) {
 			net?.startTournament();
 			startTournamentButton?.classList.add("hidden");
 		});
+	});
+
+	net.onWaitForHost(() => {
+		waitHost?.classList.remove("hidden")
 	});
 
 	net.onKick(() => {

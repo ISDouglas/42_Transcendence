@@ -27,8 +27,13 @@ export function handleTournamentSocket(io: Server, socket: Socket)
 		io.to(`tournament-${tournamentId}`).emit("state", updateStateTournament(tournament.state));
 	
 		//emit to display start button for tournament creator
-		if (playerId == tournament.idPlayers[0] && tournament.state.status === "waiting")
-			io.to(socket.id).emit("hostTournament");
+		if (tournament.state.status === "waiting")
+		{
+			if (playerId == tournament.idPlayers[0])
+				io.to(socket.id).emit("hostTournament");
+			else
+				io.to(socket.id).emit("waitForHost");
+		}
 	});
 
 	socket.on("disconnect", () => {

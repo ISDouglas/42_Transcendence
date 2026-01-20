@@ -1717,8 +1717,8 @@
 			<div class="flex justify-center gap-16 p-10 mx-auto w-full max-w-5xl">
 				<!-- Round 1 -->
 				<div class="flex flex-col justify-around gap-8">
-					<div class="w-[280px] border border-neutral-600 bg-neutral-900 dark:bg-amber-100">
-						<div class="py-4 px-2.5 text-center border-neutral-700 font-bold text-white dark:text-black" id="player1-name">
+					<div class="w-[280px] border border-neutral-600 bg-amber-900 dark:bg-amber-100">
+						<div class="py-4 px-2.5 text-center border-neutral-700 font-bold text-white dark:text-black border-b border-neutral-700" id="player1-name">
 							Player 1
 						</div>
 						<div class="py-4 px-2.5 text-center border-neutral-700 font-bold text-white dark:text-black" id="player2-name">
@@ -1726,8 +1726,8 @@
 						</div>
 					</div>
 
-					<div class="w-[280px] border border-neutral-600 bg-neutral-900 dark:bg-amber-100">
-						<div class="py-4 px-2.5 text-center border-neutral-700 font-bold text-white dark:text-black" id="player3-name">
+					<div class="w-[280px] border border-neutral-600 bg-amber-900 dark:bg-amber-100">
+						<div class="py-4 px-2.5 text-center border-neutral-700 font-bold text-white dark:text-black border-b border-neutral-700" id="player3-name">
 							Player 3
 						</div>
 						<div class="py-4 px-2.5 text-center font-bold text-white dark:text-black" id="player4-name">
@@ -1738,8 +1738,8 @@
 
 				<!-- Round 2 -->
 				<div class="flex flex-col justify-around">
-					<div class="w-[280px] border border-neutral-600 bg-neutral-900 dark:bg-amber-100">
-						<div class="py-4 px-2.5 text-center border-neutral-700 font-bold text-white dark:text-black" id="finalist1">
+					<div class="w-[280px] border border-neutral-600 bg-amber-900 dark:bg-amber-100">
+						<div class="py-4 px-2.5 text-center border-neutral-700 font-bold text-white dark:text-black border-b border-neutral-700" id="finalist1">
 							Winner Match 1
 						</div>
 						<div class="py-4 px-2.5 text-center font-bold text-white dark:text-black" id="finalist2">
@@ -1751,12 +1751,16 @@
 
 				<!-- Final -->
 				<div class="flex flex-col justify-center">
-					<div class="w-[280px] border border-neutral-600 bg-neutral-800 font-bold dark:bg-amber-100">
+					<div class="w-[280px] border border-neutral-600 bg-amber-900 font-bold dark:bg-amber-100">
 						<div class="py-4 px-2.5 text-center font-bold text-white dark:text-black" id="champion">
 							Champion
 						</div>
 					</div>
 				</div>
+			</div>
+			<div class="flex justify-center gap-16 px-16 text-center font-bold text-lg text-amber-600 opacity-80">
+				<div id="wait-host" class="w-[280px] hidden text-amber-800 dark:text-amber-100">Waiting for Host to start tournament...</div>
+				<div id="wait-game" class="w-[280px] hidden text-amber-800 dark:text-amber-100">Waiting for next game...</div>
 			</div>
 			<div id="start-button" class="game-buttons flex justify-center hidden mt-4">
 				<button class="btn mx-auto w-32" id="start-btn">Start Tournament</button>

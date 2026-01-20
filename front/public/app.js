@@ -4558,17 +4558,17 @@ var init_tournamentInstance = __esm({
       }
       setWinner(el) {
         if (!el) return;
-        el.classList.remove("border-neutral-600", "bg-neutral-900", "text-white", "border-neutral-700");
+        el.classList.remove("border-neutral-600", "bg-amber-900", "text-white", "border-neutral-700");
         el.classList.add("winner");
       }
       setLoser(el) {
         if (!el) return;
-        el.classList.remove("border-neutral-600", "bg-neutral-900", "text-white", "border-neutral-700");
+        el.classList.remove("border-neutral-600", "bg-amber-900", "text-white", "border-neutral-700");
         el.classList.add("loser");
       }
       setChampion(el) {
         if (!el) return;
-        el.classList.remove("border-neutral-600", "bg-neutral-900", "text-white", "border-neutral-700");
+        el.classList.remove("border-neutral-600", "bg-amber-900", "text-white", "border-neutral-700");
         el.classList.add("champion");
       }
     };
@@ -4594,6 +4594,9 @@ var init_tournamentNetwork = __esm({
         });
         this.socket.on("hostTournament", () => {
           this.onTournamentHostCallback?.();
+        });
+        this.socket.on("waitForHost", () => {
+          this.onWaitForHostCallback?.();
         });
         this.socket.on("startTournamentGame", (gameId, tournamentId) => {
           this.onStartTournamentGameCallback?.(gameId, tournamentId);
@@ -4622,6 +4625,9 @@ var init_tournamentNetwork = __esm({
       }
       onTournamentHost(cb) {
         this.onTournamentHostCallback = cb;
+      }
+      onWaitForHost(cb) {
+        this.onWaitForHostCallback = cb;
       }
       onsetWinner(cb) {
         this.onsetWinnerCallback = cb;
@@ -4679,6 +4685,8 @@ async function initBrackets(params) {
   const replayButton = document.getElementById("replay-button");
   const homeButton = document.getElementById("home-button");
   const watchFinalButton = document.getElementById("watch-final");
+  const waitHost = document.getElementById("wait-host");
+  const waitGame = document.getElementById("wait-game");
   const pseudoP1 = document.getElementById("player1-name");
   const pseudoP2 = document.getElementById("player2-name");
   const pseudoP3 = document.getElementById("player3-name");
@@ -4695,14 +4703,18 @@ async function initBrackets(params) {
     if (!currentTournament)
       return;
     currentTournament.applyServerState(state);
-    updateFrontGame();
+    updatePseudo();
     if (currentTournament.getCurrentState().status == "semifinal")
       net2?.SetupSemiFinal();
-    else if (currentTournament.getCurrentState().status == "final")
+    else if (currentTournament.getCurrentState().status == "final") {
+      waitHost?.classList.add("hidden");
+      waitGame?.classList.remove("hidden");
       net2?.SetupFinal();
-    else if (currentTournament.getCurrentState().status == "finished") {
+    } else if (currentTournament.getCurrentState().status == "finished") {
+      waitGame?.classList.add("hidden");
       replayButton?.classList.remove("hidden");
       homeButton?.classList.remove("hidden");
+      watchFinalButton?.classList.add("hidden");
     }
   });
   net2.onsetWinner((winner, loser, status) => {
@@ -4730,6 +4742,9 @@ async function initBrackets(params) {
       startTournamentButton?.classList.add("hidden");
     });
   });
+  net2.onWaitForHost(() => {
+    waitHost?.classList.remove("hidden");
+  });
   net2.onKick(() => {
     navigateTo("/home");
     return;
@@ -4743,7 +4758,7 @@ async function initBrackets(params) {
   net2.onHostDisconnected(() => {
     net2?.changeHost();
   });
-  function updateFrontGame() {
+  function updatePseudo() {
     if (currentTournament) {
       if (pseudoP1)
         pseudoP1.innerText = currentTournament.getCurrentState().pseudo.player1;
