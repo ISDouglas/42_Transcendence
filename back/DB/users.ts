@@ -8,7 +8,7 @@ export interface IUsers {
 	email: string;
 	password: string;
 	avatar: string;
-	status: "online" | "offline" | "busy" | "playing";
+	status: "online" | "offline" | "busy";
 	creation_date: Date;
 	modification_date: Date;
 	elo: number;
@@ -345,7 +345,7 @@ export class Users
 
 	async GetLeaderboardInfo(): Promise<boardInfo[]>
 	{
-		const query = `SELECT pseudo, avatar, elo FROM Users WHERE user_id NOT IN (-1, 0) ORDER BY elo DESC LIMIT 10`;
+		const query = `SELECT pseudo, avatar, elo FROM Users WHERE user_id NOT IN (-1, 0) ORDER BY elo DESC LIMIT 50`;
 		const info: boardInfo[] = await this._db.query(query);
 		return info;
 	}
