@@ -769,6 +769,7 @@
   .w-\[180px\] {
     width: 180px;
   }
+<<<<<<< HEAD
   .w-\[270px\] {
     width: 270px;
   }
@@ -778,14 +779,13 @@
   .w-\[clamp\(120px\,40vw\,320px\)\] {
     width: clamp(120px, 40vw, 320px);
   }
+=======
+>>>>>>> elisa
   .w-auto {
     width: auto;
   }
   .w-full {
     width: 100%;
-  }
-  .w-min {
-    width: min-content;
   }
   .max-w-3xl {
     max-width: var(--container-3xl);
@@ -799,20 +799,11 @@
   .max-w-6xl {
     max-width: var(--container-6xl);
   }
-  .max-w-\[20px\] {
-    max-width: 20px;
-  }
   .max-w-\[85\%\] {
     max-width: 85%;
   }
   .max-w-\[240px\] {
     max-width: 240px;
-  }
-  .max-w-\[280px\] {
-    max-width: 280px;
-  }
-  .max-w-\[320px\] {
-    max-width: 320px;
   }
   .max-w-\[450px\] {
     max-width: 450px;
@@ -1716,9 +1707,6 @@
   }
   .pt-8 {
     padding-top: calc(var(--spacing) * 8);
-  }
-  .pr-4 {
-    padding-right: calc(var(--spacing) * 4);
   }
   .pb-1 {
     padding-bottom: calc(var(--spacing) * 1);
