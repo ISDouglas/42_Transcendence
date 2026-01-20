@@ -284,7 +284,7 @@ async function initRemoteAndAi(game: ServerGame, io: Server, socket: Socket, gam
 	}
 
 	if (game.idPlayer2 == -1)
-		game.state.users.user1 = await users.getPlayerGame("AI");
+		game.state.users.user2 = await users.getPlayerGame("AI");
 
 	// start countdown when 2 players are in the game
 	if ((game.sockets.player1 && game.idPlayer2 == -1) 
