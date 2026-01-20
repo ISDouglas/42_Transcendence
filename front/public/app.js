@@ -279,7 +279,7 @@ async function initDashboard() {
       bar.classList.add(...progressionColors[rankinfo.type].split(" "));
     }, 50);
   } catch (error) {
-    console.error("Erreur lors du chargement :", error);
+    console.error("Error while loading :", error);
     showToast("Loading failed. Please try again later.", "error", 3e3);
   }
 }
@@ -505,7 +505,7 @@ var init_gameRenderer = __esm({
           this.ctx.fillStyle = "white";
           this.ctx.textAlign = "center";
           if (state.score.player1 > state.score.player2) {
-            const pseudo = state.pseudo.player1;
+            const pseudo = state.users.user1.pseudo;
             const str = pseudo + " wins!";
             this.ctx.fillText(
               str,
@@ -513,7 +513,7 @@ var init_gameRenderer = __esm({
               this.canvas.height * 0.75
             );
           } else {
-            const pseudo = state.pseudo.player2;
+            const pseudo = state.users.user2.pseudo;
             const str = pseudo + " wins!";
             this.ctx.fillText(
               str,
@@ -4237,7 +4237,10 @@ var init_gameInstance = __esm({
           paddles: { player1: 210, player2: 210 },
           score: { player1: 0, player2: 0 },
           status: "waiting",
-          pseudo: { player1: "", player2: "" },
+          users: {
+            user1: { pseudo: "test", elo: 0, avatar: "/files/0.png", lvl: 1 },
+            user2: { pseudo: "test", elo: 0, avatar: "/files/0.png", lvl: 1 }
+          },
           type: "AI"
         };
         this.network = null;
@@ -4284,14 +4287,15 @@ async function initPongMatch(params) {
   const gameID = params?.id;
   const paramUrl = new URLSearchParams(window.location.search);
   const tournamentId = paramUrl.get("tournamentId");
-  const prev = getPreviousPath();
-  let beforePrev = getBeforePreviousPath();
-  console.log("prev : ", prev);
-  console.log("beforePrev : ", beforePrev);
-  const isNull = !prev || !beforePrev;
-  console.log("tournamentId : ", tournamentId);
   const pseudoP1 = document.getElementById("player1-name");
   const pseudoP2 = document.getElementById("player2-name");
+  const title = document.getElementById("game-type");
+  const levelP1 = document.getElementById("player1-lvl");
+  const levelP2 = document.getElementById("player2-lvl");
+  const eloP1 = document.getElementById("player1-elo");
+  const eloP2 = document.getElementById("player2-elo");
+  const avatarP1 = document.getElementById("player1-avatar");
+  const avatarP2 = document.getElementById("player2-avatar");
   let input1 = "stop";
   let input2 = "stop";
   let input = "stop";
@@ -4317,7 +4321,7 @@ async function initPongMatch(params) {
     interval = setInterval(() => {
       if (!currentGame || !renderer)
         return;
-      updatePseudo();
+      updateFrontGame();
       renderer.drawCountdown(currentGame.getCurrentState(), countdown);
       countdown--;
       if (countdown < 0) {
@@ -4331,14 +4335,14 @@ async function initPongMatch(params) {
     if (!currentGame || !renderer)
       return;
     currentGame.applyServerState(state);
-    updatePseudo();
+    updateFrontGame();
     renderer.draw(currentGame.getCurrentState(), false);
   });
   net.onState((state) => {
     if (!currentGame || !renderer)
       return;
     currentGame.applyServerState(state);
-    updatePseudo();
+    updateFrontGame();
     renderer.draw(currentGame.getCurrentState(), true);
     updateInput();
   });
@@ -4381,12 +4385,20 @@ async function initPongMatch(params) {
       }
     }
   }
-  function updatePseudo() {
+  function updateFrontGame() {
     if (currentGame) {
       if (pseudoP1)
-        pseudoP1.innerText = currentGame.getCurrentState().pseudo.player1;
+        pseudoP1.innerText = currentGame.getCurrentState().users.user1.pseudo;
       if (pseudoP2)
-        pseudoP2.innerText = currentGame.getCurrentState().pseudo.player2;
+        pseudoP2.innerText = currentGame.getCurrentState().users.user2.pseudo;
+      if (title)
+        title.textContent = currentGame.getCurrentState().type + " Game";
+      avatarP1.src = currentGame.getCurrentState().users.user1.avatar;
+      avatarP2.src = currentGame.getCurrentState().users.user2.avatar;
+      eloP1.innerText = currentGame.getCurrentState().users.user1.elo.toString();
+      eloP2.innerText = currentGame.getCurrentState().users.user2.elo.toString();
+      levelP1.innerText = currentGame.getCurrentState().users.user1.lvl.toString();
+      levelP2.innerText = currentGame.getCurrentState().users.user2.lvl.toString();
     }
   }
   net.onDisconnection(() => {
@@ -4683,7 +4695,7 @@ async function initBrackets(params) {
     if (!currentTournament)
       return;
     currentTournament.applyServerState(state);
-    updatePseudo();
+    updateFrontGame();
     if (currentTournament.getCurrentState().status == "semifinal")
       net2?.SetupSemiFinal();
     else if (currentTournament.getCurrentState().status == "final")
@@ -4731,7 +4743,7 @@ async function initBrackets(params) {
   net2.onHostDisconnected(() => {
     net2?.changeHost();
   });
-  function updatePseudo() {
+  function updateFrontGame() {
     if (currentTournament) {
       if (pseudoP1)
         pseudoP1.innerText = currentTournament.getCurrentState().pseudo.player1;
@@ -5994,14 +6006,6 @@ function navigateTo(url2) {
   router().catch((err) => console.error("Router error:", err));
   ;
 }
-function getPreviousPath() {
-  const stack = getHistoryStack();
-  return stack[stack.length - 1] ?? null;
-}
-function getBeforePreviousPath() {
-  const stack = getHistoryStack();
-  return stack[stack.length - 2] ?? null;
-}
 async function checkLogStatus() {
   try {
     const res = await fetch("/api/checkLogged", {
@@ -6136,8 +6140,9 @@ async function router() {
       chatnet.connect(() => {
         chatnet.toKnowUserID();
         displayChat();
+        if (auth.user && auth.user.web_status)
+          auth.user.web_status = "online";
       });
-      auth.user.web_status = "online";
       isReloaded = false;
     }
     loadHeader10(auth);

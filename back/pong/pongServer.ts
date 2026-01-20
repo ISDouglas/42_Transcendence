@@ -18,7 +18,6 @@ export function handleGameSocket(io: Server, socket: Socket) {
 		socket.data.tournamentId = tournamentId;
 		socket.data.gameId = gameId;
 
-		//add io (server) to game
 		game.setIo(io);
 	
 		const playerId = socket.data.user.id;
@@ -124,11 +123,13 @@ export function handleGameSocket(io: Server, socket: Socket) {
 		{
 			if (game.type === "Local" || game.type === "AI")
 			{
+				game.status = "disconnected";
 				io.to(`game-${gameId}`).emit("state", updateStateGame(game.state, game.status, game.type));
 				if (!game.disconnectTimer) {
 					game.disconnectTimer = setTimeout(() => {
 						console.log("Timeout disconnected game : ", gameId);
 						game.status = "disconnected";
+						io.to(`game-${gameId}`).emit("state", updateStateGame(game.state, game.status, game.type));
 						games_map.delete(gameId);
 						io.in(`game-${gameId}`).socketsLeave(`game-${gameId}`);
 					}, 1 * 3 * 1000);
