@@ -8,11 +8,11 @@ export async function oauthStatus(request: FastifyRequest, reply: FastifyReply) 
       const id = request.user?.user_id as number;
       const profile = await users.getIDUser(id);
       if (!profile)
-        return reply.code(404).send({message: "User not found"});
+        return reply.send({ ok: false, message: "User not found"});
       const firstTimeLogin =  await bcrypt.compare("google", profile.password);
       return reply.send({ ok: true, twofa: false, firstTimeLogin});
     } 
     if (request.cookies.tempToken)
       return reply.send({ ok: true, twofa: true });
-    return reply.status(401).send({ ok: false });
+    return reply.send({ ok: false });
 }

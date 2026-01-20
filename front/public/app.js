@@ -4500,33 +4500,37 @@ function ProfileView() {
   return document.getElementById("profilehtml").innerHTML;
 }
 async function initProfile() {
-  const profile = await genericFetch("/api/private/profile", {
-    method: "GET"
-  });
-  const avatar = document.getElementById("profile-avatar");
-  avatar.src = profile.avatar + "?ts=" + Date.now();
-  document.getElementById("profile-pseudo").textContent = profile.pseudo;
-  document.getElementById("profile-email").textContent = profile.email;
-  const select = document.getElementById("profile-status");
-  if (select) {
-    select.value = profile.status;
-    select.addEventListener("change", async (e) => {
-      const status = e.target.value;
-      await genericFetch("/api/private/updateinfo/status", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status })
-      });
-      navigateTo("/profile");
-      showToast(`Status updated successfully to << ${status} >>`, "success", 2e3);
+  try {
+    const profile = await genericFetch("/api/private/profile", {
+      method: "GET"
     });
+    const avatar = document.getElementById("profile-avatar");
+    avatar.src = profile.avatar + "?ts=" + Date.now();
+    document.getElementById("profile-pseudo").textContent = profile.pseudo;
+    document.getElementById("profile-email").textContent = profile.email;
+    const select = document.getElementById("profile-status");
+    if (select) {
+      select.value = profile.status;
+      select.addEventListener("change", async (e) => {
+        const status = e.target.value;
+        await genericFetch("/api/private/updateinfo/status", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status })
+        });
+        navigateTo("/profile");
+        showToast(`Status updated successfully to << ${status} >>`, "success", 2e3);
+      });
+    }
+    document.getElementById("profile-elo").textContent = profile.elo.toString();
+    const twofaStatusText = document.getElementById("twofa-status");
+    if (profile.twofa_enabled === 1)
+      twofaStatusText.textContent = "Enable";
+    else
+      twofaStatusText.textContent = "Disable";
+  } catch (err) {
+    showToast(err, "error", 3e3, "Update status");
   }
-  document.getElementById("profile-elo").textContent = profile.elo.toString();
-  const twofaStatusText = document.getElementById("twofa-status");
-  if (profile.twofa_enabled === 1)
-    twofaStatusText.textContent = "Enable";
-  else
-    twofaStatusText.textContent = "Disable";
 }
 var init_p_profile = __esm({
   "front/src/views/p_profile.ts"() {
@@ -4695,7 +4699,7 @@ async function initBrackets(params) {
     if (!currentTournament)
       return;
     currentTournament.applyServerState(state);
-    updateFrontGame();
+    updatePseudo();
     if (currentTournament.getCurrentState().status == "semifinal")
       net2?.SetupSemiFinal();
     else if (currentTournament.getCurrentState().status == "final")
@@ -4743,7 +4747,7 @@ async function initBrackets(params) {
   net2.onHostDisconnected(() => {
     net2?.changeHost();
   });
-  function updateFrontGame() {
+  function updatePseudo() {
     if (currentTournament) {
       if (pseudoP1)
         pseudoP1.innerText = currentTournament.getCurrentState().pseudo.player1;
@@ -5336,7 +5340,6 @@ async function initUpdateEmail() {
     const newEmail = formEmail["new-email"].value;
     const password = formEmail["password"].value;
     try {
-      console.log("here");
       const response = await genericFetch("/api/private/updateinfo/email", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -5478,9 +5481,6 @@ function SetGGPasswordView() {
   return document.getElementById("set-gg-password-html").innerHTML;
 }
 async function initSetGGPassword() {
-  const profile = await genericFetch("/api/private/profile", {
-    method: "GET"
-  });
   document.getElementById("header").classList.add("hidden");
   const formPassword = document.getElementById("set-gg-password-form");
   formPassword.addEventListener("submit", async (e) => {
@@ -5494,6 +5494,7 @@ async function initSetGGPassword() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ oldPw, newPw, confirm })
       });
+      console.log(response);
       navigateTo("/logout");
       showToast("Password is updated successfully! Please re-log in!", "success", 2e3);
     } catch (err) {
@@ -5662,7 +5663,7 @@ async function initOAuthCallback() {
     } else {
       if (data.firstTimeLogin) {
         navigateTo("/setggpass");
-        showToast("Welcome! If this is your first login, please create a password for your account! \u{1F389}", "warning");
+        showToast("Welcome! This is your first login, please create a password for your account! \u{1F389}", "warning");
       } else
         navigateTo("/home");
     }
@@ -5740,7 +5741,6 @@ async function InitLeaderboard() {
     method: "GET"
   });
   const container = document.getElementById("leaderboard-l");
-  console.log(leaderboard);
   if (leaderboard.InfoUsers.length > 0) {
     document.getElementById("avatar-1").src = leaderboard.InfoUsers[0].avatar;
     document.getElementById("pseudo-1").textContent = leaderboard.InfoUsers[0].pseudo;
@@ -5777,7 +5777,6 @@ async function InitLeaderboard() {
     document.getElementById("your-elo").textContent = leaderboard.user.elo.toString() + " \u{1F950}";
   } else
     document.getElementById("your-position").classList.add("hidden");
-  console.log(leaderboard);
 }
 var init_p_leaderboard = __esm({
   "front/src/views/p_leaderboard.ts"() {
@@ -5848,7 +5847,6 @@ async function initAchievement() {
       i++;
     }
   } catch (err) {
-    console.log(err);
   }
 }
 var rarityBackground, ACHIEVEMENT_ORDER;
@@ -5965,7 +5963,6 @@ async function AddFriendEndG(id, pseudo) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ friendID: id })
     });
-    console.log("result notif=", result);
     if (result.message === "added")
       showToast(`Invitation sent to ${pseudo}`, "success");
     else
@@ -5991,7 +5988,6 @@ function saveHistoryStack(stack) {
 }
 function navigateTo(url2) {
   const state = { from: currentPath };
-  console.log("from =", state.from, "url =", url2);
   history.pushState(state, "", url2);
   currentPath = url2;
   const stack = getHistoryStack();
@@ -6031,7 +6027,7 @@ async function genericFetch(url2, options = {}) {
   if (result.error) {
     throw new Error(result.error || result.message || "Unknown error");
   }
-  if (!res.ok) {
+  if (result.ok === false || !res.ok) {
     throw new Error(result.error || result.message || "Unknown error");
   }
   return result;
@@ -6134,6 +6130,12 @@ async function router() {
         return;
       }
     }
+    console.log("from ", history?.state?.from, "to ", location.pathname, "is reloaded ", isReloaded);
+    if (history?.state?.from === "/oauth/callback" && location.pathname === "/home") {
+      console.log("in it)");
+      history.replaceState({ ...history.state ?? {}, from: "/home" }, "", "/home");
+      console.log("HISTI from ", history?.state?.from, "to ", location.pathname, "is reloaded ", isReloaded);
+    }
     if (auth.logged && (isReloaded && !publicPath.includes(window.location.pathname) || window.location.pathname === "/home" && (!history.state || publicPath.includes(history.state.from) || history.state.from === "/oauth/callback"))) {
       chatnet.connect(() => {
         chatnet.toKnowUserID();
@@ -6178,7 +6180,6 @@ async function popState() {
   const path = window.location.pathname;
   const toIsPrivate = !publicPath.includes(path);
   const fromIsPrivate = !publicPath.includes(currentPath);
-  console.log(history.state.from);
   if (!history?.state?.from && fromIsPrivate) {
     console.log(history.state);
     history.replaceState({ from: "/home" }, "", "/home");
@@ -6191,7 +6192,7 @@ async function popState() {
     history.replaceState({ from: "/home" }, "", "/home");
     currentPath = "/home";
   } else {
-    history.state.from = currentPath;
+    history.pushState({ from: currentPath }, "", path);
     currentPath = path;
   }
   await router();

@@ -9,12 +9,12 @@ export async function getProfile(fastify: FastifyInstance, request: FastifyReque
 		const id = request.user?.user_id as number;
 		const profile = await users.getIDUser(id);
 		if (!profile)
-			return reply.code(404).send({message: "User not found"})
+			return reply.send({ ok: false, message: "User not found"})
     	return profile;
   
 	} catch (error) {
 		fastify.log.error(error)
-		return reply.code(500).send({message: "Internal Server Error"});
+		return reply.send({ ok: false, message: "Internal Server Error"});
 	}
 }
 
