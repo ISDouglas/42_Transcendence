@@ -60,15 +60,6 @@ export function handleTournamentSocket(io: Server, socket: Socket)
 				}
 			}, 1000);
 		}
-		else if (tournament.state.status === "semifinal")
-		{
-			if (tournament.idPlayers[1] == -1 && tournament.idPlayers[2] == -1 && tournament.idPlayers[3] == -1)
-			{
-				tournaments_map.delete(socket.data.tournamentId);
-				console.log("Tournament deleted :", socket.data.tournamentId);
-				io.in(`tournament-${tournamentId}`).socketsLeave(`tournament-${tournamentId}`);
-			}
-		}
 		else if (tournament.state.status === "waiting")
 		{
 			console.log("Client disconnected:", socket.id);
