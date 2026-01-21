@@ -224,11 +224,8 @@ export function updateStateGame(state: GameState, status: "waiting" | "playing" 
 
 async function initLocal(game: ServerGame, io: Server, socket: Socket, gameId: number, pseudo: string) {
 	
-	if (game.sockets.player1 === null && game.sockets.player2 === null)
-	{
-		game.sockets.player1 = socket.id;
-		game.sockets.player2 = socket.id;
-	}
+	game.sockets.player1 = socket.id;
+	game.sockets.player2 = socket.id;
 	if (checkUser(io, socket, game) == -1)
 		return;
 	game.idPlayer2 = 0;
