@@ -30,6 +30,10 @@ The application respects the technical constraints imposed by the subject, such 
 - All forms and user inputs are properly validated in both the frontend and backend.
 - HTTPS is used
 - Docker-based deployment
+- Integration with blockchain technology for:
+  - Immutable transaction logs or records (Avalanche testnet: Fuji)
+  - Wallet-based authentication (MetaMask)
+  - Smart contract execution for automated business logic (Remix)
 
 ---
 
@@ -42,7 +46,7 @@ The application respects the technical constraints imposed by the subject, such 
 | edelanno | Product Owner & Developer | Product management, general decisions, stakeholders communication |
 | pmenard | Project Manager & Developer | Team organize, team communication, architecture |
 | tat-nguy | Scrum Master & Developer | Process and deadline tracking, infrastructure | 
-| layang | Back-end Lead & Developer | backend decisions, security, database |
+| layang | Back-end Lead & Developer | backend decisions, security, database, blockchain |
 | nrontard | Front-end Lead & Developer | Game logic, real-time features, Frontend decisions, UI/UX |
 
 
@@ -236,11 +240,13 @@ Each chosen module was selected to enhance the project’s educational value and
 
 #### 8. Minor: A complete notification system for all creation, update, and deletion actions (1 pt)
 
-- **Motivation**: 
+- **Motivation**: To be clear and noramliazation at user side, upgrading user experience.
 
 - **Details**:
+	- use *Toast* notification, with typr: sucess, warning and error.
+	- Duration personliazed and auto-string the source error message. 
 
-- **PIC**: layang
+- **PIC**: layang (edelanno, nrontard update with some feature updates)
 
 
 ### III - User Management
@@ -296,20 +302,24 @@ Each chosen module was selected to enhance the project’s educational value and
 
 #### 3. Minor: Implement remote authentication with OAuth 2.0 (Google) (1 pt)
 
-- **Motivation**: 
+- **Motivation**: Including a second register method to expand the login methods.
 
 - **Details**:
+	- Use Google authentication in google cloud.
+	- Callback at localhost after authentication in Google.
 
-- **PIC**: layang
+- **PIC**: layang (nrontard update with front features)
 
 
 #### 6. Minor: Implement a complete 2FA (Two-Factor Authentication) system for the users (1 pt)
 
-- **Motivation**: 
+- **Motivation**: Including a second authentication method to enhance account security.
 
 - **Details**:
+	- Use Google authentication in google cloud.
+	- Callback at localhost after authentication in Google.
 
-- **PIC**: layang
+- **PIC**: layang (nrontard update with front features)
 
 
 ### IV - Artificial Intelligence
@@ -317,10 +327,19 @@ Each chosen module was selected to enhance the project’s educational value and
 #### Major: Introduce an AI Opponent for games (2 pts)
 
 - **Motivation**: 
+	
+  To allow matches to proceed even when a player chooses to play alone or when there are not enough real players available, ensuring uninterrupted gameplay.
 
 - **Details**:
 
-- **PIC**: layang
+	- Implement a robot player that can participate in games alongside real players.
+	- Filling automatically empty slots and providing a consistent and competitive opponent experience.
+	- Implement a human-like AI opponent that uses the same movement and shot mechanics as real players.
+	- The AI includes configurable mistake probabilities and calculation inaccuracies to simulate realistic human errors, 	  making gameplay feel natural and balanced.
+	- The AI opponent participates in tournament rankings and is represented with its own dedicated avatar, making it feel like a real competitor.
+
+- **PIC**: 
+  layang (pmenard include it in the tournament and game, nrontard update with profil features)
 
 
 ### VI - Gaming and user experience
@@ -443,9 +462,18 @@ Each chosen module was selected to enhance the project’s educational value and
 
 #### 1. Major: Store tournament scores on the Blockchain (2 pts)
 
-- **Motivation**: 
+- **Motivation**:
 
+  To ensure tournament results are immutable, transparent, and tamper-proof by storing final rankings on a public blockchain. This provides verifiable integrity of competitive outcomes and prevents any post-tournament manipulation of scores.
+  
 - **Details**:
+
+  - Tournament results are stored on the Avalanche Fuji Testnet using a custom Solidity smart contract.
+  - The smart contract is deployed on Remix IDE, enabling easy testing and verification on the Avalanche Fuji Testnet, and deployment transactions are signed and paid through the browser’s MetaMask extension
+  - Each tournament can upload at most 8 rankings written on-chain via a secure owner-only transaction.
+  - The backend integrates with the blockchain using ethers.js, supporting safe transaction queuing, duplicate detection, and robust error handling.
+  - On-chain data can be queried individually or in bulk, allowing the application to verify and display tournament results directly from the blockchain.
+  - Execute once on server startup, and repeat every 2 seconds with setInterval during runtime.
 
 - **PIC**: layang
 
