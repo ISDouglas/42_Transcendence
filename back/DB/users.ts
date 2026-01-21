@@ -182,6 +182,16 @@ export class Users
 			return infos[0];
 	}
 
+	async getUsersByIds(ids: number[]): Promise<IUsers[]> {
+		if (ids.length === 0) return [];
+		const placeholders = ids.map(() => "?").join(", ");
+		const infos: IUsers[] = await this._db.query(
+			`SELECT * FROM Users WHERE user_id IN (${placeholders})`,
+			ids
+		);
+		return infos;
+	}
+
 	async updateUsername(id: number, newUsername: string): Promise<IUsers>
 	{
 		if (!newUsername || newUsername.trim() === '') {
