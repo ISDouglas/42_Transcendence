@@ -127,7 +127,7 @@ export async function getAllOnChainTournaments() {
         ranking: ranking.map((v) => Number(v)),
       });
     } catch (err) {
-      console.warn(`⚠️ Skip tournament ${id.toString()} due to error`);
+      console.warn(`Skip tournament ${id.toString()} due to error`);
     }
   }
 

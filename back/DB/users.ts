@@ -299,7 +299,7 @@ export class Users
 		let eloChange = Math.round(32 * multiplier * (score - expected));
 		if (eloChange < 5 && score === 1)
 			eloChange = 5;
-		if (eloChange < 5 && score === 0)
+		if (eloChange > -5 && score === 0)
 			eloChange = -5;
 		return eloChange;
 	}
