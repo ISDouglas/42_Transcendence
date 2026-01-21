@@ -6,7 +6,6 @@ import bcrypt from "bcryptjs";
 
 // Google account password placeholder
 export const GOOGLE_PASSWORD_PLACEHOLDER = "__OAUTH_GOOGLE__";
-//console.log("Google redirect_uri =", `${process.env.PUBLIC_BASE_URL}/api/oauth/google/callback`);
 // 1. Google OAuth2 setting
 const oauth2Client = new google.auth.OAuth2(
   process.env.GOOGLE_CLIENT_ID,
