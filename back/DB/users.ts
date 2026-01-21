@@ -149,7 +149,6 @@ export class Users
 		const rows = await this._db.query(query, [pseudo]);
 
 		const player: PlayerGame = rows[0];
-		console.log(rows);
 		return player;
 	}
 
