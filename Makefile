@@ -23,7 +23,9 @@ $(NAME):
 
 down:
 	@$(COMPOSE) down
-	@echo "$(RED)\n 🚽  Tear down successfully ❄️  $(NAME) ❄️$(RESET)\n"
+	@echo "$(RED)\n 🚽  Tear down successfully ❄️  $(NAME) ❄️$(RESET)
+	You can connect to https://localhost:3000\n
+	You can test with pseudo: 42, password:42 or create an account\n"
 
 # Clean
 clean:
