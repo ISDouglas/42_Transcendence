@@ -35,6 +35,7 @@ import { UserAchievements } from "./DB/users_achievements";
 import { getAchivementInfo } from "./routes/achievements/achievementInfo";
 import { getEndGameInfo } from "./routes/endgame/endgame";
 import { newInputDB } from "./DB/input";
+import { getUsersByIdsHandler } from "./routes/profile/byIds";
 
 export const db = new ManageDB("./back/DB/database.db");
 export const users = new Users(db);
@@ -253,6 +254,8 @@ fastify.post("/api/private/tournament/create", async (request, reply) => {
 	}
 	reply.send({ tournamentId });
 });
+
+fastify.post("/api/private/users/by-ids", getUsersByIdsHandler);
 
 fastify.get("/api/private/tournament/all", (req, reply) => {
 	return tournamentService.getAllTournamentsDetailed(req, reply);

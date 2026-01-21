@@ -3,48 +3,30 @@ import * as avalancheService from "../../blockchain/avalanche.service";
 import { FastifyRequest, FastifyReply } from "fastify";
 import { serverTournament } from "./serverTournament";
 
-export async function getAllTournamentsDetailed(
-  request: FastifyRequest,
-  reply: FastifyReply
-) {
-  request.log.info("GET /tournament/all called");
-
+export async function getAllTournamentsDetailed(request: FastifyRequest, reply: FastifyReply) {
   try {
     const all = await tournamentDB.getAllTournaments();
     request.log.info({ count: all.length }, "Fetched tournaments");
 
     const result = await Promise.all(
       all.map(async (t: any) => {
-        request.log.info({ tournamentId: t.id }, "Processing tournament");
-
         let ranking: number[] = [];
         try {
           const results = await tournamentDB.getTournamentResults(t.id);
-          request.log.info({ tournamentId: t.id, results }, "DB results");
-
           ranking = results?.map(r => r.player_id ?? -1) ?? [];
         } catch (err) {
           request.log.error({ err, tournamentId: t.id }, "Failed DB ranking");
         }
-
-        let blockchainRanking: number[] = [];
+        let blockchainRanking: number[] | undefined;
         const onChain = t.onchain === 1;
-
         if (onChain) {
           try {
             blockchainRanking = await avalancheService.getTournament(t.id);
-            request.log.info(
-              { tournamentId: t.id, blockchainRanking },
-              "Fetched blockchain ranking"
-            );
           } catch (err) {
-            request.log.error(
-              { err, tournamentId: t.id },
-              "Blockchain fetch failed"
-            );
+            request.log.error({ err, tournamentId: t.id }, "Blockchain fetch failed");
+            blockchainRanking = undefined;
           }
         }
-
         return {
           tournamentId: t.id,
           ranking,
@@ -57,7 +39,7 @@ export async function getAllTournamentsDetailed(
     return reply.send(result);
   } catch (err) {
     request.log.error({ err }, "Fatal error in /tournament/all");
-    return reply.send({ ok: false, error: "Internal server error" });
+    return reply.status(500).send({ error: "Internal server error" });
   }
 }
 
@@ -82,12 +64,20 @@ export async function uploadPendingTournaments() {
   const pending = await tournamentDB.getPendingOnChain();
 
   for (const t of pending) {
-    const results = await tournamentDB.getTournamentResults(t.id);
-    const ranking = results.map(r => r.player_id);
+    try {
+      const results = await tournamentDB.getTournamentResults(t.id);
+      const ranking = results.map(r => r.player_id);
 
-    while (ranking.length < 8) ranking.push(0);
+      while (ranking.length < 8) ranking.push(0);
 
-    await avalancheService.addTournamentResult(t.id, ranking);
-    await tournamentDB.markOnChain(t.id);
+      const res = await avalancheService.addTournamentResult(t.id, ranking);
+      if (res.status === "success" || res.status === "duplicate") {
+        await tournamentDB.markOnChain(t.id);
+      } else {
+        console.error(`Tournament ${t.id} failed, will retry later`);
+      }
+    } catch (err) {
+        console.error(`Unexpected error processing tournament ${t.id}`, err);
+    }
   }
 }

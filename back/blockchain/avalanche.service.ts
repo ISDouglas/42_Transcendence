@@ -1,14 +1,9 @@
 import { ethers } from "ethers";
 
-// if "module": "ESNext", can use : import dotenv from "dotenv";
-
-
-// Prepare env variables
 const PRIVATE_KEY = process.env.PRIVATE_KEY!;
 const RPC_URL = process.env.RPC_URL!; // Fuji Testnet RPC
 const CONTRACT_ADDRESS = process.env.CONTRACT_ADDRESS!;
 
-// Export abi
 const abi = [
   {
     "inputs": [
@@ -44,36 +39,49 @@ const abi = [
 ];
 export default abi;
 
-// Provider + Wallet
 const provider = new ethers.JsonRpcProvider(RPC_URL);
 const wallet = new ethers.Wallet(PRIVATE_KEY, provider);
 
-// New instance of contract
 const contract = new ethers.Contract(CONTRACT_ADDRESS, abi, wallet);
-
-// Transaction queue to ensure sequential transactions
 let txQueue: Promise<void> = Promise.resolve();
 
 /**
  * Upload a single tournament result onchain
  */
+export type UploadResult =
+  | { status: "success" }
+  | { status: "duplicate" }
+  | { status: "error"; error: string };
+
 export async function addTournamentResult(
   tournamentId: number,
   ranking: number[]
-): Promise<void> {
-  if (ranking.length !== 8) throw new Error("Ranking must contain 8 player IDs");
+): Promise<UploadResult> {
+  if (ranking.length !== 8) {
+    return { status: "error", error: "Ranking must contain 8 player IDs" };
+  }
 
+  let result: UploadResult = { status: "success" };
   txQueue = txQueue.then(async () => {
     try {
       const tx = await contract.addTournamentOnChain(tournamentId, ranking);
       await tx.wait();
-      console.log(`Tournament ${tournamentId} uploaded onchain successfully!`);
-    } catch (err) {
-      console.error(`Error uploading tournament ${tournamentId} onchain:`, err);
-      throw err;
+      console.log(`Tournament ${tournamentId} uploaded`);
+    } catch (err: any) {
+      const message =
+        err?.reason ?? err?.error?.message ?? err?.message ?? "Unknown error";
+
+      if (message.includes("Tournament already exists")) {
+        console.warn(`Tournament ${tournamentId} already on chain`);
+        result = { status: "duplicate" };
+      } else {
+        console.error(`Tournament ${tournamentId} upload failed`, message);
+        result = { status: "error", error: message };
+      }
     }
   });
-  return txQueue;
+  await txQueue;
+  return result;
 }
 
 /**
@@ -83,11 +91,12 @@ export async function getTournament(tournamentId: number): Promise<number[]> {
   try {
     const ranking: bigint[] = await contract.getTournamentOnChain(tournamentId);
     const result = ranking.map((v: bigint) => Number(v));
-    //console.log(`Tournament ${tournamentId} onchain rankings:`, result);
     return result;
-  } catch (err) {
-    console.error(`❌ Error querying tournament ${tournamentId} onchain:`, err);
-    throw err;
+  } catch (err: any) {
+    const message = err?.reason ?? err?.error?.message ?? err?.message ?? "Unknown error";
+    throw new Error(
+      `On-chain data inconsistent for tournament ${tournamentId}: ${message}`
+    );
   }
 }
 
@@ -102,7 +111,7 @@ export async function getTotalTournaments(): Promise<number> {
     return numberTotal;
   } catch (err) {
     console.error("❌ Error querying total tournaments onchain:", err);
-    throw err;
+    throw new Error("Blockchain unavailable");
   }
 }
 
@@ -110,15 +119,19 @@ export async function getTotalTournaments(): Promise<number> {
  * Query all tournaments onchain
  */
 export async function getAllOnChainTournaments() {
-  const ids: bigint[] = await contract.getAllTournamentsOnChain(); // [1,2,5,6]
+  const ids: bigint[] = await contract.getAllTournamentsOnChain();
   const result = [];
 
   for (const id of ids) {
-    const ranking: bigint[] = await contract.getTournamentOnChain(Number(id));
-    result.push({
-      tournamentId: Number(id),
-      ranking: ranking.map((v) => Number(v)),
-    });
+    try {
+      const ranking: bigint[] = await contract.getTournamentOnChain(Number(id));
+      result.push({
+        tournamentId: Number(id),
+        ranking: ranking.map((v) => Number(v)),
+      });
+    } catch (err) {
+      console.warn(`⚠️ Skip tournament ${id.toString()} due to error`);
+    }
   }
 
   return result;

@@ -9,6 +9,7 @@ import { homeView, initHomePage } from "./views/p_homelogin";
 import { ProfileView, initProfile} from "./views/p_profile";
 import { BracketsView, initBrackets, stopTournament} from "./views/p_brackets";
 import { TournamentView} from "./views/p_tournament";
+import { TournamentCheckView } from "./views/p_tournamentcheck";
 import { initLogout } from "./views/logout";
 import { FriendsView, initFriends } from "./views/p_friends";
 import { ErrorView, initError } from "./views/error";
@@ -54,6 +55,7 @@ const routes = [
   { path: "/pongmatch/:id", view: PongMatchView, init: initPongMatch, cleanup: stopGame },
   { path: "/endgame", view: endGameView, init: InitEndGame},
   { path: "/tournament", view: TournamentView},
+  { path: "/tournamentcheck", view: TournamentCheckView },
   { path: "/brackets/:id", view: BracketsView, init: initBrackets, cleanup: stopTournament},
   { path: "/error", view: ErrorView, init:initError},
   { path: "/oauth/callback", init: initOAuthCallback },

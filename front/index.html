@@ -1650,17 +1650,7 @@
 	</template>
 
 	<template id="tournamenthtml">
-		<h1 class="text-4xl sm:text-6xl lg:text-7xl font-bold bg-linear-to-r text-center from-amber-300 via-yellow-400 to-orange-400 bg-clip-text text-transparent drop-shadow-lg">Tournament Overview</h1>
-		<div class="grid grid-cols-2 gap-4 mt-8 px-6">
-			<div>
-				<h2 class="text-xl font-semibold mb-2 text-amber-700">📁 Database State</h2>
-				<div id="db-panel" class="p-4 bg-amber-200/30 rounded shadow"></div>
-			</div>
-			<div>
-				<h2 class="text-xl font-semibold mb-2 text-green-700">⛓ Blockchain State</h2>
-				<div id="chain-panel" class="p-4 bg-green-200/30 rounded shadow"></div>
-			</div>
-		</div>
+		<h1 class="text-3xl font-bold text-center mt-6">Tournament</h1>
 		<div class="flex flex-col items-center mt-6 gap-3">
 			<button id="create-tournament" class="btn mx-auto w-48">Play Tournament</button>
 			<div id="tournament-list"></div>
@@ -1670,6 +1660,51 @@
 		<footer class="absolute bottom-4 w-full dark:text-white duration-300 text-center text-sm opacity-60">
 			<a href="/termsofservice" data-link class="hover:underline">Terms of Service</a>
 			<span>|</span>
+			<a href="/privacypolicy" data-link class="hover:underline">Privacy Policy</a>
+			<p>© 2026 Croiscendence</p>
+		</footer>
+	</template>
+
+	<template id="tournamentcheckhtml">
+		<main class="min-h-screen px-6 py-8 bg-slate-100 dark:bg-slate-950">
+			<div class="mx-auto max-w-7xl">
+				<h1 class="text-3xl sm:text-4xl font-bold text-center mb-8 bg-linear-to-r from-amber-400 via-yellow-400 to-green-400 bg-clip-text text-transparent">Tournament Results Check</h1>
+				<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+					<section class="flex flex-col gap-4 p-5 rounded-xl bg-linear-to-br from-amber-100/70 to-yellow-50/70 dark:bg-linear-to-br dark:from-amber-950/60 dark:to-orange-950/60 border border-amber-400/60 dark:border-amber-700/60 shadow-sm">
+						<div class="flex items-center justify-between">
+							<h2 class="text-xl font-bold text-amber-800 dark:text-amber-200">📁 Database</h2>
+							<button id="db-show-onchain" class="btn px-3 py-1 text-sm">Show already Onchain</button>
+							<button id="db-show-all" class="btn px-3 py-1 text-sm">Show All</button>
+						</div>
+						<input 
+							id="db-search" 
+							type="text" 
+							placeholder="Search tournament ID / pseudo (exemple: pseudo:42)" 
+							class="w-full rounded-lg px-3 py-2 text-sm border border-green-400/60 bg-white/70 dark:bg-green-900/40 focus:outline-none focus:ring-2 focus:ring-green-500">
+						<div id="db-panel" class="space-y-4"></div>
+					</section>
+					<section class="flex flex-col gap-4 p-5 rounded-xl bg-linear-to-br from-green-100/70 to-emerald-50/70 dark:bg-linear-to-br dark:from-green-950/60 dark:to-emerald-950/60 border border-green-400/60 dark:border-green-700/60 shadow-sm">
+						<div class="flex items-center justify-between">
+							<h2 class="text-xl font-bold text-green-800 dark:text-green-200">⛓ Blockchain</h2>
+							<button id="chain-show-all" class="btn px-3 py-1 text-sm">Show All</button>
+						</div>
+						<input 
+							id="chain-search" 
+							type="text" 
+							placeholder="Search tournament ID / pseudo (exemple: pseudo:42)" 
+							class="w-full rounded-lg px-3 py-2 text-sm border border-green-400/60 bg-white/70 dark:bg-green-900/40 focus:outline-none focus:ring-2 focus:ring-green-500">
+						<div id="chain-panel" class="space-y-4"></div>
+					</section>
+				</div>
+				<div class="flex justify-center mt-10">
+					<button id="back-to-tournament" data-link href="/tournament" class="btn w-52">Back to Tournament</button>
+				</div>
+			</div>
+		</main>
+		<footer class="text-center text-sm dark:text-white opacity-60 mt-10">
+			<a href="/termsofservice" data-link class="hover:underline">Terms of Service</a>
+			<span class="mx-2">|</span>
 			<a href="/privacypolicy" data-link class="hover:underline">Privacy Policy</a>
 			<p>© 2026 Croiscendence</p>
 		</footer>
