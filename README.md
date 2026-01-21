@@ -218,7 +218,7 @@ Each chosen module was selected to enhance the project’s educational value and
   - Basic chat system:
     - We implemented a general chat that allows users to communicate with all other connected users.
     - WebSockets enable real-time chat, available across all pages once the user is connected.
-    - To ensure persistence, messages are stored in a database, with a limit of 25 messages (managed by a trigger that removes the oldest entry when a new one is added).
+    - To ensure persistence, messages are stored in a database, with a limit of 25 messages.
     - Messages are displayed in one color when a member sends a message and in another color when they receive one.
     - Multiple connections are also handled: if a user connects from multiple devices, the message bubbles remain consistent, and each message appears only once.
 
