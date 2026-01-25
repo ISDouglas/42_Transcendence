@@ -46,7 +46,7 @@ The application respects the technical constraints imposed by the subject, such 
 | edelanno | Product Owner & Developer | Product management, general decisions, stakeholders communication |
 | pmenard | Project Manager & Developer | Team organize, team communication, architecture |
 | tat-nguy | Scrum Master & Developer | Process and deadline tracking, infrastructure | 
-| layang | Back-end Lead & Developer | backend decisions, security, database, blockchain |
+| layang | Back-end Lead & Developer | backend decisions, security, database, blockchain, robot player, 2FA, OAuth login |
 | nrontard | Front-end Lead & Developer | Game logic, real-time features, Frontend decisions, UI/UX |
 
 
