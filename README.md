@@ -1,6 +1,7 @@
 # ft_transcendence — Croiscendence 🥐
 
 *This project was created as part of the 42 curriculum by **edelanno**, **layang**, **nrontard**, **pmenard** and **tat-nguy***
+
 ⚠️ To run this project, a **.env** file is required.  
 Please refer to the **/back/.env.example** file for the expected environment variables.
 ---
