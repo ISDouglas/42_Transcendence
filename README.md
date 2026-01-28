@@ -2,8 +2,8 @@
 
 *This project was created as part of the 42 curriculum by **edelanno**, **layang**, **nrontard**, **pmenard** and **tat-nguy***
 
-⚠️ To run this project, a **.env** file is required.  
-Please refer to the **/back/.env.example** file for the expected environment variables.
+⚠️ To run this project, create a <font color="red">.env</font> file in the project's root.  
+Please refer to the <font color="red">/back/.env.example</font> file for the expected environment variables.
 ---
 
 ## ℹ️ Introduction
