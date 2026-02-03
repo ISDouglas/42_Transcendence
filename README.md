@@ -2,12 +2,10 @@
 
 *This project was created as part of the 42 curriculum by **edelanno**, **layang**, **nrontard**, **pmenard** and **tat-nguy***
 <p align="center"><img src="demo/game.gif" width="600" /></p>
-<p align="center">
-  <img src="demo/dashboard2.gif" width="300" />
-  <img src="demo/user2.gif" width="300" />
-  <img src="demo/login_chat.gif" width="300" />
-  <img src="demo/tournament2.gif" width="300" />
-</p>
+<p align="center"><img src="demo/dashboard2.gif" width="600" /></p>
+<p align="center"><img src="demo/user2.gif" width="600" /></p>
+<p align="center"><img src="demo/login_chat.gif" width="600" /></p>
+<p align="center"><img src="demo/tournament2.gif" width="600" /></p>
 ⚠️ **Important**  
 To run this project, a **.env** file is required.  
 Please refer to **/back/.env.example** for configuration.
