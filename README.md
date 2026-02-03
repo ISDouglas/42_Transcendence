@@ -2,11 +2,11 @@
 
 *This project was created as part of the 42 curriculum by **edelanno**, **layang**, **nrontard**, **pmenard** and **tat-nguy***
 <p align="center">
-  <img src="https://github.com/ISDouglas/42_Transcendence/demo/game.gif" />
-  <img src="https://github.com/ISDouglas/42_Transcendence/demo/dashboard.gif" />
-  <img src="https://github.com/ISDouglas/42_Transcendence/demo/user.gif" />
-  <img src="https://github.com/ISDouglas/42_Transcendence/demo/friend.gif" />
-  <img src="https://github.com/ISDouglas/42_Transcendence/demo/tournament.gif" />
+  <img src="demo/game.gif" width="300" />
+  <img src="demo/dashboard.gif" width="300" />
+  <img src="demo/user.gif" width="300" />
+  <img src="demo/friend.gif" width="300" />
+  <img src="demo/tournament.gif" width="300" />
 </p>
 ⚠️ **Important**  
 To run this project, a **.env** file is required.  
