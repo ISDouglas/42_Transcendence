@@ -132,7 +132,7 @@ async function login(username, password, form) {
       credentials: "include"
     });
     const result = await res.json();
-    if (!result.ok) {
+    if (result.ok === false) {
       if (result.field === "username") {
         document.getElementById("username-loginmsg").textContent = result.error;
       }
@@ -141,7 +141,7 @@ async function login(username, password, form) {
       }
       return 0;
     }
-    if (result.ok && result.twofa === true)
+    if (result.ok === true && result.twofa === true)
       return 2;
     return 1;
   } catch (err) {
@@ -4326,7 +4326,7 @@ async function initPongMatch(params) {
   });
   net.join(Number(gameID), Number(tournamentId));
   net.onCountdown(() => {
-    let countdown = 4;
+    let countdown = 1;
     interval = setInterval(() => {
       if (!currentGame || !renderer)
         return;
@@ -5501,19 +5501,22 @@ async function initUpdateEmail() {
     document.getElementById("profile-pseudo").textContent = profile.pseudo;
     const formEmail = document.getElementById("change-email-form");
     formEmail.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const newEmail = formEmail["new-email"].value;
-      const password = formEmail["password"].value;
-      const response = await genericFetch("/api/private/updateinfo/email", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ newEmail, password })
-      });
-      navigateTo("/profile");
-      showToast(`Email updated successfully to << ${response.email} >>`, "success", 2e3);
+      try {
+        e.preventDefault();
+        const newEmail = formEmail["new-email"].value;
+        const password = formEmail["password"].value;
+        const response = await genericFetch("/api/private/updateinfo/email", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ newEmail, password })
+        });
+        navigateTo("/profile");
+        showToast(`Email updated successfully to << ${response.email} >>`, "success", 2e3);
+      } catch (err) {
+        showToast(err, "error", 3e3, "Update email");
+      }
     });
   } catch (err) {
-    showToast(err, "error", 3e3, "Update email");
   }
 }
 var init_p_updateemail = __esm({
@@ -5619,20 +5622,23 @@ async function initUpdatePassword() {
     document.getElementById("profile-pseudo").textContent = profile.pseudo;
     const formPassword = document.getElementById("change-password-form");
     formPassword.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const oldPw = formPassword["old-password"].value;
-      const newPw = formPassword["new-password"].value;
-      const confirm = formPassword["confirm-new-password"].value;
-      const response = await genericFetch("/api/private/updateinfo/password", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ oldPw, newPw, confirm })
-      });
-      navigateTo("/logout");
-      showToast("Password is updated successfully! Please re-login!", "success", 2e3);
+      try {
+        e.preventDefault();
+        const oldPw = formPassword["old-password"].value;
+        const newPw = formPassword["new-password"].value;
+        const confirm = formPassword["confirm-new-password"].value;
+        const response = await genericFetch("/api/private/updateinfo/password", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ oldPw, newPw, confirm })
+        });
+        navigateTo("/logout");
+        showToast("Password is updated successfully! Please re-login!", "success", 2e3);
+      } catch (err) {
+        showToast(err, "error", 3e3, "Update password");
+      }
     });
   } catch (err) {
-    showToast(err.message, "error", 3e3, "Update password");
   }
 }
 var init_p_updatepassword = __esm({
