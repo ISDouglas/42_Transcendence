@@ -253,7 +253,7 @@ Each chosen module was selected to enhance the project’s educational value and
 	- use *Toast* notification, with typr: sucess, warning and error.
 	- Duration personliazed and auto-string the source error message. 
 
-- **PIC**: layang (edelanno, nrontard update with some feature updates)
+- **PIC**: layang
 
 
 ### III - User Management
@@ -315,7 +315,7 @@ Each chosen module was selected to enhance the project’s educational value and
 	- Use Google authentication in google cloud.
 	- Callback at localhost after authentication in Google.
 
-- **PIC**: layang (nrontard update with front features)
+- **PIC**: layang
 
 
 #### 6. Minor: Implement a complete 2FA (Two-Factor Authentication) system for the users (1 pt)
@@ -326,7 +326,7 @@ Each chosen module was selected to enhance the project’s educational value and
 	- Use Google authentication in google cloud.
 	- Callback at localhost after authentication in Google.
 
-- **PIC**: layang (nrontard update with front features)
+- **PIC**: layang
 
 
 ### IV - Artificial Intelligence
@@ -346,7 +346,7 @@ Each chosen module was selected to enhance the project’s educational value and
 	- The AI opponent participates in tournament rankings and is represented with its own dedicated avatar, making it feel like a real competitor.
 
 - **PIC**: 
-  layang (pmenard include it in the tournament and game, nrontard update with profil features)
+  layang
 
 
 ### VI - Gaming and user experience
